@@ -1,0 +1,70 @@
+[
+  {
+    "id": 1,
+    "title": "Until Every Cage is Empty",
+    "subtitle": "Interactive data-driven map of global animal exploitation infrastructure",
+    "description": "An interactive, data-driven map exposing the global infrastructure of animal exploitation. Serves 38,500+ data points to 3,000+ monthly users globally with 100,000+ social media reach. This project consolidates publicly available data from government bodies worldwide into a single, accessible map designed for activists, journalists, and researchers. It integrates tens of thousands of facilities across distinct, toggleable layers with comprehensive filtering and performance optimization through marker clustering.",
+    "technologies": ["Rust", "Axum", "Python", "JavaScript", "Leaflet.js", "Netlify", "Shuttle"],
+    "features": [
+      "Serves 38,500+ data points to 3,000+ monthly users globally",
+      "Multi-layer interactive map with comprehensive filtering",
+      "Reached 100,000+ people through social media advocacy",
+      "Marker clustering for high-performance optimization"
+    ],
+    "links": {
+      "live": "https://www.untileverycage.org/",
+      "github": "https://github.com/eliperez-dev/UntilEveryCage"
+    },
+    "galleryFolder": "geospatial"
+  },
+  {
+    "id": 2,
+    "title": "Electron Redstone CPU",
+    "subtitle": "Complete computer-architecture toolchain built from scratch in Rust",
+    "description": "A complete computer-architecture toolchain built from scratch in Rust, centered around Electron, a custom 8-bit, Turing-complete, RISC-V-inspired CPU. The project includes an assembler that translates custom Electron Assembly into 8-bit machine code, a Rust-based emulator with a raylib-rs GUI, and a VS Code extension with syntax highlighting. The final CPU design was prototyped and built using Redstone components in Minecraft as a proof-of-concept.",
+    "technologies": ["Rust", "Custom Assembly", "VS Code Extension", "raylib-rs", "Computer Architecture"],
+    "features": [
+      "Custom 8-bit Turing-complete ISA with 4-stage pipeline",
+      "Complete toolchain: Assembler, Rust emulator with GUI, VS Code extension",
+      "Minecraft Redstone implementation as proof-of-concept"
+    ],
+    "links": {
+      "github": "https://github.com/eliperez-dev/Electron"
+    },
+    "galleryFolder": "cpu-emulator"
+  },
+  {
+    "id": 3,
+    "title": "Portable Weather Station",
+    "subtitle": "Full-stack IoT telemetry system with ESP32 and Flask",
+    "description": "A portable weather station built on ESP32 that reads temperature and humidity from a DHT11 sensor, connects to WiFi, and sends data to a Flask web server for visualization and storage. This is a complete end-to-end system capturing, storing, and visualizing real-time sensor data with an efficient, async Embedded Rust firmware and a web-based dashboard.",
+    "technologies": ["Embedded Rust", "ESP32", "Python", "Flask", "SQLite", "JavaScript"],
+    "features": [
+      "High-Performance Embedded Rust firmware on ESP32 with sensor integration",
+      "Time-Series Database with SQLite and live dashboard visualization",
+      "Deep sleep and watchdog tasks for power conservation and reliability"
+    ],
+    "links": {
+      "github": "https://github.com/eliperez-dev/Portable-Weather-Station"
+    },
+    "galleryFolder": "iot-dashboard"
+  },
+  {
+    "id": 4,
+    "title": "The AI Roundtable",
+    "subtitle": "An AI-powered conversational podcast engine running serverless on Cloudflare",
+    "description": "An AI-powered app that turns any topic into a dynamic, two-host podcast conversation. This entire project runs on the Cloudflare developer platform, showcasing serverless AI at the edge. Enter any topic or paste a long article, and the AI generates a natural, engaging conversation between two distinct hosts (Alex and Jamie) with custom personalities. The system automatically generates high-quality audio in multiple voices using Deepgram TTS, all processed through Cloudflare Workers with no external servers needed.",
+    "technologies": ["Cloudflare Workers", "Workers AI", "Cloudflare Pages", "TypeScript", "Deepgram Aura-1 TTS"],
+    "features": [
+      "Serverless AI podcast generation with dual-voice audio personalities",
+      "Multiple formats: Brief Talk (3-5 min) and Deep Dive (~10 min)",
+      "News integration, MP3 download, and full text transcripts",
+      "Sequential processing pipeline with automatic retry handling"
+    ],
+    "links": {
+      "live": "https://ai-roundtable.pages.dev",
+      "github": "https://github.com/eliperez-dev/AI-Roundtable"
+    },
+    "galleryFolder": "ai-roundtable"
+  }
+]

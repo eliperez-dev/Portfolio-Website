@@ -1,13 +1,13 @@
 .contact {
-  padding: 100px 0;
+  padding: 20px 0;
   background: transparent;
 }
 
 .contact-content {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 60px;
-  margin-top: 60px;
+  gap: 40px;
+  margin-top: 20px;
 }
 
 /* Contact Info Section */
@@ -16,9 +16,9 @@
 }
 
 .info-header h3 {
-  font-size: 1.8rem;
+  font-size: 1.3rem;
   color: var(--text-primary);
-  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
   margin-bottom: 16px;
 }
 
@@ -54,9 +54,9 @@
 }
 
 .method-label {
-  color: var(--accent-blue);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
   margin-bottom: 4px;
 }
 
@@ -66,20 +66,20 @@
 }
 
 .method-value.link {
-  color: var(--accent-green);
+  color: var(--text-primary);
   text-decoration: none;
   transition: var(--transition-smooth);
+  font-weight: 500;
 }
 
 .method-value.link:hover {
   color: var(--accent-blue);
-  text-decoration: underline;
 }
 
 /* Availability Status */
 .availability-status {
   background: var(--bg-secondary);
-  border: 1px solid var(--accent-green);
+  border: 1px solid var(--bg-tertiary);
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 32px;
@@ -90,8 +90,7 @@
   align-items: center;
   gap: 8px;
   margin-bottom: 12px;
-  font-family: 'JetBrains Mono', monospace;
-  color: var(--accent-green);
+  color: var(--text-primary);
   font-weight: 600;
 }
 
@@ -103,7 +102,7 @@
 }
 
 .status-dot.available {
-  background: var(--accent-green);
+  background: #22c55e;
 }
 
 @keyframes pulse {
@@ -135,9 +134,9 @@
 }
 
 .form-header h3 {
-  font-size: 1.8rem;
+  font-size: 1.3rem;
   color: var(--text-primary);
-  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
   margin-bottom: 16px;
 }
 
@@ -158,11 +157,10 @@
 }
 
 .form-group label {
-  color: var(--accent-blue);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-size: 0.95rem;
   margin-bottom: 8px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .form-group input,
@@ -202,20 +200,24 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 16px 24px;
-  font-size: 16px;
+  padding: 12px 24px;
+  font-size: 14px;
   margin-top: 16px;
   transition: var(--transition-smooth);
+  background: white;
+  color: black;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .submit-btn:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-glow);
 }
 
 .send-icon {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 18px;
+  font-size: 16px;
   transition: var(--transition-smooth);
 }
 
@@ -228,7 +230,7 @@
   padding: 16px;
   background: var(--bg-secondary);
   border-radius: 6px;
-  border-left: 3px solid var(--accent-yellow);
+  border-left: 3px solid var(--bg-tertiary);
 }
 
 .form-note p {
@@ -238,17 +240,18 @@
 }
 
 .form-note a {
-  color: var(--accent-blue);
+  color: var(--text-primary);
   text-decoration: none;
+  font-weight: 500;
 }
 
 .form-note a:hover {
-  text-decoration: underline;
+  color: var(--accent-blue);
 }
 
 /* Terminal Footer */
 .terminal-footer {
-  margin-top: 80px;
+  margin-top: 40px;
   padding-top: 40px;
   border-top: 1px solid var(--bg-tertiary);
 }
@@ -257,7 +260,6 @@
   background: var(--bg-secondary);
   border-radius: 8px;
   padding: 20px;
-  font-family: 'JetBrains Mono', monospace;
   border: 1px solid var(--bg-tertiary);
 }
 
@@ -267,12 +269,12 @@
 }
 
 .prompt {
-  color: var(--accent-green);
+  color: var(--text-secondary);
   margin-right: 8px;
 }
 
 .command {
-  color: var(--accent-blue);
+  color: var(--text-primary);
 }
 
 .output p {

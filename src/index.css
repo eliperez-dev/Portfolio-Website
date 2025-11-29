@@ -10,7 +10,7 @@
   --bg-primary: #151515;
   --bg-secondary: #252526;
   --bg-tertiary: #2d2d30;
-  --text-primary: #d4d4d4;
+  --text-primary: #d4d4d4; 
   --text-secondary: #969696;
   --accent-blue: #569cd6;
   --accent-green: #57d1b9;
@@ -105,4 +105,47 @@ html {
   .container {
     padding: 0 16px;
   }
+}
+
+/* Simplified text highlight - bold only, no color distractions */
+.rust-highlight,
+.education-highlight,
+.achievement-highlight,
+.organization-highlight,
+.career-highlight {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Standardized header sizing */
+h1, h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto';
+}
+
+h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto';
+}
+
+h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto';
+}
+
+h5 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto';
 }

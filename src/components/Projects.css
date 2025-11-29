@@ -1,15 +1,16 @@
 .projects {
-  padding: 100px 0;
+  padding: 20px 0;
   background: transparent;
 }
 
 .section-header {
   text-align: center;
-  margin-bottom: 60px;
+  margin-bottom: 20px;
 }
 
 .section-header h2 {
-  font-size: 2.5rem;
+  font-size: 2rem;
+  font-weight: 700;
   margin-bottom: 16px;
 }
 
@@ -23,7 +24,7 @@
 .projects-grid {
   display: grid;
   gap: 40px;
-  margin-bottom: 60px;
+  margin-bottom: 20px;
 }
 
 .project-card {
@@ -40,9 +41,8 @@
 
 .project-card:hover,
 .project-card.active {
-  border-color: var(--accent-blue);
+  border-color: var(--bg-tertiary);
   transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(86, 156, 214, 0.1);
 }
 
 .project-card:nth-child(even) {
@@ -136,13 +136,11 @@
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 4px;
-  font-family: 'JetBrains Mono', monospace;
 }
 
 .project-subtitle {
-  color: var(--accent-green);
+  color: var(--text-secondary);
   font-size: 0.9rem;
-  font-family: 'JetBrains Mono', monospace;
 }
 
 .project-description {
@@ -156,10 +154,10 @@
 }
 
 .project-features h4 {
-  color: var(--accent-yellow);
+  color: var(--text-primary);
   font-size: 0.9rem;
   margin-bottom: 8px;
-  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
 }
 
 .project-features ul {
@@ -169,17 +167,18 @@
 
 .project-features li {
   color: var(--text-secondary);
-  font-size: 0.85rem;
-  margin-bottom: 4px;
+  font-size: 1.05rem;
+  margin-bottom: 12px;
   position: relative;
   padding-left: 16px;
+  line-height: 1.5;
 }
 
 .project-features li::before {
   content: '→';
   position: absolute;
   left: 0;
-  color: var(--accent-blue);
+  color: var(--text-secondary);
 }
 
 .project-tech {
@@ -191,12 +190,11 @@
 
 .tech-tag {
   background: var(--bg-tertiary);
-  color: var(--accent-purple);
-  padding: 4px 8px;
+  color: var(--text-secondary);
+  padding: 6px 12px;
   border-radius: 4px;
-  font-size: 0.75rem;
-  font-family: 'JetBrains Mono', monospace;
-  border: 1px solid var(--accent-purple);
+  font-size: 0.85rem;
+  border: 1px solid var(--bg-tertiary);
 }
 
 .project-links {
@@ -229,18 +227,16 @@
 }
 
 .file-name {
-  font-family: 'JetBrains Mono', monospace;
-  color: var(--accent-orange);
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
 .language-tag {
-  background: var(--accent-blue);
-  color: white;
-  padding: 2px 6px;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  padding: 4px 8px;
   border-radius: 3px;
-  font-size: 10px;
-  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
   text-transform: uppercase;
 }
 
@@ -375,12 +371,12 @@
 
 /* Animation for active project */
 .project-card.active .project-title {
-  color: var(--accent-blue);
+  color: var(--text-primary);
 }
 
 .project-card.active .tech-tag {
-  border-color: var(--accent-blue);
-  color: var(--accent-blue);
+  border-color: var(--bg-tertiary);
+  color: var(--text-secondary);
 }
 
 /* Placeholder Media Styles */

@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import './Hero.css';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 const Hero = () => {
   const [displayText, setDisplayText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
   const fullText = "Hello, I'm Eli Perez";
-  const subtitle = "Software Engineer";
 
   useEffect(() => {
     if (currentIndex < fullText.length) {
@@ -23,36 +20,18 @@ const Hero = () => {
     <section id="hero" className="hero">
       <div className="container">
         <div className="hero-content">
-          <div className="terminal-window">
-            <div className="terminal-header">
-              <div className="terminal-buttons">
-                <span className="btn-red"></span>
-                <span className="btn-yellow"></span>
-                <span className="btn-green"></span>
-              </div>
-              <div className="terminal-title">eli@portfolio:~$</div>
-            </div>
-            <div className="terminal-body">
-              <div className="command-line">
-                <span className="prompt">$</span>
-                <span className="command">whoami</span>
-              </div>
-              <div className="output">
-                <h1 className="name-display">
-                  {displayText}
-                  <span className="cursor">|</span>
-                </h1>
-                <h2 className="subtitle">{subtitle}</h2>
-                <p className="description">
-                  I'm dedicated to creating high-performance,
-                  open-source tools that drive social change.
-                  I specialize in <span className="rust-highlight">full-stack</span> development, 
-                  <span className="rust-highlight"> data visualization</span>, and <span className="rust-highlight">systems programming</span>,
-                  focused on bringing data-driven solutions to complex social problems.
-                </p>
-              </div>
-
-            </div>
+          <div className="hero-intro">
+            <h1 className="hero-title">
+              {displayText}
+              <span className="cursor">|</span>
+            </h1>
+            <p className="hero-role">Full-Stack Engineer • Rust • Systems Programming</p>
+            <p className="hero-meta">
+              Software Engineer Intern at Fish Defender | Sophomore at Southwestern College
+            </p>
+            <p className="hero-description">
+              I build full-stack applications in Rust, Python, and JavaScript, from RESTful APIs to custom CPU architectures. Currently seeking <span className="rust-highlight">Summer 2026 internships</span>.
+            </p>
           </div>
           
           <div className="hero-actions">
@@ -63,7 +42,7 @@ const Hero = () => {
               Get In Touch
             </a>
             <a 
-              href="PerezEli_Resume_2025.pdf" 
+              href="/PerezEli_Resume_2025.pdf" 
               target="_blank" 
               rel="noopener noreferrer"
               className="btn-primary"
@@ -74,66 +53,32 @@ const Hero = () => {
         </div>
         
         <div className="hero-visual">
-          <div className="code-snippet">
-            <div className="code-header">
-              <span className="file-name">Editing: main.rs</span>
-            </div>
-            <SyntaxHighlighter
-              language="rust"
-              style={vscDarkPlus}
-              className="code-content"
-              showLineNumbers={true}
-              wrapLines={true}
-              customStyle={{
-                background: 'transparent',
-                padding: '20px',
-                margin: '0',
-                fontSize: '0.9rem',
-                fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
-                borderRadius: '0 0 12px 12px'
-              }}
-            >
-              {`fn main() {
-    let eli = Developer {
-        name: "Eli Perez",
-        skills: vec![
-            Rust, Javascript,
-            DataVisualization, 
-            Python, SystemsProgramming
-        ],
-        loves: "Animals",
-        mission: "Create impactful software"
-    };
-    
-    eli.do_the_dev_stuff();
-}`}
-            </SyntaxHighlighter>
-          </div>
-          
-          <div className="terminal-output">
-            <div className="terminal-header">
-              <div className="terminal-buttons">
-                <span className="btn-red"></span>
-                <span className="btn-yellow"></span>
-                <span className="btn-green"></span>
+          <div className="skills-showcase">
+            <div className="skill-category">
+              <h4>Core Skills</h4>
+              <div className="skill-list">
+                <span>Rust</span>
+                <span>Systems Programming</span>
+                <span>Full-Stack Development</span>
               </div>
-              <div className="terminal-title">eli@portfolio:~/cowsay-project$</div>
             </div>
-            <div className="terminal-body">
-              <div className="command-line">
-                <span className="prompt">$</span>
-                <span className="command">cargo run -- -cowsay</span>
+            <div className="skill-category">
+              <h4>Languages & Tools</h4>
+              <div className="skill-list">
+                <span>Python</span>
+                <span>TypeScript</span>
+                <span>Assembly</span>
+                <span>Embedded Rust</span>
               </div>
-              <div className="ascii-output">
-                <pre>{`    ________________________________
-   / Mooo! Welcome to Eli's Portfolio \\
-   \\ Website!                         /
-    --------------------------------
-         \\   ^__^ 
-          \\  (oo)\\_______
-             (__)\\       )\\/\\
-                 ||----w |
-                 ||     ||`}</pre>
+            </div>
+            <div className="skill-category">
+              <h4>Experience</h4>
+              <div className="skill-list">
+                <span>REST APIs</span>
+                <span>CPU Architecture</span>
+                <span>Geospatial Mapping</span>
+                <span>IoT Systems</span>
+                <span>AI Integration</span>
               </div>
             </div>
           </div>
