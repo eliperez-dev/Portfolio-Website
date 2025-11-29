@@ -49,9 +49,6 @@ const About = () => {
                     The project's potential for direct, tangible impact was also recently recognized by The Pollination Project Foundation,
                     which awarded it a competitive <span className="achievement-highlight">$1,000 seed grant</span> to support its continued development.
                     </p>
-                  <p>
-                    I'm actively seeking a <span className="career-highlight"> Summer 2026 software engineering internship </span> where I can apply my unique blend of technical skill and mission-driven focus to a team building meaningful projects.
-                  </p>
                 </div>
               </div>
             </div>
