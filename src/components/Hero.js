@@ -30,7 +30,7 @@ const Hero = () => {
               Software Engineer Intern at Fish Defender | Sophomore at Southwestern College
             </p>
             <p className="hero-description">
-              I build full-stack applications in Rust, Python, and JavaScript, from RESTful APIs to custom CPU architectures. Currently seeking <span className="rust-highlight">Summer 2026 internships</span>.
+              I build full-stack applications in Rust, Python, and JavaScript, from RESTful APIs to custom CPU architectures.
             </p>
           </div>
           
