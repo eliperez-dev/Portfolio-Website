@@ -35,7 +35,6 @@ const About = () => {
                     </p>
                 </div>
               </div>
-            </div>
 
             {/* <div className="achievements">
               <h3>Recent Achievements</h3>
@@ -63,7 +62,6 @@ const About = () => {
                 </li>
               </ul>
             </div> */}
-          </div>
 
           <div className="about-visual">
             <div className="profile-card">
@@ -93,6 +91,6 @@ const About = () => {
       </div>
     </section>
   ); 
-};
+}; 
 
 export default About;
