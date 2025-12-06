@@ -24,7 +24,7 @@ const About = () => {
                       activists</span>, <span className="organization-highlight">
                       researchers</span>, and <span className="organization-highlight">
                       organizations</span>. Its value to the community has been recognized through features in vegan newsletters and promotions by major activist organizations,
-                    including <span className="organization-highlight">PETA and CAFT</span>, and has been translated into <span className="organization-highlight">4 different langueges.</span></p>
+                    including <span className="organization-highlight">PETA and CAFT</span>, and has been translated into <span className="organization-highlight">4 different languages.</span></p>
                     
                     <p> 
                     As the lead engineer,
