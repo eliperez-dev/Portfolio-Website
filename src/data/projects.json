@@ -6,10 +6,11 @@
     "description": "An interactive, data-driven map exposing the global infrastructure of animal exploitation. Serves 38,500+ data points to 3,000+ monthly users globally with 100,000+ social media reach. This project consolidates publicly available data from government bodies worldwide into a single, accessible map designed for activists, journalists, and researchers. It integrates tens of thousands of facilities across distinct, toggleable layers with comprehensive filtering and performance optimization through marker clustering.",
     "technologies": ["Rust", "Axum", "Python", "JavaScript", "Leaflet.js", "Netlify", "Shuttle"],
     "features": [
-      "Serves 38,500+ data points to 3,000+ monthly users globally",
+      "Serves 54,500+ data points to 3,000+ monthly users globally",
       "Multi-layer interactive map with comprehensive filtering",
       "Reached 100,000+ people through social media advocacy",
-      "Marker clustering for high-performance optimization"
+      "Translated into Spanish, French, and German"
+  
     ],
     "links": {
       "live": "https://www.untileverycage.org/",
