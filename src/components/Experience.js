@@ -20,7 +20,7 @@ const Experience = () => {
       id: 1,
       title: "Software Engineer Intern",
       company: "Fish Defender",
-      period: "October 2025 - Present",
+      period: "October 2025 - December 2025",
       location: "Remote",
       description: "Building a serverless mapping application to help activists find fish-friendly dive locations.",
       highlights: [
