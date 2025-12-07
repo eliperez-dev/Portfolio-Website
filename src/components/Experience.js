@@ -4,6 +4,19 @@ import './Experience.css';
 const Experience = () => {
   const experiences = [
     {
+      id: 2,
+      title: "Lead Embedded Software Engineer",
+      company: "IEEE Student Branch at Southwestern College",
+      period: "November 2025 - Present",
+      location: "Chula Vista, CA",
+      description: "Spearheading the technical strategy for the chapter's Embedded Systems division, preparing for 2026 autonomous robotics competitions.",
+      highlights: [
+        "System Architecture: Defining the software roadmap for autonomous aerial robotics and ensuring memory safety and concurrency in flight control systems.",
+        "Hardware Selection: Leading the evaluation and integration planning for flight controllers, IMUs, and sensor fusion hardware.",
+        "Team Enablement: Establishing development standards and organizing technical workshops to prepare the engineering team for collaborative firmware development."
+      ]
+    },
+    {
       id: 1,
       title: "Software Engineer Intern",
       company: "Fish Defender",
