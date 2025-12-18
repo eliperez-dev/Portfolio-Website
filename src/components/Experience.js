@@ -33,7 +33,7 @@ const Experience = () => {
   ];
 
   const education = {
-    school: "Southwestern College",
+    school: "Southwestern College", 
     location: "Chula Vista, CA",
     degree: "A.S. in Computer Science (For transfer)",
     period: "Expected May 2026",
