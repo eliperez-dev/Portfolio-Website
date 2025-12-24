@@ -1,6 +1,6 @@
 ---
 title: "Exposing the Machine: Coding, Compassion, and My Spotlight on AreYouVegan"
-date: 2025-12-24
+date: 2025-12-23
 description: A reflection on being featured in AreYouVegan's Spotlight V-Zine and the journey of building Until Every Cage Is Empty.
 tags: [activism, systems-engineering, rust, philosophy, personal]
 ---

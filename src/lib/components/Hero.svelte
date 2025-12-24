@@ -64,7 +64,7 @@
 			</div>
 			
 			<p class="text-lg text-zinc-400 leading-relaxed font-sans max-w-lg">
-				I build full-stack applications in Rust, Python, and JavaScript. My passion lies in low-level systems, from performant REST APIs to custom CPU architectures and embedded drivers.
+				I build full-stack applications in Rust, Python, and TypeScript. My passion lies in low-level systems, from performant REST APIs to custom CPU architectures and embedded.
 			</p>
 
 			<div class="flex flex-wrap gap-4 pt-4">
@@ -90,7 +90,7 @@
                         <div class="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500"></div>
                         <div class="w-3 h-3 rounded-full bg-green-500/20 border border-green-500"></div>
                     </div>
-                    <div class="text-xs font-mono text-zinc-500">elm-cpu-v1.target.wasm</div>
+                    <div class="text-xs font-mono text-zinc-500">cpu-emulator.wasm</div>
                 </div>
 				<CpuEmulator />
 			</div>

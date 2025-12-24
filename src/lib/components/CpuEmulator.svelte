@@ -1,71 +1,390 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import init, { Cpu } from '$lib/wasm/wasm.js';
 
+    // --- 1. EXAMPLE PROGRAMS ---
+    const EXAMPLES = {
+        "Checkerboard": `; Checkerboard Pattern
+IMM R1 B10101010  
+IMM R2 B01010101  
+
+NOT R1 R1
+NOT R2 R2
+OUT %0 R1       
+OUT %1 R2        
+OUT %2 R1         
+OUT %3 R2        
+OUT %4 R1       
+OUT %5 R2       
+OUT %6 R1         
+OUT %7 R2        
+JMP 3`,
+        "Heart": `; Heart Shape
+IMM R1 108
+IMM R2 254
+IMM R3 254
+IMM R4 254
+IMM R5 124
+IMM R6 56
+IMM R7 16
+OUT %0 R1
+OUT %1 R2
+OUT %2 R3
+OUT %3 R4
+OUT %4 R5
+OUT %5 R6
+OUT %6 R7`,
+        "Fibonacci": `; Fibonacci Sequence
+IMM R1 0
+IMM R2 1
+MOV R3 R1
+MOV R4 R2
+ADD R1 R2
+UADD R5 R0
+OUT %0 R5
+MOV R1 R2
+MOV R2 R5
+JMP 2`
+    };
+
+    // --- 2. CONSTANTS & TYPES ---
+    const Operation = {
+        NOOP: "NOOP", IMM: "IMM", MOV: "MOV",
+        ADD: "ADD", ADDC: "ADDC", SHR: "SHR", NOT: "NOT",
+        OUT: "OUT", JMP: "JMP", BIE: "BIE"
+    } as const;
+    type Operation = typeof Operation[keyof typeof Operation];
+
+    const OperationArgs = {
+        None: "None", S: "S", U: "U", X: "X"
+    } as const;
+    type OperationArgs = typeof OperationArgs[keyof typeof OperationArgs];
+
+    const OperandType = {
+        Register: 0, MemoryAddress: 1, Immediate: 2, Port: 3
+    } as const;
+    type OperandType = typeof OperandType[keyof typeof OperandType];
+
+    class Operand {
+        type: OperandType;
+        data: number;
+        constructor(type: OperandType, data: number) {
+            this.type = type;
+            this.data = data;
+        }
+    }
+
+    class Instruction {
+        operation: Operation;
+        args: OperationArgs;
+        a: Operand;
+        b: Operand;
+
+        constructor(operation: Operation, args: OperationArgs, a: Operand, b: Operand) {
+            this.operation = operation;
+            this.args = args;
+            this.a = a;
+            this.b = b;
+        }
+
+        static none(): Instruction {
+            return new Instruction(
+                Operation.NOOP, 
+                OperationArgs.None, 
+                new Operand(OperandType.Immediate, 0), 
+                new Operand(OperandType.Immediate, 0)
+            );
+        }
+
+        clone(): Instruction {
+            return new Instruction(this.operation, this.args, this.a, this.b);
+        }
+    }
+
+    // --- 3. PARSER LOGIC ---
+    class Parser {
+        static parseLine(line: string): Instruction | null {
+            const commentIdx = line.indexOf(';');
+            if (commentIdx !== -1) line = line.substring(0, commentIdx);
+            
+            line = line.trim().toUpperCase();
+            if (line.length === 0) return null;
+
+            const tokens = line.split(/[\s,]+/).filter(s => s.length > 0);
+            if (tokens.length === 0) return null;
+
+            const opStr = tokens[0];
+            const { op, args } = this.parseOperation(opStr);
+            const needed = this.getNeededOperands(op, args);
+            
+            let tokenIdx = 1;
+            let valA = new Operand(OperandType.Immediate, 0);
+            let valB = new Operand(OperandType.Immediate, 0);
+
+            if (needed[0]) {
+                if (tokenIdx >= tokens.length) valA = new Operand(OperandType.Immediate, 0);
+                else valA = this.parseOperand(tokens[tokenIdx++]);
+            }
+            if (needed[1]) {
+                if (tokenIdx >= tokens.length) valB = new Operand(OperandType.Immediate, 0);
+                else valB = this.parseOperand(tokens[tokenIdx++]);
+            }
+
+            return new Instruction(op, args, valA, valB);
+        }
+
+        static parseOperation(str: string): { op: Operation, args: OperationArgs } {
+            let op = this.matchOp(str);
+            if (op) return { op, args: OperationArgs.None };
+
+            const prefix = str.charAt(0);
+            const suffix = str.substring(1);
+            op = this.matchOp(suffix);
+            
+            if (op && (op === Operation.ADD || op === Operation.ADDC)) {
+                let args: OperationArgs = OperationArgs.None;
+                if (prefix === 'S') args = OperationArgs.S;
+                else if (prefix === 'U') args = OperationArgs.U;
+                else if (prefix === 'X') args = OperationArgs.X;
+                return { op, args };
+            }
+            throw new Error(`Invalid operation: ${str}`);
+        }
+
+        static matchOp(str: string): Operation | null {
+            switch(str) {
+                case "IMM": return Operation.IMM;
+                case "MOV": return Operation.MOV;
+                case "ADD": return Operation.ADD;
+                case "ADDC": return Operation.ADDC;
+                case "SHR": return Operation.SHR;
+                case "NOOP": case "NOP": return Operation.NOOP;
+                case "OUT": return Operation.OUT;
+                case "JMP": return Operation.JMP;
+                case "BIE": return Operation.BIE;
+                case "NOT": return Operation.NOT;
+                default: return null;
+            }
+        }
+
+        static getNeededOperands(op: Operation, args: OperationArgs): [boolean, boolean] {
+            switch (op) {
+                case Operation.NOOP: return [false, false];
+                case Operation.IMM: return [true, true]; 
+                case Operation.MOV: return [true, true]; 
+                case Operation.ADD:
+                case Operation.ADDC: return args === OperationArgs.X ? [false, true] : [true, true];
+                case Operation.SHR: return [true, true];
+                case Operation.NOT: return [true, true];
+                case Operation.OUT: return [true, true]; 
+                case Operation.JMP: case Operation.BIE: return [true, false]; 
+                default: return [false, false];
+            }
+        }
+
+        static parseOperand(str: string): Operand {
+            const first = str.charAt(0);
+            const rest = str.substring(1);
+            if (first === 'R') return new Operand(OperandType.Register, this.parseBinary(rest));
+            else if (first === '#') return new Operand(OperandType.MemoryAddress, this.parseBinary(rest));
+            else if (first === '%') return new Operand(OperandType.Port, this.parseBinary(rest));
+            else {
+                try { return new Operand(OperandType.Immediate, this.parseBinary(str)); } 
+                catch { return new Operand(OperandType.Immediate, 0); }
+            }
+        }
+
+        static parseBinary(str: string): number {
+            str = str.replace(/_/g, '');
+            if (str.startsWith('B')) return parseInt(str.substring(1), 2);
+            return parseInt(str);
+        }
+    }
+
+    // --- 4. EMULATOR LOGIC ---
+    class Registers {
+        private regs = new Uint8Array(8);
+        read(addr: number): number { return addr === 0 ? 0 : (this.regs[addr] || 0); }
+        write(addr: number, data: number) { if (addr > 0 && addr < 8) this.regs[addr] = data & 0xFF; }
+        getAll(): number[] { return Array.from(this.regs); }
+    }
+
+    class ALU {
+        accumulator: number = 0;
+        flags = { equals: false, greater: false, less: false, overflow: false };
+
+        execute(registers: Registers, instr: Instruction) {
+            let a_data = (instr.args === OperationArgs.U || instr.args === OperationArgs.X) 
+                ? this.accumulator 
+                : registers.read(instr.a.data);
+            let b_data = registers.read(instr.b.data);
+            let result = 0;
+            let op = instr.operation;
+
+            if (op === Operation.ADD) result = a_data + b_data;
+            else if (op === Operation.ADDC) result = a_data + b_data + 1;
+            else if (op === Operation.SHR) result = b_data >> 1;
+            else if (op === Operation.NOT) result = (~b_data) & 0xFF;
+
+            this.flags.equals = a_data === b_data;
+            this.flags.greater = a_data > b_data;
+            this.flags.less = a_data < b_data;
+            this.flags.overflow = result > 255;
+            if (result > 255) result -= 256;
+            this.accumulator = result & 0xFF;
+        }
+    }
+
+    class Emulator {
+        instructions: Instruction[] = [];
+        pc: number = 0;
+        fetch_reg = Instruction.none();
+        decode_reg = Instruction.none();
+        execute_reg = Instruction.none();
+        writeback_reg = Instruction.none();
+        registers = new Registers();
+        alu = new ALU();
+        portsOut = new Uint8Array(8);
+
+        constructor(code: string) { this.loadProgram(code); }
+
+        loadProgram(code: string) {
+            this.instructions = [];
+            const lines = code.split('\n');
+            for (let line of lines) {
+                try {
+                    const instr = Parser.parseLine(line);
+                    if (instr) this.instructions.push(instr);
+                } catch (e) { console.error(e); }
+            }
+            while (this.instructions.length < 256) this.instructions.push(Instruction.none());
+            this.pc = 0;
+        }
+
+        clock() {
+            this.writeBackStage();
+            this.executeStage();
+            this.decodeStage();
+            this.fetchStage();
+            this.incrementPc();
+        }
+
+        private incrementPc() {
+            this.pc++;
+            if (this.pc >= 32) this.pc = 0;
+        }
+        private fetchStage() {
+            this.fetch_reg = (this.instructions[this.pc]) ? this.instructions[this.pc].clone() : Instruction.none();
+        }
+        private decodeStage() { this.decode_reg = this.fetch_reg.clone(); }
+        private executeStage() {
+            this.execute_reg = this.decode_reg.clone();
+            if (this.execute_reg.operation === Operation.JMP) this.pc = this.execute_reg.a.data;
+            else if (this.execute_reg.operation === Operation.BIE && this.alu.flags.equals) this.pc = this.execute_reg.a.data;
+            this.alu.execute(this.registers, this.execute_reg);
+        }
+        private writeBackStage() {
+            this.writeback_reg = this.execute_reg.clone();
+            const op = this.writeback_reg.operation;
+            const a = this.writeback_reg.a.data;
+            const b = this.writeback_reg.b.data;
+
+            if (op === Operation.IMM) this.registers.write(a, b);
+            else if (op === Operation.MOV) this.registers.write(a, this.registers.read(b));
+            else if ((op === Operation.ADD || op === Operation.ADDC) && 
+                     (this.writeback_reg.args === OperationArgs.S || this.writeback_reg.args === OperationArgs.U)) {
+                this.registers.write(a, this.alu.accumulator);
+            }
+            else if (op === Operation.SHR || op === Operation.NOT) this.registers.write(a, this.alu.accumulator);
+            else if (op === Operation.OUT && a < 8) this.portsOut[a] = this.registers.read(b);
+        }
+    }
+
+    // --- 5. SVELTE UI ---
     let canvas: HTMLCanvasElement;
     let ctx: CanvasRenderingContext2D;
-    let cpu: Cpu;
+    let emulator: Emulator | null = null;
     let animationId: number;
     let isRunning = $state(false);
     
-    // Editor state
-    let code = $state(`MOV A, 10
-ADD A, 5
-OUT A`);
-    
-    // CPU State for visualization
-    let pc = $state(0);
-    let registers = $state([0, 0, 0, 0]); // A, B, C, D
+    // UI State
+    let showDocs = $state(false);
+    let onImg: HTMLImageElement;
+    let offImg: HTMLImageElement;
+    let isReady = $state(false);
+    let useImages = false;
 
-    onMount(async () => {
-        await init();
-        cpu = new Cpu();
+    // Line Number Scrolling
+    let textareaEl: HTMLTextAreaElement;
+    let lineNumEl: HTMLDivElement;
+
+    // Default Code
+    let code = $state(EXAMPLES["Checkerboard"]);
+
+    // Reactive Stats
+    let pc = $state(0);
+    let registers = $state([0,0,0,0,0,0,0,0]);
+    let acc = $state(0);
+    let ports = $state([0,0,0,0,0,0,0,0]);
+    
+    // Pipeline State
+    let pipeF = $state(Instruction.none());
+    let pipeD = $state(Instruction.none());
+    let pipeE = $state(Instruction.none());
+    let pipeW = $state(Instruction.none());
+
+    onMount(() => {
+        onImg = new Image(); offImg = new Image();
+        let loadCount = 0; let errorCount = 0;
+        const checkStatus = () => {
+            if (loadCount + errorCount === 2) {
+                useImages = errorCount === 0;
+                isReady = true;
+                draw();
+            }
+        };
+        onImg.onload = () => { loadCount++; checkStatus(); };
+        offImg.onload = () => { loadCount++; checkStatus(); };
+        onImg.onerror = () => { errorCount++; checkStatus(); };
+        offImg.onerror = () => { errorCount++; checkStatus(); };
+
+        onImg.src = "/on.png"; 
+        offImg.src = "/off.png";
+
+        if (canvas) {
+            ctx = canvas.getContext('2d')!;
+            canvas.width = 720; 
+            canvas.height = 720;
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
         
-        ctx = canvas.getContext('2d')!;
-        
-        // Initial render
-        draw();
-        
+        initEmulator();
         return () => cancelAnimationFrame(animationId);
     });
 
-    function draw() {
-        if (!ctx) return;
-        
-        // Clear canvas
-        ctx.fillStyle = '#18181b'; // Zinc-900 matches theme
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // Draw "Minecraft Background" placeholder
-        ctx.strokeStyle = '#27272a'; // Zinc-800
-        ctx.lineWidth = 2;
-        ctx.strokeRect(50, 50, 500, 300);
-        
-        // Draw "Redstone Lamp" visualization based on PC
-        // Just a simple visual indicator for now
-        ctx.fillStyle = isRunning ? '#ef4444' : '#71717a'; // Red-500 or Zinc-500
-        ctx.beginPath();
-        ctx.arc(300, 200, 20, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Draw PC location indicator
-        ctx.fillStyle = '#22d3ee'; // Cyan
-        ctx.font = '20px monospace';
-        ctx.fillText(`PC: ${pc}`, 60, 80);
+    function handleScroll() {
+        if (textareaEl && lineNumEl) {
+            lineNumEl.scrollTop = textareaEl.scrollTop;
+        }
     }
 
-    function parseAssembly(asm: string) {
-        // Placeholder parser
-        // In the future, this will compile ASM to opcodes and load into Wasm memory
-        const lines = asm.split('\n').filter(l => l.trim().length > 0);
-        console.log("Parsing:", lines);
-        return lines;
+    function initEmulator() {
+        emulator = new Emulator(code);
+        updateStats();
+        draw();
+    }
+
+    function loadExample(e: Event) {
+        const key = (e.target as HTMLSelectElement).value;
+        // @ts-ignore
+        code = EXAMPLES[key];
+        reset();
     }
 
     function toggleRun() {
         isRunning = !isRunning;
         if (isRunning) {
-            parseAssembly(code); // Re-parse on run
+            if(emulator) emulator.loadProgram(code);
             loop();
         } else {
             cancelAnimationFrame(animationId);
@@ -73,113 +392,294 @@ OUT A`);
     }
     
     function step() {
-        if (cpu) {
-            cpu.tick();
-            updateStats();
-            draw();
-        }
+        if (!emulator) initEmulator();
+        emulator!.clock();
+        updateStats();
+        draw();
     }
 
     function reset() {
         isRunning = false;
         cancelAnimationFrame(animationId);
-        if (cpu) {
-            cpu.reset();
-            updateStats();
-            draw();
-        }
+        initEmulator(); 
+        updateStats();
+        draw();
     }
 
     function loop() {
         if (!isRunning) return;
-        
-        // Throttle simulation speed
         step();
-        
         animationId = requestAnimationFrame(() => {
-            setTimeout(loop, 500); // 2Hz clock speed for demo
+            setTimeout(loop, 100); 
         });
     }
     
     function updateStats() {
-        if (cpu) {
-            pc = cpu.get_pc();
-            registers = [
-                cpu.get_reg_a(),
-                cpu.get_reg_b(),
-                cpu.get_reg_c(),
-                cpu.get_reg_d()
-            ];
+        if (emulator) {
+            pc = emulator.pc;
+            registers = emulator.registers.getAll();
+            acc = emulator.alu.accumulator;
+            ports = Array.from(emulator.portsOut);
+            
+            // Update Pipeline
+            pipeF = emulator.fetch_reg.clone();
+            pipeD = emulator.decode_reg.clone();
+            pipeE = emulator.execute_reg.clone();
+            pipeW = emulator.writeback_reg.clone();
+        }
+    }
+    
+    function formatInstr(inst: Instruction) {
+        if (inst.operation === "NOOP") return "-";
+        
+        let s = inst.operation;
+        if (inst.args !== "None") s += inst.args;
+        
+        const formatOp = (op: Operand) => {
+            if (op.type === 0) return `R${op.data}`; // Reg
+            if (op.type === 3) return `%${op.data}`; // Port
+            return `${op.data}`;
+        };
+
+        const needed = Parser.getNeededOperands(inst.operation, inst.args);
+        if (needed[0]) s += " " + formatOp(inst.a);
+        if (needed[1]) s += " " + formatOp(inst.b);
+        return s;
+    }
+
+    function draw() {
+        if (!ctx || !emulator) return;
+        
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        const gridSizeX = 8; const gridSizeY = 8;
+        const cellW = canvas.width / gridSizeX;
+        const cellH = canvas.height / gridSizeY;
+
+        for (let port = 0; port < gridSizeY; port++) {
+            const val = emulator.portsOut[port];
+            
+            for (let bitIndex = 0; bitIndex < gridSizeX; bitIndex++) {
+                const bitShift = 7 - bitIndex;
+                const bitVal = (val >> bitShift) & 1;
+                const isOn = bitVal === 1;
+                
+                const x = bitIndex * cellW;
+                const y = port * cellH;
+
+                if (useImages) {
+                    ctx.drawImage(isOn ? onImg : offImg, x, y, cellW, cellH);
+                } else {
+                    ctx.fillStyle = isOn ? '#ef4444' : '#3f3f46';
+                    ctx.strokeStyle = '#000';
+                    ctx.lineWidth = 2;
+                    ctx.fillRect(x, y, cellW, cellH);
+                    ctx.strokeRect(x, y, cellW, cellH);
+                }
+            }
         }
     }
 </script>
 
-<div class="grid lg:grid-cols-2 gap-8 p-6 bg-zinc-900/80 border border-zinc-800 rounded-lg backdrop-blur-sm">
-    <!-- Left: Code Editor -->
-    <div class="flex flex-col gap-4">
-        <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
-            <span class="text-sm font-mono text-[var(--color-schematic-primary)]">ASSEMBLY EDITOR</span>
-            <div class="flex gap-2">
-                <button 
-                    onclick={toggleRun}
-                    class="px-3 py-1 bg-[var(--color-schematic-primary)] text-black text-xs font-mono font-bold hover:bg-white transition-colors"
-                >
-                    {isRunning ? 'PAUSE' : 'RUN'}
-                </button>
-                <button 
-                    onclick={step}
-                    class="px-3 py-1 border border-zinc-700 text-zinc-300 text-xs font-mono hover:border-zinc-500 transition-colors"
-                >
-                    STEP
-                </button>
-                <button 
-                    onclick={reset}
-                    class="px-3 py-1 border border-zinc-700 text-zinc-300 text-xs font-mono hover:border-zinc-500 transition-colors"
-                >
-                    RESET
-                </button>
+<div class="grid lg:grid-cols-2 gap-4 p-4 bg-zinc-900/80 border border-zinc-800 rounded-lg backdrop-blur-sm relative h-auto">
+    
+    {#if showDocs}
+        <div class="absolute inset-0 z-50 bg-black/80 flex items-center justify-center p-8 backdrop-blur-sm">
+            <div class="bg-zinc-900 border border-zinc-700 p-6 rounded max-w-2xl w-full max-h-full overflow-y-auto shadow-2xl">
+                <div class="flex justify-between items-center mb-4 border-b border-zinc-700 pb-2">
+                    <h2 class="text-xl font-mono text-[var(--color-schematic-primary)] font-bold">MANUAL</h2>
+                    <button onclick={() => showDocs = false} class="text-zinc-500 hover:text-white">✕</button>
+                </div>
+                
+                <div class="space-y-4 text-xs font-mono text-zinc-300">
+                    <section>
+                        <h3 class="text-white font-bold mb-1">ARCHITECTURE</h3>
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li><strong>Registers (R1-R7):</strong> 8-bit general purpose storage.</li>
+                            <li><strong>R0:</strong> Constant 0 (Read-only).</li>
+                            <li><strong>ACC:</strong> Accumulator for ALU operations.</li>
+                            <li><strong>Ports (%0-%7):</strong> 8-bit Output ports mapped to the display.</li>
+                            <li><strong>PC:</strong> Program Counter (0-31).</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h3 class="text-white font-bold mb-1">INSTRUCTION SET</h3>
+                        <div class="grid grid-cols-1 gap-1">
+                            <div class="grid grid-cols-[100px_1fr] gap-2">
+                                <code class="text-[var(--color-schematic-primary)]">IMM A, VAL</code> 
+                                <span>Load immediate value (0-255) into A.</span>
+                            </div>
+                            <div class="grid grid-cols-[100px_1fr] gap-2">
+                                <code class="text-[var(--color-schematic-primary)]">MOV A, B</code> 
+                                <span>Copy value from register B to A.</span>
+                            </div>
+                            <div class="grid grid-cols-[100px_1fr] gap-2">
+                                <code class="text-[var(--color-schematic-primary)]">ADD A, B</code> 
+                                <span>A = A + B. Updates flags.</span>
+                            </div>
+                            <div class="grid grid-cols-[100px_1fr] gap-2">
+                                <code class="text-[var(--color-schematic-primary)]">UADD A, B</code> 
+                                <span>A = ACC + B. (Unsigned Add using Accumulator).</span>
+                            </div>
+                             <div class="grid grid-cols-[100px_1fr] gap-2">
+                                <code class="text-[var(--color-schematic-primary)]">ADDC A, B</code> 
+                                <span>A = A + B + 1. (Add with Carry).</span>
+                            </div>
+                            <div class="grid grid-cols-[100px_1fr] gap-2">
+                                <code class="text-[var(--color-schematic-primary)]">SHR A</code> 
+                                <span>Bitwise Shift Right (A = A >> 1).</span>
+                            </div>
+                            <div class="grid grid-cols-[100px_1fr] gap-2">
+                                <code class="text-[var(--color-schematic-primary)]">NOT A, B</code> 
+                                <span>A = Bitwise NOT B.</span>
+                            </div>
+                            <div class="grid grid-cols-[100px_1fr] gap-2">
+                                <code class="text-[var(--color-schematic-primary)]">OUT %P, A</code> 
+                                <span>Write value in A to Port P (0-7).</span>
+                            </div>
+                            <div class="grid grid-cols-[100px_1fr] gap-2">
+                                <code class="text-[var(--color-schematic-primary)]">JMP L</code> 
+                                <span>Unconditional jump to line L.</span>
+                            </div>
+                            <div class="grid grid-cols-[100px_1fr] gap-2">
+                                <code class="text-[var(--color-schematic-primary)]">BIE L</code> 
+                                <span>Branch if Equal. Jump to L if last ALU op was Equal.</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h3 class="text-white font-bold mb-1">PIPELINE STAGES</h3>
+                        <div class="grid grid-cols-[40px_1fr] gap-2">
+                            <span class="text-zinc-500">IF</span>
+                            <span>Fetch instruction from memory at PC.</span>
+                        </div>
+                        <div class="grid grid-cols-[40px_1fr] gap-2">
+                            <span class="text-zinc-500">ID</span>
+                            <span>Decode opcode and read register values.</span>
+                        </div>
+                        <div class="grid grid-cols-[40px_1fr] gap-2">
+                            <span class="text-zinc-500">EX</span>
+                            <span>ALU calculations (Add, Shift, Not). Flags updated here.</span>
+                        </div>
+                        <div class="grid grid-cols-[40px_1fr] gap-2">
+                            <span class="text-zinc-500">WB</span>
+                            <span>Write result back to Register or Port.</span>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    {/if}
+
+    <div class="flex flex-col gap-2 h-full min-h-0" >
+        <div class="flex flex-wrap items-center justify-between border-b border-zinc-800 pb-2 gap-2 shrink-0">
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-mono text-[var(--color-schematic-primary)] font-bold">ASM</span>
+                <select onchange={loadExample} class="bg-zinc-950 text-[10px] text-zinc-400 border border-zinc-800 p-1 rounded font-mono outline-none">
+                    <option value="Checkerboard">Checkerboard</option>
+                    <option value="Heart">Heart</option>
+                    <option value="Fibonacci">Fibonacci</option>
+                </select>
+            </div>
+            
+            <div class="flex gap-1">
+                <button onclick={() => showDocs = !showDocs} class="px-2 py-1 bg-zinc-800 text-zinc-300 text-[10px] font-mono hover:bg-zinc-700">DOCS</button>
+                <button onclick={toggleRun} class="px-2 py-1 bg-[var(--color-schematic-primary)] text-black text-[10px] font-mono font-bold hover:bg-white">{isRunning ? 'PAUSE' : 'RUN'}</button>
+                <button onclick={step} class="px-2 py-1 border border-zinc-700 text-zinc-300 text-[10px] font-mono hover:border-zinc-500">STEP</button>
+                <button onclick={reset} class="px-2 py-1 border border-zinc-700 text-zinc-300 text-[10px] font-mono hover:border-zinc-500">RESET</button>
             </div>
         </div>
         
-        <textarea 
-            bind:value={code}
-            class="w-full h-64 bg-zinc-950 text-zinc-300 font-mono p-4 text-sm border border-zinc-800 focus:border-[var(--color-schematic-primary)] outline-none resize-none"
-            placeholder="MOV A, 10..."
-            spellcheck="false"
-        ></textarea>
-        
-        <!-- Status Panel -->
-        <div class="grid grid-cols-4 gap-2 font-mono text-xs">
-            <div class="bg-zinc-950 p-2 border border-zinc-800">
-                <span class="text-zinc-500 block">REG A</span>
-                <span class="text-[var(--color-schematic-primary)]">{registers[0]}</span>
+        <div class="flex-grow flex bg-zinc-950 border border-zinc-800 relative overflow-hidden min-h-0 h-96">
+            <div 
+                bind:this={lineNumEl}
+                class="w-8 pt-2 pb-2 text-center text-zinc-600 bg-zinc-900/50 border-r border-zinc-800 select-none font-mono text-xs leading-5 overflow-hidden"
+            >
+                {#each code.split('\n') as _, i}
+                    <div>{i}</div>
+                {/each}
             </div>
-             <div class="bg-zinc-950 p-2 border border-zinc-800">
-                <span class="text-zinc-500 block">REG B</span>
-                <span class="text-[var(--color-schematic-primary)]">{registers[1]}</span>
-            </div>
-             <div class="bg-zinc-950 p-2 border border-zinc-800">
-                <span class="text-zinc-500 block">REG C</span>
-                <span class="text-[var(--color-schematic-primary)]">{registers[2]}</span>
-            </div>
-             <div class="bg-zinc-950 p-2 border border-zinc-800">
-                <span class="text-zinc-500 block">PC</span>
-                <span class="text-white">{pc}</span>
-            </div>
+            <textarea 
+                bind:this={textareaEl}
+                bind:value={code}
+                onscroll={handleScroll}
+                class="flex-grow bg-transparent text-zinc-300 font-mono p-2 text-xs leading-5 outline-none resize-none whitespace-pre"
+                spellcheck="false"
+            ></textarea>
         </div>
     </div>
 
-    <!-- Right: Visualization Canvas -->
-    <div class="relative bg-zinc-950 border border-zinc-800 aspect-video flex items-center justify-center overflow-hidden">
-        <canvas 
-            bind:this={canvas}
-            width={600}
-            height={400}
-            class="w-full h-full object-contain"
-        ></canvas>
+    <div class="flex flex-col gap-1 min-w-0">
         
-        <div class="absolute bottom-4 right-4 text-xs font-mono text-zinc-500">
-            VISUALIZER_V1.0
+        <div class="flex-grow min-h-0 flex items-center justify-center bg-zinc-950/30 rounded relative overflow-hidden p-1">
+            
+            <div class="flex flex-row max-h-full h-auto w-auto max-w-full border border-zinc-800 bg-black rounded-sm shadow-xl shrink items-stretch overflow-hidden">
+                
+                <div class="flex flex-col w-10 shrink-0 font-mono border-r border-zinc-800 bg-zinc-950 hidden sm:flex">
+                    {#each ports as val, i}
+                        <div class="flex-1 flex flex-col justify-center items-center text-[12px] border-b border-zinc-800/50 last:border-0 leading-none py-1">
+                            <span class="text-zinc-500">%{i}</span>
+                            <span class="text-white font-bold">{val}</span>
+                        </div>
+                    {/each}
+                </div>
+                
+                <div class="aspect-square h-auto w-auto relative flex-grow">
+                    <canvas bind:this={canvas} class="w-full h-full block image-pixelated"></canvas>
+                    {#if !isReady}
+                         <div class="absolute top-2 right-2 text-[10px] text-zinc-500 font-mono bg-black/50 p-1">Loading...</div>
+                    {/if}
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-4 gap-1 font-mono text-[9px] mt-1">
+                <div class="border border-zinc-800 bg-zinc-900/50 p-1">
+                    <div class="text-zinc-600 text-[8px] uppercase tracking-wider mb-0.5">Fetch</div>
+                    <div class="text-zinc-300 truncate">{formatInstr(pipeF)}</div>
+                </div>
+                <div class="border border-zinc-800 bg-zinc-900/50 p-1">
+                    <div class="text-zinc-600 text-[8px] uppercase tracking-wider mb-0.5">Decode</div>
+                    <div class="text-zinc-300 truncate">{formatInstr(pipeD)}</div>
+                </div>
+                <div class="border border-zinc-800 bg-zinc-900/50 p-1">
+                    <div class="text-zinc-600 text-[8px] uppercase tracking-wider mb-0.5">Exec</div>
+                    <div class="text-[var(--color-schematic-primary)] truncate">{formatInstr(pipeE)}</div>
+                </div>
+                <div class="border border-zinc-800 bg-zinc-900/50 p-1">
+                    <div class="text-zinc-600 text-[8px] uppercase tracking-wider mb-0.5">Write</div>
+                    <div class="text-zinc-300 truncate">{formatInstr(pipeW)}</div>
+                </div>
+        </div>
+        
+        <div class="flex flex-col gap-1 shrink-0">
+            <div class="grid grid-cols-4 gap-1 font-mono text-[10px]">
+                {#each registers as reg, i}
+                    <div class="bg-zinc-950 px-2 py-1 border border-zinc-800 flex justify-between">
+                        <span class="text-zinc-500">R{i}</span>
+                        <span class="text-[var(--color-schematic-primary)]">{reg}</span>
+                    </div>
+                {/each}
+                <div class="bg-zinc-950 px-2 py-1 border border-zinc-800 col-span-2 flex justify-between">
+                    <span class="text-zinc-500">PC</span>
+                    <span class="text-white">{pc}</span>
+                </div>
+                <div class="bg-zinc-950 px-2 py-1 border border-zinc-800 col-span-2 flex justify-between">
+                    <span class="text-zinc-500">ACC</span>
+                    <span class="text-white">{acc}</span>
+                </div>
+            </div>
+
+            
         </div>
     </div>
 </div>
+
+<style>
+    .image-pixelated {
+        image-rendering: pixelated;
+    }
+</style>
