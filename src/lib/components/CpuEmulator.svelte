@@ -3,22 +3,74 @@
 
     // --- 1. EXAMPLE PROGRAMS ---
     const EXAMPLES = {
-        "Checkerboard": `; Checkerboard Pattern
-IMM R1 B10101010  
-IMM R2 B01010101  
+        "Input Test": `; Input Instruction Test
+; Run this! It will popup a custom UI.
 
-NOT R1 R1
-NOT R2 R2
-OUT %0 R1       
-OUT %1 R2        
-OUT %2 R1         
-OUT %3 R2        
-OUT %4 R1       
-OUT %5 R2       
-OUT %6 R1         
-OUT %7 R2        
-JMP 3`,
-        "Heart": `; Heart Shape
+; 1. Ask user for value
+; 2. Store in R1
+INP R1
+
+; 3. Output R1 to Port 0
+OUT %0 R1
+
+; 4. Add 1 to R1
+IMM R2 1
+ADD R1 R2
+
+; 5. Output result to Port 1
+OUT %1 R1
+`,
+        "Fibonacci": `; Fibonacci Sequence
+; Check Port %0 for output
+IMM R1 0
+IMM R2 1
+MOV R3 R1
+MOV R4 R2
+ADD R1 R2
+UADD R5 R0
+OUT %0 R5
+MOV R1 R2
+MOV R2 R5
+JMP 2`,
+        "Intro": `; Intro Graphics Animation
+; Feel free to mess around with
+; the emulator.
+
+; More examples and docs are right
+; above the text editor. Enjoy!
+
+; --- FRAME 1: Draw Face ---
+IMM R1 60     ; 00111100 (Hair)
+IMM R2 66     ; 01000010 (Forehead)
+IMM R3 165    ; 10100101 (Eyes Open)
+IMM R4 129    ; 10000001 (Nose Bridge)
+IMM R5 165    ; 10100101 (Cheeks)
+IMM R6 153    ; 10011001 (Smile)
+IMM R7 b01000010 ; (Chin)
+OUT %0 R1
+OUT %1 R2
+OUT %2 R3
+OUT %3 R4
+OUT %4 R5
+OUT %5 R6
+OUT %6 R7
+OUT %7 R1
+
+; --- FRAME 2: Flat mouth  ---
+IMM R5 b10000001 ; Flat mouth
+IMM R6 b10111101 
+OUT %4 R5    
+OUT %5 R6     
+NOP
+NOP
+
+; --- FRAME 3: Smile ---
+IMM R5 165    ; 10100101 Smile
+IMM R6 153    ; 10011001
+OUT %4 R5     
+OUT %5 R6  
+
+; --- FRAME 4: Heart --- 
 IMM R1 108
 IMM R2 254
 IMM R3 254
@@ -32,25 +84,69 @@ OUT %2 R3
 OUT %3 R4
 OUT %4 R5
 OUT %5 R6
-OUT %6 R7`,
-        "Fibonacci": `; Fibonacci Sequence
-IMM R1 0
-IMM R2 1
-MOV R3 R1
-MOV R4 R2
-ADD R1 R2
-UADD R5 R0
-OUT %0 R5
-MOV R1 R2
-MOV R2 R5
-JMP 2`
-    };
+OUT %6 R7
+OUT %7 R0
+
+; --- FRAME 4: Checkerboad --- 
+IMM R1 B10101010  
+IMM R2 B01010101  
+
+NOT R1 R1
+NOT R2 R2
+OUT %0 R1       
+OUT %1 R2        
+OUT %2 R1         
+OUT %3 R2        
+OUT %4 R1       
+OUT %5 R2       
+OUT %6 R1         
+OUT %7 R2    
+  
+; --- Cylon Scanline ---
+IMM R1 255  ; Full Row ON
+IMM R2 0    ; Full Row OFF
+
+; Frame 0
+OUT %0 R1
+OUT %0 R2   ; Clear immediately
+
+; Frame 1
+OUT %1 R1
+OUT %1 R2
+
+; Frame 2
+OUT %2 R1
+OUT %2 R2
+
+; Frame 3
+OUT %3 R1
+OUT %3 R2
+
+; Frame 4
+OUT %4 R1
+OUT %4 R2
+
+; Frame 5
+OUT %5 R1
+OUT %5 R2
+
+; Frame 6
+OUT %6 R1
+OUT %6 R2
+
+; Frame 7
+OUT %7 R1
+OUT %7 R2
+
+JMP 0
+`
+};
 
     // --- 2. CONSTANTS & TYPES ---
     const Operation = {
         NOOP: "NOOP", IMM: "IMM", MOV: "MOV",
         ADD: "ADD", ADDC: "ADDC", SHR: "SHR", NOT: "NOT",
-        OUT: "OUT", JMP: "JMP", BIE: "BIE"
+        OUT: "OUT", JMP: "JMP", BIE: "BIE", INP: "INP" 
     } as const;
     type Operation = typeof Operation[keyof typeof Operation];
 
@@ -78,12 +174,14 @@ JMP 2`
         args: OperationArgs;
         a: Operand;
         b: Operand;
+        address: number; // Added to track which line this is
 
-        constructor(operation: Operation, args: OperationArgs, a: Operand, b: Operand) {
+        constructor(operation: Operation, args: OperationArgs, a: Operand, b: Operand, address: number = -1) {
             this.operation = operation;
             this.args = args;
             this.a = a;
             this.b = b;
+            this.address = address;
         }
 
         static none(): Instruction {
@@ -91,18 +189,37 @@ JMP 2`
                 Operation.NOOP, 
                 OperationArgs.None, 
                 new Operand(OperandType.Immediate, 0), 
-                new Operand(OperandType.Immediate, 0)
+                new Operand(OperandType.Immediate, 0),
+                -1 // Invalid address
             );
         }
 
         clone(): Instruction {
-            return new Instruction(this.operation, this.args, this.a, this.b);
+            return new Instruction(this.operation, this.args, this.a, this.b, this.address);
         }
     }
 
     // --- 3. PARSER LOGIC ---
+    function getLineToAddressMap(code: string): (number | string)[] {
+        const lines = code.split('\n');
+        const map: (number | string)[] = [];
+        let instructionCount = 0;
+
+        for (let line of lines) {
+            const cleanLine = line.split(';')[0].trim();
+            if (cleanLine.length > 0) {
+                map.push(instructionCount);
+                instructionCount++;
+            } else {
+                map.push(""); 
+            }
+        }
+        return map;
+    }
+
     class Parser {
-        static parseLine(line: string): Instruction | null {
+        
+        static parseLine(line: string, address: number): Instruction | null {
             const commentIdx = line.indexOf(';');
             if (commentIdx !== -1) line = line.substring(0, commentIdx);
             
@@ -129,7 +246,7 @@ JMP 2`
                 else valB = this.parseOperand(tokens[tokenIdx++]);
             }
 
-            return new Instruction(op, args, valA, valB);
+            return new Instruction(op, args, valA, valB, address);
         }
 
         static parseOperation(str: string): { op: Operation, args: OperationArgs } {
@@ -162,6 +279,7 @@ JMP 2`
                 case "JMP": return Operation.JMP;
                 case "BIE": return Operation.BIE;
                 case "NOT": return Operation.NOT;
+                case "INP": return Operation.INP;
                 default: return null;
             }
         }
@@ -177,6 +295,7 @@ JMP 2`
                 case Operation.NOT: return [true, true];
                 case Operation.OUT: return [true, true]; 
                 case Operation.JMP: case Operation.BIE: return [true, false]; 
+                case Operation.INP: return [true, false];
                 default: return [false, false];
             }
         }
@@ -212,7 +331,7 @@ JMP 2`
         accumulator: number = 0;
         flags = { equals: false, greater: false, less: false, overflow: false };
 
-        execute(registers: Registers, instr: Instruction) {
+        execute(registers: Registers, instr: Instruction, emuRef: Emulator) {
             let a_data = (instr.args === OperationArgs.U || instr.args === OperationArgs.X) 
                 ? this.accumulator 
                 : registers.read(instr.a.data);
@@ -224,11 +343,18 @@ JMP 2`
             else if (op === Operation.ADDC) result = a_data + b_data + 1;
             else if (op === Operation.SHR) result = b_data >> 1;
             else if (op === Operation.NOT) result = (~b_data) & 0xFF;
+            
+            else if (op === Operation.INP) {
+                emuRef.waitingForInput = true;
+                emuRef.inputRegister = instr.a.data;
+                result = 0;
+            }
 
             this.flags.equals = a_data === b_data;
             this.flags.greater = a_data > b_data;
             this.flags.less = a_data < b_data;
             this.flags.overflow = result > 255;
+            
             if (result > 255) result -= 256;
             this.accumulator = result & 0xFF;
         }
@@ -245,22 +371,36 @@ JMP 2`
         alu = new ALU();
         portsOut = new Uint8Array(8);
 
+        waitingForInput = false;
+        inputRegister = 0;
+
         constructor(code: string) { this.loadProgram(code); }
 
         loadProgram(code: string) {
             this.instructions = [];
             const lines = code.split('\n');
+            let addrCounter = 0;
             for (let line of lines) {
                 try {
-                    const instr = Parser.parseLine(line);
-                    if (instr) this.instructions.push(instr);
+                    const instr = Parser.parseLine(line, addrCounter);
+                    if (instr) {
+                        this.instructions.push(instr);
+                        addrCounter++;
+                    }
                 } catch (e) { console.error(e); }
             }
             while (this.instructions.length < 256) this.instructions.push(Instruction.none());
             this.pc = 0;
+            this.waitingForInput = false;
+        }
+
+        resolveInput(val: number) {
+            this.alu.accumulator = val & 0xFF;
+            this.waitingForInput = false;
         }
 
         clock() {
+            if (this.waitingForInput) return;
             this.writeBackStage();
             this.executeStage();
             this.decodeStage();
@@ -270,7 +410,7 @@ JMP 2`
 
         private incrementPc() {
             this.pc++;
-            if (this.pc >= 32) this.pc = 0;
+            if (this.pc >= 256) this.pc = 0;
         }
         private fetchStage() {
             this.fetch_reg = (this.instructions[this.pc]) ? this.instructions[this.pc].clone() : Instruction.none();
@@ -280,7 +420,7 @@ JMP 2`
             this.execute_reg = this.decode_reg.clone();
             if (this.execute_reg.operation === Operation.JMP) this.pc = this.execute_reg.a.data;
             else if (this.execute_reg.operation === Operation.BIE && this.alu.flags.equals) this.pc = this.execute_reg.a.data;
-            this.alu.execute(this.registers, this.execute_reg);
+            this.alu.execute(this.registers, this.execute_reg, this);
         }
         private writeBackStage() {
             this.writeback_reg = this.execute_reg.clone();
@@ -291,10 +431,15 @@ JMP 2`
             if (op === Operation.IMM) this.registers.write(a, b);
             else if (op === Operation.MOV) this.registers.write(a, this.registers.read(b));
             else if ((op === Operation.ADD || op === Operation.ADDC) && 
-                     (this.writeback_reg.args === OperationArgs.S || this.writeback_reg.args === OperationArgs.U)) {
+                    (this.writeback_reg.args === OperationArgs.S || 
+                    this.writeback_reg.args === OperationArgs.U || 
+                    this.writeback_reg.args === OperationArgs.None)) {
                 this.registers.write(a, this.alu.accumulator);
             }
             else if (op === Operation.SHR || op === Operation.NOT) this.registers.write(a, this.alu.accumulator);
+            else if (op === Operation.INP) {
+                this.registers.write(a, this.alu.accumulator);
+            }
             else if (op === Operation.OUT && a < 8) this.portsOut[a] = this.registers.read(b);
         }
     }
@@ -313,15 +458,23 @@ JMP 2`
     let isReady = $state(false);
     let useImages = false;
 
+    // Input Modal State
+    let showInputModal = $state(false);
+    let inputValue = $state("");
+    let inputRegIndex = $state(0);
+    let inputRef: HTMLInputElement;
+
     // Line Number Scrolling
     let textareaEl: HTMLTextAreaElement;
     let lineNumEl: HTMLDivElement;
 
     // Default Code
-    let code = $state(EXAMPLES["Checkerboard"]);
+    let code = $state(EXAMPLES["Input Test"]);
+    let lineMap = $derived(getLineToAddressMap(code));
 
     // Reactive Stats
     let pc = $state(0);
+    let execAddr = $state(-1); // To track highlighting
     let registers = $state([0,0,0,0,0,0,0,0]);
     let acc = $state(0);
     let ports = $state([0,0,0,0,0,0,0,0]);
@@ -382,6 +535,7 @@ JMP 2`
     }
 
     function toggleRun() {
+        if (showInputModal) return; 
         isRunning = !isRunning;
         if (isRunning) {
             if(emulator) emulator.loadProgram(code);
@@ -393,13 +547,43 @@ JMP 2`
     
     function step() {
         if (!emulator) initEmulator();
+        if (showInputModal) return;
+
         emulator!.clock();
+
+        if (emulator!.waitingForInput) {
+            handleInputInterrupt();
+        }
+
         updateStats();
         draw();
     }
 
+    function handleInputInterrupt() {
+        isRunning = false;
+        cancelAnimationFrame(animationId);
+        inputRegIndex = emulator!.inputRegister;
+        inputValue = "";
+        showInputModal = true;
+        setTimeout(() => inputRef?.focus(), 50);
+    }
+
+    function submitInput() {
+        let num = parseInt(inputValue);
+        if (isNaN(num)) num = 0;
+        emulator!.resolveInput(num);
+        showInputModal = false;
+        isRunning = true;
+        loop();
+    }
+
+    function handleInputKey(e: KeyboardEvent) {
+        if (e.key === "Enter") submitInput();
+    }
+
     function reset() {
         isRunning = false;
+        showInputModal = false;
         cancelAnimationFrame(animationId);
         initEmulator(); 
         updateStats();
@@ -409,6 +593,7 @@ JMP 2`
     function loop() {
         if (!isRunning) return;
         step();
+        if (showInputModal) return;
         animationId = requestAnimationFrame(() => {
             setTimeout(loop, 100); 
         });
@@ -417,11 +602,11 @@ JMP 2`
     function updateStats() {
         if (emulator) {
             pc = emulator.pc;
+            execAddr = emulator.execute_reg.address; // Get address of executing line
             registers = emulator.registers.getAll();
             acc = emulator.alu.accumulator;
             ports = Array.from(emulator.portsOut);
             
-            // Update Pipeline
             pipeF = emulator.fetch_reg.clone();
             pipeD = emulator.decode_reg.clone();
             pipeE = emulator.execute_reg.clone();
@@ -484,6 +669,35 @@ JMP 2`
 
 <div class="grid lg:grid-cols-2 gap-4 p-4 bg-zinc-900/80 border border-zinc-800 rounded-lg backdrop-blur-sm relative h-auto">
     
+    {#if showInputModal}
+        <div class="absolute inset-0 z-50 bg-black/60 flex items-center justify-center backdrop-blur-sm p-4">
+            <div class="bg-zinc-900 border border-zinc-700 p-6 rounded shadow-2xl w-full max-w-sm flex flex-col gap-4">
+                <div class="flex flex-col gap-1">
+                    <h3 class="text-white font-mono font-bold text-lg">INPUT REQUESTED</h3>
+                    <p class="text-zinc-400 text-xs font-mono">
+                        The program is waiting for input for Register <span class="text-[var(--color-schematic-primary)]">R{inputRegIndex}</span>.
+                    </p>
+                </div>
+                
+                <input 
+                    bind:this={inputRef}
+                    bind:value={inputValue}
+                    onkeydown={handleInputKey}
+                    type="number" 
+                    placeholder="0-255"
+                    class="bg-zinc-950 border border-zinc-700 text-white font-mono p-2 text-sm outline-none focus:border-[var(--color-schematic-primary)]"
+                />
+
+                <button 
+                    onclick={submitInput}
+                    class="bg-[var(--color-schematic-primary)] hover:bg-white text-black font-mono font-bold py-2 text-sm transition-colors"
+                >
+                    SUBMIT VALUE
+                </button>
+            </div>
+        </div>
+    {/if}
+
     {#if showDocs}
         <div class="absolute inset-0 z-50 bg-black/80 flex items-center justify-center p-8 backdrop-blur-sm">
             <div class="bg-zinc-900 border border-zinc-700 p-6 rounded max-w-2xl w-full max-h-full overflow-y-auto shadow-2xl">
@@ -540,6 +754,10 @@ JMP 2`
                                 <span>Write value in A to Port P (0-7).</span>
                             </div>
                             <div class="grid grid-cols-[100px_1fr] gap-2">
+                                <code class="text-[var(--color-schematic-primary)]">INP A</code> 
+                                <span>Ask user for input, save to Register A.</span>
+                            </div>
+                            <div class="grid grid-cols-[100px_1fr] gap-2">
                                 <code class="text-[var(--color-schematic-primary)]">JMP L</code> 
                                 <span>Unconditional jump to line L.</span>
                             </div>
@@ -547,26 +765,6 @@ JMP 2`
                                 <code class="text-[var(--color-schematic-primary)]">BIE L</code> 
                                 <span>Branch if Equal. Jump to L if last ALU op was Equal.</span>
                             </div>
-                        </div>
-                    </section>
-
-                    <section>
-                        <h3 class="text-white font-bold mb-1">PIPELINE STAGES</h3>
-                        <div class="grid grid-cols-[40px_1fr] gap-2">
-                            <span class="text-zinc-500">IF</span>
-                            <span>Fetch instruction from memory at PC.</span>
-                        </div>
-                        <div class="grid grid-cols-[40px_1fr] gap-2">
-                            <span class="text-zinc-500">ID</span>
-                            <span>Decode opcode and read register values.</span>
-                        </div>
-                        <div class="grid grid-cols-[40px_1fr] gap-2">
-                            <span class="text-zinc-500">EX</span>
-                            <span>ALU calculations (Add, Shift, Not). Flags updated here.</span>
-                        </div>
-                        <div class="grid grid-cols-[40px_1fr] gap-2">
-                            <span class="text-zinc-500">WB</span>
-                            <span>Write result back to Register or Port.</span>
                         </div>
                     </section>
                 </div>
@@ -579,8 +777,8 @@ JMP 2`
             <div class="flex items-center gap-2">
                 <span class="text-xs font-mono text-[var(--color-schematic-primary)] font-bold">ASM</span>
                 <select onchange={loadExample} class="bg-zinc-950 text-[10px] text-zinc-400 border border-zinc-800 p-1 rounded font-mono outline-none">
-                    <option value="Checkerboard">Checkerboard</option>
-                    <option value="Heart">Heart</option>
+                    <option value="Input Test">Input Test</option>
+                    <option value="Intro">Intro</option>
                     <option value="Fibonacci">Fibonacci</option>
                 </select>
             </div>
@@ -595,13 +793,19 @@ JMP 2`
         
         <div class="flex-grow flex bg-zinc-950 border border-zinc-800 relative overflow-hidden min-h-0 h-96">
             <div 
-                bind:this={lineNumEl}
-                class="w-8 pt-2 pb-2 text-center text-zinc-600 bg-zinc-900/50 border-r border-zinc-800 select-none font-mono text-xs leading-5 overflow-hidden"
-            >
-                {#each code.split('\n') as _, i}
-                    <div>{i}</div>
-                {/each}
-            </div>
+            bind:this={lineNumEl}
+            class="w-8 pt-2 pb-2 text-center text-zinc-600 bg-zinc-900/50 border-r border-zinc-800 select-none font-mono text-xs leading-5 overflow-hidden"
+        >
+            {#each lineMap as addr, i}
+                <div 
+                    class:text-zinc-200={pc === addr && addr !== ""} 
+                    class:text-[var(--color-schematic-primary)]={execAddr === addr && addr !== ""}
+                    class:font-bold={execAddr === addr}
+                >
+                    {addr !== "" ? addr : "•"}
+                </div>
+            {/each}
+        </div>
             <textarea 
                 bind:this={textareaEl}
                 bind:value={code}
@@ -630,7 +834,7 @@ JMP 2`
                 <div class="aspect-square h-auto w-auto relative flex-grow">
                     <canvas bind:this={canvas} class="w-full h-full block image-pixelated"></canvas>
                     {#if !isReady}
-                         <div class="absolute top-2 right-2 text-[10px] text-zinc-500 font-mono bg-black/50 p-1">Loading...</div>
+                          <div class="absolute top-2 right-2 text-[10px] text-zinc-500 font-mono bg-black/50 p-1">Loading...</div>
                     {/if}
                 </div>
             </div>
