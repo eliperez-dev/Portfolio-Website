@@ -7,5 +7,5 @@
 </svelte:head>
 
 <article>
-    <svelte:component this={data.content} />
+	<svelte:component this={data.content} />
 </article>

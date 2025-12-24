@@ -5,8 +5,8 @@
 <header class="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-sm">
     <div class="container mx-auto px-6 h-20 flex items-center justify-between">
         <a href="/" class="text-xl font-bold font-mono text-white flex items-center gap-2 group">
-            <span class="text-[var(--color-schematic-primary)] group-hover:animate-pulse">>_</span>
-            <span>ELI_PEREZ</span>
+            <span class="text-[var(--color-schematic-primary)] group-hover:animate-pulse">></span>
+            <span>eliperez.dev</span>
         </a>
 
         <nav class="hidden md:flex items-center gap-8 font-mono text-sm uppercase tracking-wider">

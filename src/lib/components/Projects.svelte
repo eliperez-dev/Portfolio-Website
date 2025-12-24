@@ -3,11 +3,10 @@
     import Gallery from '$lib/components/Gallery.svelte';
 </script>
 
-<section id="projects" class="py-20 relative">
+<section id="projects" class="py-10 relative">
 	<div class="container mx-auto px-6">
 		<h2 class="text-3xl font-bold font-mono text-white flex items-center gap-4 mb-16">
 			<span class="text-[var(--color-schematic-primary)]">03.</span> Featured Projects
-			<span class="h-1 bg-zinc-800 flex-grow"></span>
 		</h2>
 
 		<div class="grid lg:grid-cols-2 gap-8">

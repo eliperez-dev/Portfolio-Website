@@ -46,9 +46,9 @@
 				</p>
 			</div>
 			
-			<div class="space-y-4 font-mono text-sm text-zinc-500 border-l-2 border-zinc-800 pl-4">
+			<div class="space-y-1 font-mono text-sm text-zinc-500 border-l-2 border-zinc-800 pl-4">
 				<div class="flex items-center gap-3">
-					<span class="text-[var(--color-schematic-primary)]">CURRENT_ROLE</span>
+					<span class="text-[var(--color-schematic-primary)]">LAST_ROLE</span>
 					<span>Software Engineer @ Fish Defender</span>
 				</div>
 				<div class="flex items-center gap-3">
@@ -58,8 +58,7 @@
 				<div class="flex items-center gap-3">
 					<span class="text-[var(--color-schematic-primary)]">STATUS</span>
 					<span class="flex items-center gap-2">
-						<span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-						Online & Compiling
+						Seeking full-time opportunities!
 					</span>
 				</div>
 			</div>
