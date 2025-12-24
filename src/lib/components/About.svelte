@@ -7,7 +7,7 @@
 		<div class="space-y-8">
 			<h2 class="text-3xl font-bold font-mono text-white flex items-center gap-4">
 				<span class="text-[var(--color-schematic-primary)]">01.</span> About Me
-				<span class="h-px bg-zinc-800 flex-grow"></span>
+				<span class="h-1 bg-zinc-800 flex-grow"></span>
 			</h2>
 
 			<div class="space-y-6 text-zinc-400 leading-relaxed">

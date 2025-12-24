@@ -13,7 +13,7 @@
 <div class="pt-32 pb-20 container mx-auto px-6 max-w-4xl">
     <h1 class="text-3xl font-bold font-mono text-white mb-12 flex items-center gap-4">
         <span class="text-[var(--color-schematic-primary)]">04.</span> Engineering Blog
-        <span class="h-px bg-zinc-800 flex-grow"></span>
+        <span class="h-1 bg-zinc-800 flex-grow"></span>
     </h1>
 
     <div class="space-y-8">

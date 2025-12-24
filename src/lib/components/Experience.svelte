@@ -58,13 +58,13 @@
 	<div class="container mx-auto px-6">
 		<h2 class="text-3xl font-bold font-mono text-white flex items-center gap-4 mb-16">
 			<span class="text-[var(--color-schematic-primary)]">02.</span> Experience
-			<span class="h-px bg-zinc-800 flex-grow"></span>
+			<span class="h-1 bg-zinc-800 flex-grow"></span>
 		</h2>
 
 		<div class="grid lg:grid-cols-3 gap-8">
 			<div class="lg:col-span-2 space-y-8">
 				<h3 class="text-xl text-white font-mono uppercase tracking-widest mb-6 border-l-2 border-[var(--color-schematic-primary)] pl-4">Work History</h3>
-				<div class="relative space-y-8 border-l border-zinc-800 ml-3 pl-8 pb-4">
+				<div class="relative space-y-8 border-l-2 border-[var(--color-schematic-primary)] ml-3 pl-8">
 					{#each experiences as exp}
 						<div class="relative">
 							<!-- Timeline dot -->

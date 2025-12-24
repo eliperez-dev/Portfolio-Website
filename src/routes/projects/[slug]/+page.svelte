@@ -46,7 +46,7 @@
                      {#if project.links.live}
                         <a href={project.links.live} target="_blank" rel="noopener noreferrer" 
                            class="px-6 py-2 border border-[var(--color-schematic-primary)] text-[var(--color-schematic-primary)] hover:bg-[var(--color-schematic-primary)] hover:text-black transition-colors font-mono text-sm uppercase tracking-wider">
-                            Launch System
+                            Live Demo
                         </a>
                     {/if}
                     {#if project.links.github}
@@ -62,7 +62,7 @@
 
     <div class="container mx-auto px-6 grid lg:grid-cols-[2fr_1fr] gap-12">
         <!-- Main Content -->
-        <div class="space-y-12">
+        <div class="space-y-12 min-w-0">
             <!-- Overview -->
             <section>
                 <h2 class="text-2xl font-bold font-mono text-white mb-6 flex items-center gap-3">

@@ -82,7 +82,7 @@ export const projects: Project[] = [
 		],
 		gallery: {
 			path: "cpu-emulator",
-			images: ["gui-example.png", "image0.jpeg", "image1.jpeg", "image2.png", "image3.png", "image4.jpeg", "image5.jpeg"]
+			images: ["Video.mp4", "gui-example.png", "image0.jpeg", "image1.jpeg", "image2.png", "image3.png", "image4.jpeg", "image5.jpeg"]
 		}
 	},
 	{
