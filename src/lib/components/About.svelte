@@ -10,24 +10,24 @@
 				<span class="h-px bg-zinc-800 flex-grow"></span>
 			</h2>
 
-			<div class="space-y-6 text-zinc-400 font-mono leading-relaxed">
-				<p>
-					I'm a <span class="text-white">Sophomore at Southwestern College</span> studying Computer Science. I started programming at 15 and fell in love with systems design—now I build full-stack applications in Rust, Python, and JavaScript.
-				</p>
-				
-				<p>
-					I'm most interested in <span class="text-white">systems programming and Rust</span>. I've built RESTful APIs, custom CPU emulators, and embedded sensor drivers. I like working at all levels of the stack, from low-level assembly to high-level web frameworks.
-				</p>
+			<div class="space-y-6 text-zinc-400 leading-relaxed">
+    <p>
+        I am a <span class="text-white">Systems Engineer</span> and the <span class="text-white">Technical Lead for the IEEE Embedded Systems division</span>, currently architecting firmware for autonomous aerial robotics. My focus is on high-performance infrastructure, embedded control systems, and computer architecture.
+    </p>
 
-				<p>
-					My open-source project, <span class="text-white">"Until Every Cage is Empty"</span>, is making a significant real-world impact by providing a critical data resource to animal rights activists, researchers, and organizations.
-				</p>
-				
-				<p>
-					As the lead engineer, I developed this full-stack application in <span class="text-white">Rust + Vanilla JS</span> to serve over <span class="text-[var(--color-schematic-primary)]">54,000 data points</span> to more than <span class="text-[var(--color-schematic-primary)]">3,000 monthly users</span>. The project was awarded a seed grant by The Pollination Project Foundation.
-				</p>
-			</div>
-		</div>
+    <p>
+        I specialize in <span class="text-white">Rust for safety-critical environments</span>. I recently engineered a fault-tolerant telemetry system for a nuclear startup, implementing a <span class="text-white">voting logic algorithm</span> to synthesize data from triple-redundant Rockwell PLCs, neutron flux detectors, and seismometers with sub-10ms latency.
+    </p>
+
+    <p>
+        My passion for low-level architecture led me to design "Electron," a <span class="text-white">custom 8-bit CPU</span> built from logic gates. I developed the entire ecosystem in Rust—including an assembler, a cycle-accurate emulator, and a <span class="text-white">VS Code extension</span>—to validate the custom instruction set.
+    </p>
+
+    <p>
+        On the web, I architected <span class="text-white">"Until Every Cage is Empty"</span>, a high-performance geospatial platform. I built the system in Rust (Axum) and Vanilla JS to serve over <span class="text-[var(--color-schematic-primary)]">56,000 data points</span> to more than <span class="text-[var(--color-schematic-primary)]">3,000 monthly users</span>, securing a seed grant from The Pollination Project.
+    </p>
+</div>
+</div>
 
 		<div class="space-y-8">
 			<div class="relative group max-w-md mx-auto lg:max-w-none">

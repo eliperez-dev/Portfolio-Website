@@ -73,7 +73,7 @@
 							<div class="bg-zinc-900/50 border border-zinc-800 p-6 hover:border-[var(--color-schematic-primary)] transition-colors group">
 								<div class="flex flex-col md:flex-row md:justify-between md:items-start mb-4 gap-2">
 									<div>
-										<h4 class="text-lg font-bold text-white group-hover:text-[var(--color-schematic-primary)] transition-colors">{exp.title}</h4>
+										<h4 class="text-lg font-bold text-white font-mono group-hover:text-[var(--color-schematic-primary)] transition-colors">{exp.title}</h4>
 										<p class="text-[var(--color-schematic-primary)] font-mono text-sm">{exp.company}</p>
 									</div>
 									<div class="text-right">
@@ -102,7 +102,7 @@
 				<h3 class="text-xl text-white font-mono uppercase tracking-widest mb-6 border-l-2 border-[var(--color-schematic-primary)] pl-4">Education</h3>
 				<div class="bg-zinc-900/50 border border-zinc-800 p-6 sticky top-24">
 					<div class="mb-6">
-						<h4 class="text-lg font-bold text-white">{education.school}</h4>
+						<h4 class="text-lg font-bold text-white font-mono">{education.school}</h4>
 						<p class="text-[var(--color-schematic-primary)] font-mono text-sm">{education.degree}</p>
 						<div class="flex justify-between items-center mt-2 text-xs text-zinc-500 font-mono">
 							<span>{education.period}</span>

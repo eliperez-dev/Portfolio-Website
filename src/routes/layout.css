@@ -2,22 +2,23 @@
 
 @theme {
   --font-mono: 'JetBrains Mono', monospace;
-  --font-sans: 'JetBrains Mono', monospace;
+  --font-sans: 'Inter', sans-serif;
 
-  --color-schematic-bg: #0a0a0a;
-  --color-schematic-grid: #1a1a1a;
-  --color-schematic-primary: #00ff9d;
+  --color-schematic-bg: #09090b;
+  --color-schematic-grid: #18181b;
+  --color-schematic-primary: #22d3ee;
+  --color-schematic-primary-dim: rgba(34, 211, 238, 0.1);
 }
 
 @layer base {
   body {
     background-color: var(--color-schematic-bg);
-    color: white;
-    font-family: var(--font-mono);
+    color: #e4e4e7;
+    font-family: var(--font-sans);
     background-image:
       linear-gradient(to right, var(--color-schematic-grid) 1px, transparent 1px),
       linear-gradient(to bottom, var(--color-schematic-grid) 1px, transparent 1px);
-    background-size: 40px 40px;
+    background-size: 50px 50px;
     min-height: 100vh;
   }
 }
