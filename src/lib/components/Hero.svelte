@@ -47,12 +47,10 @@
 					Get In Touch
 				</a>
                 <a 
-                  href="/PerezEli_Resume_2025.pdf" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
+                  href="/resume" 
                   class="px-6 py-3 bg-zinc-800 text-white hover:bg-zinc-700 transition-colors font-mono uppercase text-sm tracking-wider"
                 >
-                  Download Resume
+                  View Resume
                 </a>
 			</div>
 		</div>

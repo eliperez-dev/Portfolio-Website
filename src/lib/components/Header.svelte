@@ -18,9 +18,7 @@
 
         <div class="flex items-center gap-4">
              <a 
-                href="/PerezEli_Resume_2025.pdf" 
-                target="_blank" 
-                rel="noopener noreferrer"
+                href="/resume" 
                 class="hidden sm:block px-4 py-2 border border-zinc-700 text-zinc-300 text-xs font-mono uppercase hover:border-[var(--color-schematic-primary)] hover:text-[var(--color-schematic-primary)] transition-colors"
             >
                 Resume

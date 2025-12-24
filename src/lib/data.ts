@@ -15,6 +15,10 @@ export interface Project {
 	challenges?: string[];
 	architecture?: string; // Markdown or description
 	outcomes?: string[];
+	gallery?: {
+		path: string;
+		images: string[];
+	};
 }
 
 export const projects: Project[] = [
@@ -44,7 +48,11 @@ export const projects: Project[] = [
 			"Used by major NGOs for investigations",
 			"Featured in international press",
 			"99.9% uptime with minimal maintenance costs"
-		]
+		],
+		gallery: {
+			path: "geospatial",
+			images: ["5.png", "7.png", "2.png", "3.png", "4.png", "6.png"]
+		}
 	},
 	{
 		id: 2,
@@ -71,7 +79,11 @@ export const projects: Project[] = [
 			"Successfully ran complex algorithms (Fibonacci, Multiplication)",
 			"Visualized internal CPU state for educational purposes",
 			"Ported logic to Minecraft Redstone circuitry"
-		]
+		],
+		gallery: {
+			path: "cpu-emulator",
+			images: ["gui-example.png", "image0.jpeg", "image1.jpeg", "image2.png", "image3.png", "image4.jpeg", "image5.jpeg"]
+		}
 	},
 	{
 		id: 3,
@@ -98,7 +110,11 @@ export const projects: Project[] = [
 			"Battery life extended to weeks via Deep Sleep optimization",
 			"Reliable data logging with automatic reconnection strategies",
 			"Clean, responsive web dashboard for data analysis"
-		]
+		],
+		gallery: {
+			path: "iot-dashboard",
+			images: ["timelapse.gif", "weather-station.jpeg", "dashboard.png"]
+		}
 	},
 	{
 		id: 4,
@@ -126,6 +142,10 @@ export const projects: Project[] = [
 			"Zero-infrastructure deployment on Cloudflare",
 			"Fast generation times compared to traditional server-based solutions",
 			"Viral engagement potential due to unique content generation"
-		]
+		],
+		gallery: {
+			path: "ai-roundtable",
+			images: ["1.png", "2.png"]
+		}
 	}
 ];

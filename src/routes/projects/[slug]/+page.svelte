@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import Gallery from '$lib/components/Gallery.svelte';
 	
 	let { data }: { data: PageData } = $props();
 	const { project } = data;
@@ -13,7 +14,7 @@
     <!-- Header / Schematic Title Block -->
 	<div class="container mx-auto px-6 mb-16">
         <a href="/#projects" class="inline-flex items-center gap-2 text-zinc-500 hover:text-[var(--color-schematic-primary)] transition-colors mb-8 font-mono text-sm group">
-            <span class="group-hover:-translate-x-1 transition-transform"><-</span>
+            <span class="group-hover:-translate-x-1 transition-transform">&lt;-</span>
             BACK_TO_PROJECTS
         </a>
 
@@ -104,6 +105,14 @@
                     {/each}
                 </ul>
             </section>
+            {/if}
+            {#if project.gallery}
+                <section>
+                    <h2 class="text-2xl font-bold font-mono text-white mb-6 flex items-center gap-3">
+                        <span class="text-[var(--color-schematic-primary)]">04.</span> Visual Artifacts
+                    </h2>
+                    <Gallery path={project.gallery.path} images={project.gallery.images} />
+                </section>
             {/if}
         </div>
 
