@@ -3,7 +3,7 @@
 </script>
 
 <div class="pt-32 pb-20 container mx-auto px-6 max-w-3xl blog-content">
-    <a href="/blog" class="inline-flex items-center gap-2 text-zinc-500 hover:text-[var(--color-schematic-primary)] transition-colors mb-8 font-mono text-sm">
+    <a href="/blog" class="inline-flex items-center gap-2 text-zinc-500 hover:text-indigo-400 transition-colors mb-8 font-mono text-sm !no-underline">
         ← Back to Blog
     </a>
     {@render children()}
@@ -12,25 +12,28 @@
 <style>
     @import '../../layout.css';
 
-
-    /* Added tracking-tight to headers to make them feel more solid */
-    
     :global(.blog-content h1) {
-        /* Bumped to 5xl, kept font-mono */
-        @apply text-5xl font-bold text-white mb-10 mt-4 font-mono tracking-tight;
+        @apply text-5xl font-black text-white mb-10 mt-4 font-mono tracking-tight;
     }
 
     :global(.blog-content h2) {
-        /* Bumped to 3xl, made border thicker (border-b-2) */
-        @apply text-3xl font-bold text-white mb-8 mt-12 border-b-2 border-zinc-800 pb-4 font-mono tracking-tight;
+        @apply text-3xl font-extrabold text-white mb-8 mt-12 border-b-2 border-zinc-300 font-mono tracking-tight;
     }
 
     :global(.blog-content h3) {
-        @apply text-2xl font-bold text-white mb-6 mt-10 font-mono tracking-tight;
+        @apply text-2xl font-extrabold text-white mb-6 mt-10 font-mono tracking-tight;
+    }
+
+    :global(.blog-content h4) {
+        @apply text-xl font-extrabold text-white mb-6 mt-10 font-mono tracking-tight;
+    }
+
+    :global(.blog-content strong),
+    :global(.blog-content b) {
+        @apply text-cyan-400 font-extrabold;
     }
 
     :global(.blog-content p) {
-        /* Kept font-mono, kept size standard */
         @apply text-zinc-300 leading-relaxed mb-6 font-mono text-base;
     }
 
@@ -54,13 +57,15 @@
         @apply bg-zinc-800 px-1.5 py-0.5 rounded text-[var(--color-schematic-primary)] text-sm;
     }
 
+    /* --- UPDATED LINK COLORS --- */
     :global(.blog-content a) {
-        @apply text-[var(--color-schematic-primary)] hover:underline;
+        /* CHANGED: text-indigo-400 (Cool Purple/Blue) + Hover effect */
+        @apply text-indigo-400 hover:text-indigo-300 underline underline-offset-4 transition-colors;
     }
 
     :global(.blog-content hr) {
         border: none;
-        border-bottom: 2px solid #27272a;
+        border-bottom: 2px solid #dadada;
         margin: 3rem 0;
     }
 </style>
