@@ -1,0 +1,30 @@
+<script lang="ts">
+    import { page } from '$app/stores';
+</script>
+
+<header class="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-sm">
+    <div class="container mx-auto px-6 h-20 flex items-center justify-between">
+        <a href="/" class="text-xl font-bold font-mono text-white flex items-center gap-2 group">
+            <span class="text-[var(--color-schematic-primary)] group-hover:animate-pulse">>_</span>
+            <span>ELI_PEREZ</span>
+        </a>
+
+        <nav class="hidden md:flex items-center gap-8 font-mono text-sm uppercase tracking-wider">
+            <a href="/#about" class="text-zinc-400 hover:text-[var(--color-schematic-primary)] transition-colors">About</a>
+            <a href="/#projects" class="text-zinc-400 hover:text-[var(--color-schematic-primary)] transition-colors">Projects</a>
+            <a href="/#contact" class="text-zinc-400 hover:text-[var(--color-schematic-primary)] transition-colors">Contact</a>
+            <a href="/blog" class="text-zinc-400 hover:text-[var(--color-schematic-primary)] transition-colors">Blog</a>
+        </nav>
+
+        <div class="flex items-center gap-4">
+             <a 
+                href="/PerezEli_Resume_2025.pdf" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="hidden sm:block px-4 py-2 border border-zinc-700 text-zinc-300 text-xs font-mono uppercase hover:border-[var(--color-schematic-primary)] hover:text-[var(--color-schematic-primary)] transition-colors"
+            >
+                Resume
+            </a>
+        </div>
+    </div>
+</header>
