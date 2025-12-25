@@ -71,16 +71,20 @@ OUT %4 R5
 OUT %5 R6
 OUT %6 R7
 OUT %7 R0
-NOOP
-NOOP
-NOOP
+
+--- Store Heart To RAM ---
+PUSH R1
+PUSH R2
+PUSH R3
+PUSH R4
+PUSH R5
+PUSH R6
+PUSH R7
 
 ; --- Checkerboard --- 
 IMM R1 B10101010  
 IMM R2 B01010101  
 
-NOT R1 R1
-NOT R2 R2
 OUT %0 R1        
 OUT %1 R2         
 OUT %2 R1          
@@ -124,10 +128,6 @@ OUT %4 R4
 OUT %5 R5
 OUT %6 R6
 OUT %7 R6
-NOOP
-NOOP
-NOOP
-NOOP
 
 ; --- Cylon Scanline ---
 IMM R1 255  ; Full Row ON
@@ -150,6 +150,18 @@ OUT %6 R2
 OUT %7 R1
 OUT %7 R2
 
+-- Pop Heart From RAM --
+; This wont do anything,
+; but shocases RAM usage.
+
+POP R0 ; Load to Zero Reg
+POP R0
+POP R0
+POP R0
+POP R0
+POP R0
+POP R0
+
 JMP 0
 `,
         "Input Test": `; Input Instruction Test
@@ -161,6 +173,7 @@ ADD R1 R2       ; Add 1 to Input
 OUT %1 R1       ; Show result on Port 1`,
 
         "Fibonacci": `; Fibonacci Sequence
+; Output will be on Port %0
 IMM R1 0
 IMM R2 1
 MOV R3 R1
@@ -1277,13 +1290,13 @@ RET           ; Return to caller`
             <div class="border border-zinc-800 bg-zinc-900/50 p-1 mt-1">
                 <div class="flex justify-between items-center mb-1">
                     <div class="text-zinc-600 text-[8px] uppercase tracking-wider">RAM (16 Bytes)</div>
-                    <div class="text-zinc-600 text-[8px]">SP: {sp}</div>
+                    <div class="text-zinc-600 text-[8px]">STACK POINTER (YELLOW): {sp}</div>
                 </div>
                 <div class="grid grid-cols-8 gap-px bg-zinc-800">
                     {#each ram as byte, i}
                         <div class="bg-zinc-950 text-[9px] font-mono text-center py-1 relative group">
                             <span class={i === sp ? "text-yellow-400 font-bold" : "text-zinc-400"}>
-                                {byte.toString(16).toUpperCase().padStart(2, '0')}
+                                {byte.toString()}
                             </span>
                             
                             {#if i === sp}
