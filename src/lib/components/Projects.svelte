@@ -49,7 +49,7 @@
 
                     <!-- Gallery Integration -->
                     {#if project.gallery}
-                        <div class="mb-6 border-y border-zinc-800 py-4 bg-zinc-950/30 -mx-8 px-8 relative z-10 pointer-events-none">
+                        <div class="mb-6 border-zinc-800 py-4 bg-zinc-850/30 -mx-8 px-8 relative z-10 pointer-events-none">
                             <div class="pointer-events-auto">
                                 <Gallery path={project.gallery.path} images={project.gallery.images} />
                             </div>
@@ -77,7 +77,7 @@
                         <div class="flex justify-end gap-3 mt-6 flex-wrap relative z-20">
                             {#if project.links.live}
                                 <a href={project.links.live} target="_blank" rel="noopener noreferrer" on:click|stopPropagation class="text-white font-mono text-sm font-semibold bg-[var(--color-schematic-primary)] text-black px-3 py-2 hover:shadow-lg hover:shadow-[var(--color-schematic-primary)]/50 transition-all duration-200 flex items-center gap-2 border border-[var(--color-schematic-primary)] hover:scale-105">
-                                    LIVE DEMO <span class="transition-transform inline-block">↗</span>
+                                    LIVE WEBSITE <span class="transition-transform inline-block">↗</span>
                                 </a>
                             {/if}
                             {#if project.links.github}

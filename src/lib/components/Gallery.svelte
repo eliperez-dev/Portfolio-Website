@@ -68,7 +68,7 @@
 <div class="space-y-4">
     <div class="flex justify-between items-end border-b border-zinc-800 pb-2">
         <h3 class="font-mono text-sm uppercase tracking-widest text-zinc-500">
-            Visual Data Log
+            Gallery
         </h3>
         <div class="flex gap-1">
             <button 
@@ -123,7 +123,7 @@
                     {/if}
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2 pointer-events-none">
                         <span class="text-xs font-mono text-[var(--color-schematic-primary)]">
-                            {isVideo(image) ? 'VID_' : 'IMG_'}{image.split('.')[0].toUpperCase().substring(0, 8)}
+                            {isVideo(image) ? ' VID_' : 'IMG_'}{image.split('.')[0].toUpperCase().substring(0, 8)}
                         </span>
                     </div>
                     
@@ -203,7 +203,7 @@
             
             <div class="flex-shrink-0 p-4 bg-zinc-950 border-t border-zinc-900 text-center relative">
                  <p class="font-mono text-sm text-[var(--color-schematic-primary)]">
-                    // VIEWING_ARTIFACT: {currentImage} [{(selectedIndex || 0) + 1}/{images.length}]
+                    VIEWING: {currentImage} [{(selectedIndex || 0) + 1}/{images.length}]
                  </p>
                  <div class="flex justify-center gap-4 mt-2 md:hidden">
                     <button class="text-zinc-500 hover:text-white" onclick={() => navigate(-1)}>&lt; PREV</button>

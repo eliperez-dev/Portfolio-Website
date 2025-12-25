@@ -3,49 +3,45 @@
 
     // --- 1. EXAMPLE PROGRAMS ---
     const EXAMPLES = {
-        "Input Test": `; Input Instruction Test
-; Run this! It will popup a custom UI.
+        "Intro": `; This system is a faithful
+; emulation of my Electron CPU,
+; an entirely custom architature
+; built in Minecraft on controller.
 
-; 1. Ask user for value
-; 2. Store in R1
-INP R1
-
-; 3. Output R1 to Port 0
-OUT %0 R1
-
-; 4. Add 1 to R1
-IMM R2 1
-ADD R1 R2
-
-; 5. Output result to Port 1
-OUT %1 R1
-`,
-        "Fibonacci": `; Fibonacci Sequence
-; Check Port %0 for output
-IMM R1 0
-IMM R2 1
-MOV R3 R1
-MOV R4 R2
-ADD R1 R2
-UADD R5 R0
-OUT %0 R5
-MOV R1 R2
-MOV R2 R5
-JMP 2`,
-        "Intro": `; Intro Graphics Animation
-; Feel free to mess around with
-; the emulator.
+; The emulator was originally written
+; in Rust, but I have ported it to
+; TypeScript to run in the browser.
 
 ; More examples and docs are right
-; above the text editor. Enjoy!
+; above the text editor. Info on this
+; project and others is down below!
 
-; --- FRAME 1: Draw Face ---
-IMM R1 60     ; 00111100 (Hair)
-IMM R2 66     ; 01000010 (Forehead)
-IMM R3 165    ; 10100101 (Eyes Open)
-IMM R4 129    ; 10000001 (Nose Bridge)
-IMM R5 165    ; 10100101 (Cheeks)
-IMM R6 153    ; 10011001 (Smile)
+; I hope you enjoy my portfolio!
+
+; --- Crab ---
+IMM R1 B10000001
+IMM R2 B11011011
+IMM R3 B01111110
+IMM R4 B11111111
+IMM R5 B01111110
+IMM R6 B10100101
+IMM R7 B10000001
+OUT %0 R0
+OUT %1 R1
+OUT %2 R2
+OUT %3 R3
+OUT %4 R4
+OUT %5 R5
+OUT %6 R6
+OUT %7 R7
+
+; --- Draw Face ---
+IMM R1 60      ; 00111100 (Hair)
+IMM R2 66      ; 01000010 (Forehead)
+IMM R3 165     ; 10100101 (Eyes Open)
+IMM R4 129     ; 10000001 (Nose Bridge)
+IMM R5 165     ; 10100101 Smile
+IMM R6 153     ; 10011001
 IMM R7 b01000010 ; (Chin)
 OUT %0 R1
 OUT %1 R2
@@ -55,22 +51,11 @@ OUT %4 R5
 OUT %5 R6
 OUT %6 R7
 OUT %7 R1
+NOOP
 
-; --- FRAME 2: Flat mouth  ---
-IMM R5 b10000001 ; Flat mouth
-IMM R6 b10111101 
-OUT %4 R5    
-OUT %5 R6     
-NOP
-NOP
 
-; --- FRAME 3: Smile ---
-IMM R5 165    ; 10100101 Smile
-IMM R6 153    ; 10011001
-OUT %4 R5     
-OUT %5 R6  
 
-; --- FRAME 4: Heart --- 
+; --- Heart --- 
 IMM R1 108
 IMM R2 254
 IMM R3 254
@@ -86,67 +71,136 @@ OUT %4 R5
 OUT %5 R6
 OUT %6 R7
 OUT %7 R0
+NOOP
+NOOP
+NOOP
 
-; --- FRAME 4: Checkerboad --- 
+; --- Checkerboard --- 
 IMM R1 B10101010  
 IMM R2 B01010101  
 
 NOT R1 R1
 NOT R2 R2
-OUT %0 R1       
-OUT %1 R2        
-OUT %2 R1         
-OUT %3 R2        
-OUT %4 R1       
-OUT %5 R2       
-OUT %6 R1         
-OUT %7 R2    
-  
+OUT %0 R1        
+OUT %1 R2         
+OUT %2 R1          
+OUT %3 R2         
+OUT %4 R1        
+OUT %5 R2        
+OUT %6 R1          
+OUT %7 R2     
+
+; --- Snake (Python) ---
+IMM R1 B00011000
+IMM R2 B00011100
+IMM R3 B00110000
+IMM R4 B00111100
+IMM R5 B00000110
+IMM R6 B01111100
+IMM R7 B01100000
+OUT %0 R0
+OUT %1 R1
+OUT %2 R2
+OUT %3 R3
+OUT %4 R4
+OUT %5 R5
+OUT %6 R6
+OUT %7 R7
+
+
+; --- Music Note ---
+IMM R1 B00011100 ; Top / Flag
+IMM R2 B00010010
+IMM R3 B00010001
+IMM R4 B00010000 ; Stem
+IMM R5 B00010000 ; Stem
+IMM R6 B01110000 ; Note Head
+IMM R7 B00110000 ; Note Head
+OUT %0 R0
+OUT %1 R1
+OUT %2 R2
+OUT %3 R3
+OUT %4 R4
+OUT %5 R5
+OUT %6 R6
+OUT %7 R6
+NOOP
+NOOP
+NOOP
+NOOP
+
 ; --- Cylon Scanline ---
 IMM R1 255  ; Full Row ON
 IMM R2 0    ; Full Row OFF
 
-; Frame 0
 OUT %0 R1
-OUT %0 R2   ; Clear immediately
-
-; Frame 1
+OUT %0 R2
 OUT %1 R1
 OUT %1 R2
-
-; Frame 2
 OUT %2 R1
 OUT %2 R2
-
-; Frame 3
 OUT %3 R1
 OUT %3 R2
-
-; Frame 4
 OUT %4 R1
 OUT %4 R2
-
-; Frame 5
 OUT %5 R1
 OUT %5 R2
-
-; Frame 6
 OUT %6 R1
 OUT %6 R2
-
-; Frame 7
 OUT %7 R1
 OUT %7 R2
 
 JMP 0
-`
+`,
+        "Input Test": `; Input Instruction Test
+; Run this! It will popup a custom UI.
+INP R1          ; Ask user for value
+OUT %0 R1       ; Show input on Port 0
+IMM R2 1
+ADD R1 R2       ; Add 1 to Input
+OUT %1 R1       ; Show result on Port 1`,
+
+        "Fibonacci": `; Fibonacci Sequence
+IMM R1 0
+IMM R2 1
+MOV R3 R1
+MOV R4 R2
+ADD R1 R2
+UADD R5 R0
+OUT %0 R5
+MOV R1 R2
+MOV R2 R5
+JMP 2`,
+    "Functions": `; Function Call Test
+; Main Program
+
+IMM R1 3
+OUT %0 R1
+CALL 6        ; Call "double_r1" function
+NOP           ; Wait for flush       
+OUT %0 R1     ; Output result 
+JMP 2         ; Loop forever
+
+; --- Function: double_r1 ---
+; Expects argument in R1
+; Returns result in R1
+IMM R2 2      ; Line 6
+MOV R3 R1
+ADD R1 R3     ; Double it
+RET           ; Return to caller`
 };
 
     // --- 2. CONSTANTS & TYPES ---
     const Operation = {
         NOOP: "NOOP", IMM: "IMM", MOV: "MOV",
-        ADD: "ADD", ADDC: "ADDC", SHR: "SHR", NOT: "NOT",
-        OUT: "OUT", JMP: "JMP", BIE: "BIE", INP: "INP" 
+        ADD: "ADD", ADDC: "ADDC", SUB: "SUB",
+        OR: "OR", XOR: "XOR", AND: "AND",
+        SHR: "SHR", NOT: "NOT",
+        OUT: "OUT", INP: "INP",
+        JMP: "JMP", BIE: "BIE", BIG: "BIG", BIL: "BIL", BIO: "BIO",
+        STORE: "STORE", LOAD: "LOAD",
+        PUSH: "PUSH", POP: "POP",
+        CALL: "CALL", RET: "RET"
     } as const;
     type Operation = typeof Operation[keyof typeof Operation];
 
@@ -174,7 +228,7 @@ JMP 0
         args: OperationArgs;
         a: Operand;
         b: Operand;
-        address: number; // Added to track which line this is
+        address: number;
 
         constructor(operation: Operation, args: OperationArgs, a: Operand, b: Operand, address: number = -1) {
             this.operation = operation;
@@ -185,13 +239,7 @@ JMP 0
         }
 
         static none(): Instruction {
-            return new Instruction(
-                Operation.NOOP, 
-                OperationArgs.None, 
-                new Operand(OperandType.Immediate, 0), 
-                new Operand(OperandType.Immediate, 0),
-                -1 // Invalid address
-            );
+            return new Instruction(Operation.NOOP, OperationArgs.None, new Operand(OperandType.Immediate, 0), new Operand(OperandType.Immediate, 0), -1);
         }
 
         clone(): Instruction {
@@ -204,7 +252,6 @@ JMP 0
         const lines = code.split('\n');
         const map: (number | string)[] = [];
         let instructionCount = 0;
-
         for (let line of lines) {
             const cleanLine = line.split(';')[0].trim();
             if (cleanLine.length > 0) {
@@ -218,7 +265,6 @@ JMP 0
     }
 
     class Parser {
-        
         static parseLine(line: string, address: number): Instruction | null {
             const commentIdx = line.indexOf(';');
             if (commentIdx !== -1) line = line.substring(0, commentIdx);
@@ -238,12 +284,10 @@ JMP 0
             let valB = new Operand(OperandType.Immediate, 0);
 
             if (needed[0]) {
-                if (tokenIdx >= tokens.length) valA = new Operand(OperandType.Immediate, 0);
-                else valA = this.parseOperand(tokens[tokenIdx++]);
+                if (tokenIdx < tokens.length) valA = this.parseOperand(tokens[tokenIdx++]);
             }
             if (needed[1]) {
-                if (tokenIdx >= tokens.length) valB = new Operand(OperandType.Immediate, 0);
-                else valB = this.parseOperand(tokens[tokenIdx++]);
+                if (tokenIdx < tokens.length) valB = this.parseOperand(tokens[tokenIdx++]);
             }
 
             return new Instruction(op, args, valA, valB, address);
@@ -257,7 +301,10 @@ JMP 0
             const suffix = str.substring(1);
             op = this.matchOp(suffix);
             
-            if (op && (op === Operation.ADD || op === Operation.ADDC)) {
+            // ALU Ops that support S, U, X prefixes
+            const aluOps = [Operation.ADD, Operation.ADDC, Operation.SUB, Operation.OR, Operation.XOR, Operation.AND];
+            
+            if (op && aluOps.includes(op)) {
                 let args: OperationArgs = OperationArgs.None;
                 if (prefix === 'S') args = OperationArgs.S;
                 else if (prefix === 'U') args = OperationArgs.U;
@@ -273,13 +320,26 @@ JMP 0
                 case "MOV": return Operation.MOV;
                 case "ADD": return Operation.ADD;
                 case "ADDC": return Operation.ADDC;
+                case "SUB": return Operation.SUB;
+                case "OR": return Operation.OR;
+                case "XOR": return Operation.XOR;
+                case "AND": return Operation.AND;
                 case "SHR": return Operation.SHR;
-                case "NOOP": case "NOP": return Operation.NOOP;
+                case "NOT": return Operation.NOT;
                 case "OUT": return Operation.OUT;
+                case "INP": return Operation.INP;
                 case "JMP": return Operation.JMP;
                 case "BIE": return Operation.BIE;
-                case "NOT": return Operation.NOT;
-                case "INP": return Operation.INP;
+                case "BIG": return Operation.BIG;
+                case "BIL": return Operation.BIL;
+                case "BIO": return Operation.BIO;
+                case "STORE": return Operation.STORE;
+                case "LOAD": return Operation.LOAD;
+                case "PUSH": return Operation.PUSH;
+                case "POP": return Operation.POP;
+                case "NOOP": case "NOP": return Operation.NOOP;
+                case "CALL": return Operation.CALL;
+                case "RET": return Operation.RET;
                 default: return null;
             }
         }
@@ -290,12 +350,27 @@ JMP 0
                 case Operation.IMM: return [true, true]; 
                 case Operation.MOV: return [true, true]; 
                 case Operation.ADD:
-                case Operation.ADDC: return args === OperationArgs.X ? [false, true] : [true, true];
-                case Operation.SHR: return [true, true];
+                case Operation.ADDC: 
+                case Operation.SUB:
+                case Operation.OR:
+                case Operation.XOR:
+                case Operation.AND:
+                    return args === OperationArgs.X ? [false, true] : [true, true];
+                case Operation.SHR:
                 case Operation.NOT: return [true, true];
                 case Operation.OUT: return [true, true]; 
-                case Operation.JMP: case Operation.BIE: return [true, false]; 
+                case Operation.JMP: 
+                case Operation.BIE: 
+                case Operation.BIG: 
+                case Operation.BIO:
+                case Operation.BIL: return [true, false]; 
                 case Operation.INP: return [true, false];
+                case Operation.STORE: return [true, true]; // STORE #addr reg
+                case Operation.LOAD: return [true, true]; // LOAD reg #addr
+                case Operation.PUSH: return [true, false];
+                case Operation.POP: return [true, false];
+                case Operation.CALL: return [true, false]; // CALL address
+                case Operation.RET: return [false, false]; 
                 default: return [false, false];
             }
         }
@@ -332,44 +407,82 @@ JMP 0
         flags = { equals: false, greater: false, less: false, overflow: false };
 
         execute(registers: Registers, instr: Instruction, emuRef: Emulator) {
-            let a_data = (instr.args === OperationArgs.U || instr.args === OperationArgs.X) 
-                ? this.accumulator 
-                : registers.read(instr.a.data);
-            let b_data = registers.read(instr.b.data);
+            // Determine Operand A (Reg/Imm or Acc)
+            let a_data = 0;
+            if (instr.args === OperationArgs.U || instr.args === OperationArgs.X) {
+                a_data = this.accumulator;
+            } else {
+                a_data = registers.read(instr.a.data);
+            }
+
+            // Determine Operand B
+            let b_data = registers.read(instr.b.data); // Default: Read register
+            
+            // Special cases where B is immediate (logic ops usually take regs, but parser logic above assigns types)
+            // Note: The ISA definition says logic/math ops take Register, Register.
+            // However, the parser might return Immediate if user typed a number.
+            // We follow the strict ISA: Math ops read from registers. 
+            // Only IMM reads immediate. 
+            // EXCEPT: If the instruction implies immediate? The ISA provided says ADD is Register Register.
+            // We will trust registers.read handles it. 
+
             let result = 0;
             let op = instr.operation;
 
+            // Math & Logic
             if (op === Operation.ADD) result = a_data + b_data;
             else if (op === Operation.ADDC) result = a_data + b_data + 1;
+            else if (op === Operation.SUB) result = a_data - b_data;
+            else if (op === Operation.OR) result = a_data | b_data;
+            else if (op === Operation.XOR) result = a_data ^ b_data;
+            else if (op === Operation.AND) result = a_data & b_data;
             else if (op === Operation.SHR) result = b_data >> 1;
             else if (op === Operation.NOT) result = (~b_data) & 0xFF;
             
             else if (op === Operation.INP) {
                 emuRef.waitingForInput = true;
                 emuRef.inputRegister = instr.a.data;
-                result = 0;
+                result = 0; // Temp result
             }
 
+            // Flags
             this.flags.equals = a_data === b_data;
             this.flags.greater = a_data > b_data;
             this.flags.less = a_data < b_data;
-            this.flags.overflow = result > 255;
+            this.flags.overflow = result > 255 || result < 0; // Simple overflow check
             
-            if (result > 255) result -= 256;
-            this.accumulator = result & 0xFF;
+            // Wrap Result
+            if (result > 255) result = result % 256;
+            if (result < 0) result = (result + 256) % 256; // Handle negative from SUB
+
+            // Store to Accumulator for ALU ops
+            const isAluOp = [
+                Operation.ADD, Operation.ADDC, Operation.SUB, 
+                Operation.OR, Operation.XOR, Operation.AND, 
+                Operation.SHR, Operation.NOT
+            ].includes(op);
+
+            if (isAluOp) {
+                this.accumulator = result & 0xFF;
+            }
         }
     }
 
     class Emulator {
         instructions: Instruction[] = [];
         pc: number = 0;
+        sp: number = 15; // FIXED: Stack Pointer starts at 15 (end of 16-byte RAM)
+        
+        // Pipeline Registers
         fetch_reg = Instruction.none();
         decode_reg = Instruction.none();
         execute_reg = Instruction.none();
         writeback_reg = Instruction.none();
+        
         registers = new Registers();
         alu = new ALU();
         portsOut = new Uint8Array(8);
+        ram = new Uint8Array(16); // FIXED: 16 Byte Memory
 
         waitingForInput = false;
         inputRegister = 0;
@@ -389,8 +502,10 @@ JMP 0
                     }
                 } catch (e) { console.error(e); }
             }
-            while (this.instructions.length < 256) this.instructions.push(Instruction.none());
+            while (this.instructions.length < 255) this.instructions.push(Instruction.none());
             this.pc = 0;
+            this.sp = 15; // FIXED: Reset to 15
+            this.ram.fill(0);
             this.waitingForInput = false;
         }
 
@@ -410,37 +525,117 @@ JMP 0
 
         private incrementPc() {
             this.pc++;
-            if (this.pc >= 256) this.pc = 0;
+            if (this.pc >= 255) this.pc = 0;
         }
         private fetchStage() {
             this.fetch_reg = (this.instructions[this.pc]) ? this.instructions[this.pc].clone() : Instruction.none();
         }
         private decodeStage() { this.decode_reg = this.fetch_reg.clone(); }
+        
         private executeStage() {
             this.execute_reg = this.decode_reg.clone();
-            if (this.execute_reg.operation === Operation.JMP) this.pc = this.execute_reg.a.data;
-            else if (this.execute_reg.operation === Operation.BIE && this.alu.flags.equals) this.pc = this.execute_reg.a.data;
+            const op = this.execute_reg.operation;
+            
+            // Branching (Happens in Execute)
+            let takeBranch = false;
+            if (op === Operation.JMP) takeBranch = true;
+            else if (op === Operation.CALL) takeBranch = true;
+            else if (op === Operation.BIE && this.alu.flags.equals) takeBranch = true;
+            else if (op === Operation.BIG && this.alu.flags.greater) takeBranch = true;
+            else if (op === Operation.BIO && this.alu.flags.overflow) takeBranch = true;
+            else if (op === Operation.BIL && this.alu.flags.less) takeBranch = true;
+
+            if (takeBranch) {
+                this.pc = this.execute_reg.a.data;
+                // Pipeline Flush simulation (In real hardware, we'd invalidate F and D)
+                // The prompt says "Next 3 instructions already in pipeline complete"
+                // This architecture doesn't flush, it just updates PC. 
+                // The previous stages (already fetched) will ripple through.
+            }
+
+            // ALU Execution
             this.alu.execute(this.registers, this.execute_reg, this);
         }
+
         private writeBackStage() {
             this.writeback_reg = this.execute_reg.clone();
             const op = this.writeback_reg.operation;
-            const a = this.writeback_reg.a.data;
-            const b = this.writeback_reg.b.data;
+            const a = this.writeback_reg.a.data; // Dest
+            const b = this.writeback_reg.b.data; // Src
+            const address = this.writeback_reg.address; // Current line number
 
-            if (op === Operation.IMM) this.registers.write(a, b);
-            else if (op === Operation.MOV) this.registers.write(a, this.registers.read(b));
-            else if ((op === Operation.ADD || op === Operation.ADDC) && 
-                    (this.writeback_reg.args === OperationArgs.S || 
-                    this.writeback_reg.args === OperationArgs.U || 
-                    this.writeback_reg.args === OperationArgs.None)) {
+            // --- 1. Immediate Load ---
+            if (op === Operation.IMM) {
+                this.registers.write(a, b);
+            }
+            // --- 2. Register Move ---
+            else if (op === Operation.MOV) {
+                this.registers.write(a, this.registers.read(b));
+            }
+            // --- 3. ALU Operations (Write Accumulator to Register) ---
+            else if (
+                op === Operation.ADD || op === Operation.ADDC || op === Operation.SUB ||
+                op === Operation.OR || op === Operation.XOR || op === Operation.AND
+            ) {
+                // Write back if args is S (Store), U (Use+Store), or None (Default)
+                // X (eXecute only) does not write back
+                const args = this.writeback_reg.args;
+                if (args === OperationArgs.S || args === OperationArgs.U || args === OperationArgs.None) {
+                    this.registers.write(a, this.alu.accumulator);
+                }
+            }
+            else if (op === Operation.SHR || op === Operation.NOT) {
                 this.registers.write(a, this.alu.accumulator);
             }
-            else if (op === Operation.SHR || op === Operation.NOT) this.registers.write(a, this.alu.accumulator);
+            // --- 4. Input ---
             else if (op === Operation.INP) {
                 this.registers.write(a, this.alu.accumulator);
             }
-            else if (op === Operation.OUT && a < 8) this.portsOut[a] = this.registers.read(b);
+            // --- 5. Output ---
+            else if (op === Operation.OUT && a < 8) {
+                this.portsOut[a] = this.registers.read(b);
+            }
+            // --- 6. Memory Store (Register -> Memory) ---
+            else if (op === Operation.STORE) {
+                // Syntax: STORE #addr reg
+                if (a < 16) this.ram[a] = this.registers.read(b);
+            }
+            // --- 7. Memory Load (Memory -> Register) ---
+            else if (op === Operation.LOAD) {
+                // Syntax: LOAD reg #addr
+                if (b < 16) this.registers.write(a, this.ram[b]);
+            }
+            // --- 8. Push (Register -> Stack) ---
+            else if (op === Operation.PUSH) {
+                if (this.sp >= 0) {
+                    this.ram[this.sp] = this.registers.read(a);
+                    this.sp--;
+                    if (this.sp < 0) this.sp = 15; // FIXED: Wrap to 15
+                }
+            }
+            // --- 9. Pop (Stack -> Register) ---
+            else if (op === Operation.POP) {
+                this.sp++;
+                if (this.sp > 15) this.sp = 0; // FIXED: Wrap if > 15
+                this.registers.write(a, this.ram[this.sp]);
+            }
+
+            else if (op === Operation.CALL) {
+                if (this.sp >= 0) {
+                    // Push the *next* instruction address (current + 1)
+                    this.ram[this.sp] = address + 1;
+                    this.sp--;
+                    if (this.sp < 0) this.sp = 15; // FIXED: Wrap to 15
+                }
+            }
+
+            // --- NEW: RET (Pop Return Address & Jump) ---
+            else if (op === Operation.RET) {
+                this.sp++;
+                if (this.sp > 15) this.sp = 0; // FIXED: Wrap if > 15
+                const returnAddress = this.ram[this.sp];
+                this.pc = returnAddress; // Restore PC
+            }
         }
     }
 
@@ -467,23 +662,47 @@ JMP 0
     // Line Number Scrolling
     let textareaEl: HTMLTextAreaElement;
     let lineNumEl: HTMLDivElement;
+    
+    // --- NEW: Auto Scroll State ---
+    let autoScroll = $state(false); 
+    let ignoreScrollEvent = false;
 
     // Default Code
-    let code = $state(EXAMPLES["Input Test"]);
+    let code = $state(EXAMPLES["Intro"]);
     let lineMap = $derived(getLineToAddressMap(code));
 
     // Reactive Stats
     let pc = $state(0);
-    let execAddr = $state(-1); // To track highlighting
+    let sp = $state(15);
+    let execAddr = $state(-1);
     let registers = $state([0,0,0,0,0,0,0,0]);
     let acc = $state(0);
     let ports = $state([0,0,0,0,0,0,0,0]);
+    let ram = $state(new Uint8Array(16));
+    let flags = $state({ equals: false, greater: false, less: false, overflow: false });
     
     // Pipeline State
     let pipeF = $state(Instruction.none());
     let pipeD = $state(Instruction.none());
     let pipeE = $state(Instruction.none());
     let pipeW = $state(Instruction.none());
+
+    // --- NEW: Auto Scroll Effect ---
+    $effect(() => {
+        if (autoScroll && textareaEl && execAddr >= 0) {
+            const visualLineIndex = lineMap.findIndex(addr => addr === execAddr);
+            
+            if (visualLineIndex !== -1) {
+                const lineHeight = 20; 
+                const containerHeight = textareaEl.clientHeight;
+                const scrollPos = (visualLineIndex * lineHeight) - (containerHeight / 2) + (lineHeight / 2);
+                
+                // Set flag so the scroll event handler knows this is a programmatic scroll
+                ignoreScrollEvent = true; 
+                textareaEl.scrollTo({ top: scrollPos, behavior: 'auto' });
+            }
+        }
+    });
 
     onMount(() => {
         onImg = new Image(); offImg = new Image();
@@ -493,6 +712,9 @@ JMP 0
                 useImages = errorCount === 0;
                 isReady = true;
                 draw();
+
+                isRunning = true; 
+                loop();
             }
         };
         onImg.onload = () => { loadCount++; checkStatus(); };
@@ -519,6 +741,18 @@ JMP 0
         if (textareaEl && lineNumEl) {
             lineNumEl.scrollTop = textareaEl.scrollTop;
         }
+
+        // --- NEW: Detection Logic ---
+        // If the scroll was triggered by our $effect, ignore it and reset flag.
+        if (ignoreScrollEvent) {
+            ignoreScrollEvent = false;
+            return;
+        }
+
+        // Otherwise, it was the user scrolling manually.
+        if (autoScroll) {
+            autoScroll = false;
+        }
     }
 
     function initEmulator() {
@@ -538,7 +772,9 @@ JMP 0
         if (showInputModal) return; 
         isRunning = !isRunning;
         if (isRunning) {
-            if(emulator) emulator.loadProgram(code);
+            if (!emulator) {
+                initEmulator();
+            }
             loop();
         } else {
             cancelAnimationFrame(animationId);
@@ -588,6 +824,7 @@ JMP 0
         initEmulator(); 
         updateStats();
         draw();
+        autoScroll = true; // Reset autoScroll to true on reset
     }
 
     function loop() {
@@ -602,10 +839,13 @@ JMP 0
     function updateStats() {
         if (emulator) {
             pc = emulator.pc;
-            execAddr = emulator.execute_reg.address; // Get address of executing line
+            sp = emulator.sp;
+            execAddr = emulator.execute_reg.address;
             registers = emulator.registers.getAll();
             acc = emulator.alu.accumulator;
             ports = Array.from(emulator.portsOut);
+            ram = new Uint8Array(emulator.ram);
+            flags = {...emulator.alu.flags};
             
             pipeF = emulator.fetch_reg.clone();
             pipeD = emulator.decode_reg.clone();
@@ -622,6 +862,7 @@ JMP 0
         
         const formatOp = (op: Operand) => {
             if (op.type === 0) return `R${op.data}`; // Reg
+            if (op.type === 1) return `#${op.data}`; // Mem
             if (op.type === 3) return `%${op.data}`; // Port
             return `${op.data}`;
         };
@@ -700,74 +941,207 @@ JMP 0
 
     {#if showDocs}
         <div class="absolute inset-0 z-50 bg-black/80 flex items-center justify-center p-8 backdrop-blur-sm">
-            <div class="bg-zinc-900 border border-zinc-700 p-6 rounded max-w-2xl w-full max-h-full overflow-y-auto shadow-2xl">
-                <div class="flex justify-between items-center mb-4 border-b border-zinc-700 pb-2">
-                    <h2 class="text-xl font-mono text-[var(--color-schematic-primary)] font-bold">MANUAL</h2>
-                    <button onclick={() => showDocs = false} class="text-zinc-500 hover:text-white">✕</button>
+            <div class="bg-zinc-900 border border-zinc-700 rounded-lg max-w-3xl w-full max-h-full flex flex-col shadow-2xl overflow-hidden">
+                
+                <div class="flex justify-between items-center p-4 border-b border-zinc-800 bg-zinc-950/50">
+                    <div>
+                        <h2 class="text-lg font-mono text-[var(--color-schematic-primary)] font-bold tracking-wider">ELECTRON 2 MANUAL</h2>
+                        <p class="text-[10px] text-zinc-500 font-mono mt-1">
+                            Operands <b>A</b> and <b>B</b> can be Registers (R0-R7), Numbers (0-255), or Ports (%0-%7).
+                        </p>
+                    </div>
+                    <button onclick={() => showDocs = false} class="text-zinc-500 hover:text-white px-2 text-xl">✕</button>
                 </div>
                 
-                <div class="space-y-4 text-xs font-mono text-zinc-300">
-                    <section>
-                        <h3 class="text-white font-bold mb-1">ARCHITECTURE</h3>
-                        <ul class="list-disc pl-5 space-y-1">
-                            <li><strong>Registers (R1-R7):</strong> 8-bit general purpose storage.</li>
-                            <li><strong>R0:</strong> Constant 0 (Read-only).</li>
-                            <li><strong>ACC:</strong> Accumulator for ALU operations.</li>
-                            <li><strong>Ports (%0-%7):</strong> 8-bit Output ports mapped to the display.</li>
-                            <li><strong>PC:</strong> Program Counter (0-31).</li>
-                        </ul>
-                    </section>
+                <div class="overflow-y-auto p-6 space-y-6 font-mono text-xs">
 
-                    <section>
-                        <h3 class="text-white font-bold mb-1">INSTRUCTION SET</h3>
-                        <div class="grid grid-cols-1 gap-1">
-                            <div class="grid grid-cols-[100px_1fr] gap-2">
-                                <code class="text-[var(--color-schematic-primary)]">IMM A, VAL</code> 
-                                <span>Load immediate value (0-255) into A.</span>
+                    <div class="text-zinc-400 leading-relaxed border-b border-zinc-800/50 pb-6 space-y-4">
+                        <p>
+                            This system is a faithful emulation of <strong>Electron 2</strong>, the successor to the original Electron CPU. It is currently under active construction in Minecraft (PS5 Edition) to push the limits of redstone computing.
+                        </p>
+                        <p class="text-zinc-500 text-[11px] italic">
+                           <strong>Electron</strong>,  the original CPU (which features a simpler architecture but is fully documented) can be found in the project card further down the page.
+                        </p>
+                    </div>
+
+                    <section class="bg-red-900/10 border border-red-900/30 p-4 rounded-md">
+                        <h3 class="text-red-400 font-bold mb-3 uppercase tracking-widest text-[10px]">⚠ Hardware Constraints</h3>
+                        <p class="text-red-300/70 mb-4 text-[11px]">
+                            This architecture utilizes a raw pipeline without hardware interlocking. Instructions do not automatically stall for dependencies.
+                        </p>
+                        
+                        <div class="grid md:grid-cols-2 gap-6 text-[11px]">
+                            <div>
+                                <strong class="text-zinc-200 block mb-1">1. Read-After-Write Latency</strong>
+                                <p class="text-zinc-500 mb-2">
+                                    Registers update in the final pipeline stage. Reading a register immediately after writing to it yields the <b>OLD</b> value.
+                                </p>
+                                <p class="text-zinc-300">
+                                    <span class="text-green-500">Fix:</span> Insert a <span class="text-[var(--color-schematic-primary)]">NOOP</span> between the write and the read.
+                                </p>
                             </div>
-                            <div class="grid grid-cols-[100px_1fr] gap-2">
-                                <code class="text-[var(--color-schematic-primary)]">MOV A, B</code> 
-                                <span>Copy value from register B to A.</span>
-                            </div>
-                            <div class="grid grid-cols-[100px_1fr] gap-2">
-                                <code class="text-[var(--color-schematic-primary)]">ADD A, B</code> 
-                                <span>A = A + B. Updates flags.</span>
-                            </div>
-                            <div class="grid grid-cols-[100px_1fr] gap-2">
-                                <code class="text-[var(--color-schematic-primary)]">UADD A, B</code> 
-                                <span>A = ACC + B. (Unsigned Add using Accumulator).</span>
-                            </div>
-                             <div class="grid grid-cols-[100px_1fr] gap-2">
-                                <code class="text-[var(--color-schematic-primary)]">ADDC A, B</code> 
-                                <span>A = A + B + 1. (Add with Carry).</span>
-                            </div>
-                            <div class="grid grid-cols-[100px_1fr] gap-2">
-                                <code class="text-[var(--color-schematic-primary)]">SHR A</code> 
-                                <span>Bitwise Shift Right (A = A >> 1).</span>
-                            </div>
-                            <div class="grid grid-cols-[100px_1fr] gap-2">
-                                <code class="text-[var(--color-schematic-primary)]">NOT A, B</code> 
-                                <span>A = Bitwise NOT B.</span>
-                            </div>
-                            <div class="grid grid-cols-[100px_1fr] gap-2">
-                                <code class="text-[var(--color-schematic-primary)]">OUT %P, A</code> 
-                                <span>Write value in A to Port P (0-7).</span>
-                            </div>
-                            <div class="grid grid-cols-[100px_1fr] gap-2">
-                                <code class="text-[var(--color-schematic-primary)]">INP A</code> 
-                                <span>Ask user for input, save to Register A.</span>
-                            </div>
-                            <div class="grid grid-cols-[100px_1fr] gap-2">
-                                <code class="text-[var(--color-schematic-primary)]">JMP L</code> 
-                                <span>Unconditional jump to line L.</span>
-                            </div>
-                            <div class="grid grid-cols-[100px_1fr] gap-2">
-                                <code class="text-[var(--color-schematic-primary)]">BIE L</code> 
-                                <span>Branch if Equal. Jump to L if last ALU op was Equal.</span>
+
+                            <div>
+                                <strong class="text-zinc-200 block mb-1">2. Branch Delay Slot</strong>
+                                <p class="text-zinc-500 mb-2">
+                                    The pipeline <b>does not flush</b> on branches. The instruction physically located immediately following a <span class="text-[var(--color-schematic-primary)]">JMP</span> or Branch <b>will execute</b> before the jump occurs.
+                                </p>
                             </div>
                         </div>
                     </section>
+                    
+                    <section>
+                        <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">Assignments</h3>
+                        <div class="grid grid-cols-[60px_100px_1fr] gap-y-2 text-zinc-400 border-b border-zinc-800/50 pb-4">
+                            <div class="text-[9px] uppercase text-zinc-600">Op</div>
+                            <div class="text-[9px] uppercase text-zinc-600">Syntax</div>
+                            <div class="text-[9px] uppercase text-zinc-600">Effect</div>
+
+                            <span class="text-[var(--color-schematic-primary)]">IMM</span>
+                            <span class="text-white">IMM A B</span> 
+                            <span>Set Register <b>A</b> to value <b>B</b>.</span>
+
+                            <span class="text-[var(--color-schematic-primary)]">MOV</span>
+                            <span class="text-white">MOV A B</span> 
+                            <span>Copy value from Register <b>B</b> to <b>A</b>.</span>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">Math & Logic</h3>
+                        <div class="grid grid-cols-[60px_100px_1fr] gap-y-2 text-zinc-400 border-b border-zinc-800/50 pb-4">
+                            
+                            <span class="text-[var(--color-schematic-primary)]">ADD</span>
+                            <span class="text-white">ADD A B</span> 
+                            <span><b>A</b> = <b>A</b> + <b>B</b></span>
+
+                            <span class="text-[var(--color-schematic-primary)]">ADDC</span>
+                            <span class="text-white">ADDC A B</span> 
+                            <span><b>A</b> = <b>A</b> + <b>B</b> + 1</span>
+
+                            <span class="text-[var(--color-schematic-primary)]">SUB</span>
+                            <span class="text-white">SUB A B</span> 
+                            <span><b>A</b> = <b>A</b> - <b>B</b></span>
+
+                            <span class="text-[var(--color-schematic-primary)]">AND</span>
+                            <span class="text-white">AND A B</span> 
+                            <span><b>A</b> = <b>A</b> &amp; <b>B</b> (Bitwise AND)</span>
+
+                            <span class="text-[var(--color-schematic-primary)]">OR</span>
+                            <span class="text-white">OR A B</span> 
+                            <span><b>A</b> = <b>A</b> | <b>B</b> (Bitwise OR)</span>
+
+                            <span class="text-[var(--color-schematic-primary)]">XOR</span>
+                            <span class="text-white">XOR A B</span> 
+                            <span><b>A</b> = <b>A</b> ^ <b>B</b> (Bitwise XOR)</span>
+
+                            <span class="text-[var(--color-schematic-primary)]">SHR</span>
+                            <span class="text-white">SHR A B</span> 
+                            <span><b>A</b> = <b>B</b> shifted right by 1.</span>
+
+                            <span class="text-[var(--color-schematic-primary)]">NOT</span>
+                            <span class="text-white">NOT A B</span> 
+                            <span><b>A</b> = Inverted bits of <b>B</b></span>
+                        </div>
+                    </section>
+
+                    <section class="bg-blue-900/10 border border-blue-900/30 p-4 rounded-md mt-4">
+                        <h3 class="text-blue-400 font-bold mb-3 uppercase tracking-widest text-[10px]">Instruction Variations (U, X)</h3>
+                        <p class="text-blue-300/70 mb-4 text-[11px]">
+                            Math and Logic operations can be prefixed to change how they interact with the <b>Accumulator (ACC)</b> and <b>Registers</b>.
+                        </p>
+                        
+                        <div class="grid gap-3 text-[11px]">
+                            <div class="grid grid-cols-[80px_1fr] gap-2">
+                                <code class="text-white bg-zinc-800 px-1 rounded text-center">No Prefix</code>
+                                <span class="text-zinc-400"><b>ADD R1 R2</b>: Reads R1 and R2, stores result in <b>ACC</b> AND <b>R1</b>.</span>
+                            </div>
+                            <div class="grid grid-cols-[80px_1fr] gap-2">
+                                <code class="text-white bg-zinc-800 bg-zinc-800 px-1 rounded text-center">U </code>
+                                <span class="text-zinc-400"><b>UADD R1 R2</b>: Uses <b>ACC</b> as Operand A instead of R1. Stores result in <b>ACC</b> and <b>R1</b>.</span>
+                            </div>
+                            <div class="grid grid-cols-[80px_1fr] gap-2">
+                                <code class="text-white bg-zinc-800 bg-zinc-800 px-1 rounded text-center">X</code>
+                                <span class="text-zinc-400"><b>XADD R0 R2</b>: Uses <b>ACC</b> as Operand A. Result goes to <b>ACC ONLY</b>. Register A is ignored (useful for comparisons).</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">Memory (RAM)</h3>
+                        <div class="grid grid-cols-[60px_100px_1fr] gap-y-2 text-zinc-400 border-b border-zinc-800/50 pb-4">
+                            
+                            <span class="text-[var(--color-schematic-primary)]">STORE</span>
+                            <span class="text-white">STORE A B</span> 
+                            <span>Save Register <b>B</b> into Memory Address <b>A</b>.</span>
+
+                            <span class="text-[var(--color-schematic-primary)]">LOAD</span>
+                            <span class="text-white">LOAD A B</span> 
+                            <span>Load Memory Address <b>B</b> into Register <b>A</b>.</span>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">Flow Control</h3>
+                        <div class="grid grid-cols-[60px_100px_1fr] gap-y-2 text-zinc-400 border-b border-zinc-800/50 pb-4">
+                            
+                            <span class="text-[var(--color-schematic-primary)]">JMP</span>
+                            <span class="text-white">JMP A</span> 
+                            <span>Jump to Line Number <b>A</b>.</span>
+
+                            <span class="text-[var(--color-schematic-primary)]">BIE</span>
+                            <span class="text-white">BIE A</span> 
+                            <span>Jump to <b>A</b> if Equal (==).</span>
+
+                            <span class="text-[var(--color-schematic-primary)]">BIG</span>
+                            <span class="text-white">BIG A</span> 
+                            <span>Jump to <b>A</b> if Greater (&gt;).</span>
+
+                            <span class="text-[var(--color-schematic-primary)]">BIL</span>
+                            <span class="text-white">BIL A</span> 
+                            <span>Jump to <b>A</b> if Less (&lt;).</span>
+
+                            <span class="text-[var(--color-schematic-primary)]">BIO</span>
+                            <span class="text-white">BIO A</span> 
+                            <span>Jump to <b>A</b> if Overflow.</span>
+
+                            <span class="text-[var(--color-schematic-primary)]">CALL</span>
+                            <span class="text-white">CALL A</span> 
+                            <span>Run Function at Line <b>A</b>.</span>
+
+                            <span class="text-[var(--color-schematic-primary)]">RET</span>
+                            <span class="text-white">RET</span> 
+                            <span>Return from function.</span>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">System & I/O</h3>
+                        <div class="grid grid-cols-[60px_100px_1fr] gap-y-2 text-zinc-400">
+                            
+                            <span class="text-[var(--color-schematic-primary)]">OUT</span>
+                            <span class="text-white">OUT A B</span> 
+                            <span>Send Register <b>B</b> to Port <b>A</b> (%0-%7).</span>
+
+                            <span class="text-[var(--color-schematic-primary)]">INP</span>
+                            <span class="text-white">INP A</span> 
+                            <span>Wait for user input, store in Register <b>A</b>.</span>
+
+                            <span class="text-[var(--color-schematic-primary)]">PUSH</span>
+                            <span class="text-white">PUSH A</span> 
+                            <span>Push Register <b>A</b> onto Stack.</span>
+
+                            <span class="text-[var(--color-schematic-primary)]">POP</span>
+                            <span class="text-white">POP A</span> 
+                            <span>Pop Stack into Register <b>A</b>.</span>
+
+                            <span class="text-[var(--color-schematic-primary)]">NOOP</span>
+                            <span class="text-white">NOOP</span> 
+                            <span>No Operation (Do nothing).</span>
+                        </div>
+                    </section>
                 </div>
+
             </div>
         </div>
     {/if}
@@ -775,11 +1149,12 @@ JMP 0
     <div class="flex flex-col gap-2 h-full min-h-0" >
         <div class="flex flex-wrap items-center justify-between border-b border-zinc-800 pb-2 gap-2 shrink-0">
             <div class="flex items-center gap-2">
-                <span class="text-xs font-mono text-[var(--color-schematic-primary)] font-bold">ASM</span>
+                <span class="text-xs font-mono text-[var(--color-schematic-primary)] font-bold">ROM:</span>
                 <select onchange={loadExample} class="bg-zinc-950 text-[10px] text-zinc-400 border border-zinc-800 p-1 rounded font-mono outline-none">
-                    <option value="Input Test">Input Test</option>
                     <option value="Intro">Intro</option>
+                    <option value="Input Test">Input Test</option>
                     <option value="Fibonacci">Fibonacci</option>
+                     <option value="Functions">Functions</option>
                 </select>
             </div>
             
@@ -791,28 +1166,38 @@ JMP 0
             </div>
         </div>
         
-        <div class="flex-grow flex bg-zinc-950 border border-zinc-800 relative overflow-hidden min-h-0 h-96">
-            <div 
-            bind:this={lineNumEl}
-            class="w-8 pt-2 pb-2 text-center text-zinc-600 bg-zinc-900/50 border-r border-zinc-800 select-none font-mono text-xs leading-5 overflow-hidden"
-        >
-            {#each lineMap as addr, i}
+        <div class="flex-grow flex flex-col bg-zinc-950 border border-zinc-800 relative overflow-hidden min-h-0 h-96">
+            <div class="flex-grow flex relative min-h-0">
                 <div 
-                    class:text-zinc-200={pc === addr && addr !== ""} 
-                    class:text-[var(--color-schematic-primary)]={execAddr === addr && addr !== ""}
-                    class:font-bold={execAddr === addr}
+                    bind:this={lineNumEl}
+                    class="w-8 pt-2 pb-2 text-center text-zinc-600 bg-zinc-900/50 border-r border-zinc-800 select-none font-mono text-xs leading-5 overflow-hidden"
                 >
-                    {addr !== "" ? addr : "•"}
+                    {#each lineMap as addr, i}
+                        <div 
+                            class:text-zinc-200={pc === addr && addr !== ""} 
+                            class:text-[var(--color-schematic-primary)]={execAddr === addr && addr !== ""}
+                            class:font-bold={execAddr === addr}
+                        >
+                            {addr !== "" ? addr : "•"}
+                        </div>
+                    {/each}
                 </div>
-            {/each}
-        </div>
-            <textarea 
-                bind:this={textareaEl}
-                bind:value={code}
-                onscroll={handleScroll}
-                class="flex-grow bg-transparent text-zinc-300 font-mono p-2 text-xs leading-5 outline-none resize-none whitespace-pre"
-                spellcheck="false"
-            ></textarea>
+                <textarea 
+                    bind:this={textareaEl}
+                    bind:value={code}
+                    onscroll={handleScroll}
+                    oninput={() => autoScroll = false}
+                    class="flex-grow bg-transparent text-zinc-300 font-mono p-2 text-xs leading-5 outline-none resize-none whitespace-pre"
+                    spellcheck="false"
+                ></textarea>
+            </div>
+            
+            <div class="shrink-0 flex items-center justify-end px-2 py-1 bg-zinc-900/50 border-t border-zinc-800">
+                <label class="flex items-center gap-2 cursor-pointer group">
+                    <input type="checkbox" bind:checked={autoScroll} class="w-3 h-3 accent-[var(--color-schematic-primary)] rounded-sm cursor-pointer" />
+                    <span class="text-[9px] font-mono text-zinc-500 group-hover:text-zinc-300 transition-colors uppercase tracking-wider">Auto-Follow Execution</span>
+                </label>
+            </div>
         </div>
     </div>
 
@@ -867,17 +1252,48 @@ JMP 0
                         <span class="text-[var(--color-schematic-primary)]">{reg}</span>
                     </div>
                 {/each}
-                <div class="bg-zinc-950 px-2 py-1 border border-zinc-800 col-span-2 flex justify-between">
+            </div>
+
+            <div class="grid grid-cols-4 gap-1 font-mono text-[10px]">
+                 <div class="bg-zinc-950 px-2 py-1 border border-zinc-800 flex justify-between">
                     <span class="text-zinc-500">PC</span>
                     <span class="text-white">{pc}</span>
                 </div>
-                <div class="bg-zinc-950 px-2 py-1 border border-zinc-800 col-span-2 flex justify-between">
+                <div class="bg-zinc-950 px-2 py-1 border border-zinc-800 flex justify-between">
                     <span class="text-zinc-500">ACC</span>
                     <span class="text-white">{acc}</span>
                 </div>
+                 <div class="bg-zinc-950 px-2 py-1 border border-zinc-800 flex justify-between col-span-2 gap-2">
+                    <span class="text-zinc-500">FLAGS</span>
+                    <div class="flex gap-1">
+                        <span class={flags.equals ? "text-[var(--color-schematic-primary)]" : "text-zinc-700"}>EQ</span>
+                        <span class={flags.greater ? "text-[var(--color-schematic-primary)]" : "text-zinc-700"}>GT</span>
+                        <span class={flags.less ? "text-[var(--color-schematic-primary)]" : "text-zinc-700"}>LT</span>
+                        <span class={flags.overflow ? "text-[var(--color-schematic-primary)]" : "text-zinc-700"}>OVERFLOW</span>
+                    </div>
+                </div>
             </div>
 
-            
+            <div class="border border-zinc-800 bg-zinc-900/50 p-1 mt-1">
+                <div class="flex justify-between items-center mb-1">
+                    <div class="text-zinc-600 text-[8px] uppercase tracking-wider">RAM (16 Bytes)</div>
+                    <div class="text-zinc-600 text-[8px]">SP: {sp}</div>
+                </div>
+                <div class="grid grid-cols-8 gap-px bg-zinc-800">
+                    {#each ram as byte, i}
+                        <div class="bg-zinc-950 text-[9px] font-mono text-center py-1 relative group">
+                            <span class={i === sp ? "text-yellow-400 font-bold" : "text-zinc-400"}>
+                                {byte.toString(16).toUpperCase().padStart(2, '0')}
+                            </span>
+                            
+                            {#if i === sp}
+                                <div class="absolute inset-0 border border-yellow-500/50 pointer-events-none"></div>
+                            {/if}
+                        </div>
+                    {/each}
+                </div>
+            </div>
+
         </div>
     </div>
 </div>

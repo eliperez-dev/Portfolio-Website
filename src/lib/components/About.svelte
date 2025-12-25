@@ -67,7 +67,7 @@
         {/each}
     </div>
 
-    {#if latestPost}
+    <!-- {#if latestPost}
     <div class="mt-24 max-w-4xl mx-auto">
         <h3 class="text-2xl font-bold font-mono text-white mb-8 flex items-center gap-4">
             <span class="text-[var(--color-schematic-primary)]">Latest</span> Blog Post
@@ -99,7 +99,7 @@
             </div>
         </a>
     </div>
-    {/if}
+    {/if} -->
 
 </div>
 </section>
