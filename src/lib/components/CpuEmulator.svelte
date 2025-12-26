@@ -1665,19 +1665,19 @@ function highlightSyntax(code: string): string {
 
         <div class="grid grid-cols-4 gap-1 font-mono text-[9px] mt-1">
                 <div class="border border-zinc-800 bg-zinc-900/50 p-1">
-                    <div class="text-zinc-600 text-[8px] uppercase tracking-wider mb-0.5">Fetch</div>
+                    <div class="text-zinc-500 text-[8px] uppercase tracking-wider mb-0.5">Fetch</div>
                     <div class="text-zinc-300 truncate">{formatInstr(pipeF)}</div>
                 </div>
                 <div class="border border-zinc-800 bg-zinc-900/50 p-1">
-                    <div class="text-zinc-600 text-[8px] uppercase tracking-wider mb-0.5">Decode</div>
+                    <div class="text-zinc-500 text-[8px] uppercase tracking-wider mb-0.5">Decode</div>
                     <div class="text-zinc-300 truncate">{formatInstr(pipeD)}</div>
                 </div>
                 <div class="border border-zinc-800 bg-zinc-900/50 p-1">
-                    <div class="text-zinc-600 text-[8px] uppercase tracking-wider mb-0.5">Exec</div>
+                    <div class="text-zinc-500 text-[8px] uppercase tracking-wider mb-0.5">Exec</div>
                     <div class="text-[var(--color-schematic-primary)] truncate">{formatInstr(pipeE)}</div>
                 </div>
                 <div class="border border-zinc-800 bg-zinc-900/50 p-1">
-                    <div class="text-zinc-600 text-[8px] uppercase tracking-wider mb-0.5">Write</div>
+                    <div class="text-zinc-500 text-[8px] uppercase tracking-wider mb-0.5">Write</div>
                     <div class="text-zinc-300 truncate">{formatInstr(pipeW)}</div>
                 </div>
         </div>
@@ -1714,8 +1714,11 @@ function highlightSyntax(code: string): string {
 
             <div class="border border-zinc-800 bg-zinc-900/50 p-1 mt-1">
                 <div class="flex justify-between items-center mb-1">
-                    <div class="text-zinc-600 text-[8px] uppercase tracking-wider">RAM (16 Bytes)</div>
-                    <div class="text-zinc-600 text-[8px]">STACK POINTER (YELLOW): {sp}</div>
+                    <div class="text-zinc-500 text-[8px] uppercase tracking-wider">RAM (16 Bytes)</div>
+                    <div class="text-zinc-500 text-[8px]">
+                        <span class="text-yellow-400/80 font-bold shrink-0">STACK POINTER:</span>
+                        <span class="text-zinc-400 font-bold shrink-0">{sp}</span>
+                    </div>
                 </div>
                 <div class="grid grid-cols-8 gap-px bg-zinc-800">
                     {#each ram as byte, i}
