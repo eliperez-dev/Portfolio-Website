@@ -25,8 +25,8 @@
             
             // Simulate micro-fluctuations in telemetry to make it look "live"
             const jitter = (Math.random() - 0.5) * 0.0001;
-            displayLat = (currentLat + jitter).toFixed(4) + "° N";
-            displayLng = (currentLng + jitter).toFixed(4) + "° W";
+            displayLat = (currentLat + jitter).toFixed(4) + "°";
+            displayLng = (currentLng + jitter).toFixed(4) + "°";
         };
         updateTime();
         const timer = setInterval(updateTime, 100); // Faster updates for "live" feel
