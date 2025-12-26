@@ -1488,17 +1488,22 @@ function highlightSyntax(code: string): string {
                 <button onclick={() => showDocs = !showDocs} class="ml-2 px-3 py-2 bg-zinc-800 text-zinc-200 text-xs font-mono font-bold hover:bg-zinc-700 rounded border border-zinc-700">DOCS</button>
             </div>
             
-            <div class="flex gap-1">
+        <div class="flex gap-1">
                 <button onclick={toggleRun} class="px-2 py-1 bg-[var(--color-schematic-primary)] text-black text-[10px] font-mono font-bold hover:bg-white transition-colors">{isRunning ? 'PAUSE' : 'RUN'}</button>
                 <button onclick={step} class="px-2 py-1 border border-zinc-700 text-zinc-300 text-[10px] font-mono hover:border-zinc-500 transition-colors">STEP</button>
                 <button onclick={reset} class="px-2 py-1 border border-zinc-700 text-zinc-300 text-[10px] font-mono hover:border-zinc-500 transition-colors">RESET</button>
-                            <button 
-                    onclick={() => autoScroll = !autoScroll} 
-                    class="px-2 py-1 border text-[10px] font-mono transition-colors {autoScroll ? 'border-[var(--color-schematic-primary)] text-[var(--color-schematic-primary)] bg-zinc-900' : 'border-zinc-700 text-zinc-300 hover:border-zinc-500'}"
+                <label 
+                    class="px-2 py-1 border border-zinc-700 text-zinc-300 text-[10px] font-mono hover:border-zinc-500 transition-colors flex items-center gap-2 cursor-pointer select-none rounded-[2px]"
                     title="Toggle Auto-Follow Execution"
                 >
                     FOLLOW CODE EXECUTION
-                </button>
+                    <input 
+                        type="checkbox" 
+                        bind:checked={autoScroll} 
+                        class="w-3 h-3 accent-[var(--color-schematic-primary)] rounded-sm cursor-pointer"
+                    />
+                </label>
+
             </div>
         </div>
         
@@ -1630,10 +1635,6 @@ function highlightSyntax(code: string): string {
             </div>
             
             <div class="shrink-0 flex items-center justify-end px-2 py-1 bg-zinc-900/50 border-t border-zinc-800">
-                <label class="flex items-center gap-2 cursor-pointer group">
-                    <input type="checkbox" bind:checked={autoScroll} class="w-3 h-3 accent-[var(--color-schematic-primary)] rounded-sm cursor-pointer" />
-                    <span class="text-[9px] font-mono text-zinc-500 group-hover:text-zinc-300 transition-colors uppercase tracking-wider">Auto-Follow Execution</span>
-                </label>
             </div>
         </div>
     </div>
