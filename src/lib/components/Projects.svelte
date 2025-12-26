@@ -11,7 +11,7 @@
 
 		<div class="grid lg:grid-cols-2 gap-8">
 			{#each projects as project}
-				<div class="bg-zinc-900/50 border border-zinc-800 p-8 hover:border-[var(--color-schematic-primary)] transition-all duration-300 group flex flex-col h-full relative hover:bg-zinc-900/80 hover:shadow-[0_0_20px_rgba(34,211,238,0.1)]">
+				<div class="min-w-0 bg-zinc-900/50 border border-zinc-800 p-8 hover:border-[var(--color-schematic-primary)] transition-all duration-300 group flex flex-col h-full relative hover:bg-zinc-900/80 hover:shadow-[0_0_20px_rgba(34,211,238,0.1)]">
                     
                     <!-- Schematic Corner Brackets -->
                     <div class="absolute -top-px -left-px w-6 h-6 border-t-2 border-l-2 border-[var(--color-schematic-primary)] opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none"></div>
