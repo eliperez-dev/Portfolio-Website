@@ -10,10 +10,10 @@
         </a>
 
         <nav class="hidden md:flex items-center gap-8 font-mono text-sm uppercase tracking-wider">
-            <a href="/#about" class="text-zinc-400 hover:text-[var(--color-schematic-primary)] transition-colors">About</a>
-            <a href="/#projects" class="text-zinc-400 hover:text-[var(--color-schematic-primary)] transition-colors">Projects</a>
-            <a href="/#contact" class="text-zinc-400 hover:text-[var(--color-schematic-primary)] transition-colors">Contact</a>
-            <a href="/blog" class="text-zinc-400 hover:text-[var(--color-schematic-primary)] transition-colors">Blog</a>
+            <a href="/#about" class="nav-link text-zinc-400 hover:text-[var(--color-schematic-primary)] transition-colors">About</a>
+            <a href="/#projects" class="nav-link text-zinc-400 hover:text-[var(--color-schematic-primary)] transition-colors">Projects</a>
+            <a href="/#contact" class="nav-link text-zinc-400 hover:text-[var(--color-schematic-primary)] transition-colors">Contact</a>
+            <a href="/blog" class="nav-link text-zinc-400 hover:text-[var(--color-schematic-primary)] transition-colors">Blog</a>
         </nav>
 
         <div class="flex items-center gap-4">
@@ -26,3 +26,27 @@
         </div>
     </div>
 </header>
+
+<style>
+    .nav-link {
+        position: relative;
+    }
+    
+    .nav-link::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 1px;
+        bottom: -4px;
+        left: 0;
+        background-color: var(--color-schematic-primary);
+        transform: scaleX(0);
+        transform-origin: bottom right;
+        transition: transform 0.3s ease-out;
+    }
+
+    .nav-link:hover::after {
+        transform: scaleX(1);
+        transform-origin: bottom left;
+    }
+</style>

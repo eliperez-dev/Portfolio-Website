@@ -33,16 +33,21 @@
             link: 'https://github.com/eliperez-dev'
         }
     ];
+
+    import { viewport } from '$lib/actions';
 </script>
 
 <section id="contact" class="py-10 relative">
     <div class="container mx-auto px-6">
-        <h2 class="text-3xl font-bold font-mono text-white flex items-center gap-4 mb-16">
+        <h2 
+            class="text-3xl font-bold font-mono text-white flex items-center gap-4 mb-16 animate-on-scroll"
+            use:viewport
+        >
             <span class="text-[var(--color-schematic-primary)]">04.</span> Get In Touch
         </h2>
 
         <div class="grid lg:grid-cols-2 gap-16">
-            <div class="space-y-8">
+            <div class="space-y-8 animate-on-scroll delay-100" use:viewport>
                 <div>
                     <h3 class="text-xl text-white font-mono font-bold mb-4">My Links</h3>
                     <div class="space-y-4">
@@ -63,7 +68,7 @@
             </div>
 
             {#if latestPosts.length > 0}
-            <div>
+            <div class="animate-on-scroll delay-200" use:viewport>
                 <h3 class="text-xl text-white font-mono font-bold mb-4">Recent Posts</h3>
                 <div class="space-y-4">
                     {#each latestPosts as post}

@@ -1,0 +1,14 @@
+d:\Projects\Portfolio website\my-app\wasm\target\wasm32-unknown-unknown\debug\deps\serde-e2018c0ccbf105bd.d: C:\Users\pnael\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\lib.rs C:\Users\pnael\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\integer128.rs C:\Users\pnael\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\mod.rs C:\Users\pnael\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\de.rs C:\Users\pnael\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\ser.rs d:\Projects\Portfolio\ website\my-app\wasm\target\wasm32-unknown-unknown\debug\build\serde-141b1c507dbf0caf\out/private.rs
+
+d:\Projects\Portfolio website\my-app\wasm\target\wasm32-unknown-unknown\debug\deps\libserde-e2018c0ccbf105bd.rlib: C:\Users\pnael\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\lib.rs C:\Users\pnael\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\integer128.rs C:\Users\pnael\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\mod.rs C:\Users\pnael\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\de.rs C:\Users\pnael\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\ser.rs d:\Projects\Portfolio\ website\my-app\wasm\target\wasm32-unknown-unknown\debug\build\serde-141b1c507dbf0caf\out/private.rs
+
+d:\Projects\Portfolio website\my-app\wasm\target\wasm32-unknown-unknown\debug\deps\libserde-e2018c0ccbf105bd.rmeta: C:\Users\pnael\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\lib.rs C:\Users\pnael\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\integer128.rs C:\Users\pnael\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\mod.rs C:\Users\pnael\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\de.rs C:\Users\pnael\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\ser.rs d:\Projects\Portfolio\ website\my-app\wasm\target\wasm32-unknown-unknown\debug\build\serde-141b1c507dbf0caf\out/private.rs
+
+C:\Users\pnael\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\lib.rs:
+C:\Users\pnael\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\integer128.rs:
+C:\Users\pnael\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\mod.rs:
+C:\Users\pnael\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\de.rs:
+C:\Users\pnael\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\ser.rs:
+d:\Projects\Portfolio\ website\my-app\wasm\target\wasm32-unknown-unknown\debug\build\serde-141b1c507dbf0caf\out/private.rs:
+
+# env-dep:OUT_DIR=d:\\Projects\\Portfolio website\\my-app\\wasm\\target\\wasm32-unknown-unknown\\debug\\build\\serde-141b1c507dbf0caf\\out

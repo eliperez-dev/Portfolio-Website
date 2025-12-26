@@ -10,5 +10,10 @@ export default defineConfig({
 		sveltekit(),
 		wasm(),
 		topLevelAwait()
-	] 
+	],
+	server: {
+		fs: {
+			allow: ['wasm']
+		}
+	}
 });

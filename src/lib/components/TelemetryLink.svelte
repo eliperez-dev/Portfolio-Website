@@ -130,6 +130,8 @@
             isLocating = false;
         }
     }
+
+    import { viewport } from '$lib/actions';
 </script>
 
 <style>
@@ -147,13 +149,19 @@
     <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:100px_100px] pointer-events-none"></div>
 
     <div class="container mx-auto px-6 relative z-10">
-        <h2 class="text-3xl font-bold font-mono text-white flex items-center gap-4 mb-12">
+        <h2 
+            class="text-3xl font-bold font-mono text-white flex items-center gap-4 mb-12 animate-on-scroll"
+            use:viewport
+        >
             <span class="text-[var(--color-schematic-primary)]">02.</span> Showcase: Until Every Cage Is Empty
         </h2>
 
         <div class="grid lg:grid-cols-12 gap-8 items-start">
             <!-- Left Panel: Controls/Status -->
-            <div class="lg:col-span-3 space-y-6">
+            <div 
+                class="lg:col-span-3 space-y-6 animate-on-scroll delay-100" 
+                use:viewport
+            >
                 <div class="border border-zinc-800 bg-zinc-900/80 p-6 backdrop-blur-sm">
                     <h3 class="text-white font-mono font-bold mb-4 flex items-center gap-2">
                         <div class="w-2 h-2 bg-[var(--color-schematic-primary)] animate-pulse rounded-full"></div>
@@ -197,7 +205,10 @@
             </div>
 
             <!-- Right Panel: The Viewer -->
-            <div class="lg:col-span-9">
+            <div 
+                class="lg:col-span-9 animate-on-scroll delay-200"
+                use:viewport
+            >
 
     <div class="md:hidden mb-3 w-full bg-zinc-900/80 border border-zinc-700 p-3 backdrop-blur-sm flex justify-between items-center font-mono text-xs text-[var(--color-schematic-primary)] shadow-sm">
         <div class="flex-1 text-left">LAT: {displayLat}</div>

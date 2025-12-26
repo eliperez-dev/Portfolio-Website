@@ -1,17 +1,25 @@
 <script>
 	import { projects } from '$lib/data';
     import Gallery from '$lib/components/Gallery.svelte';
+    import { viewport } from '$lib/actions';
 </script>
 
 <section id="projects" class="py-10 relative">
 	<div class="container mx-auto px-6">
-		<h2 class="text-3xl font-bold font-mono text-white flex items-center gap-4 mb-16">
+		<h2 
+            class="text-3xl font-bold font-mono text-white flex items-center gap-4 mb-16 animate-on-scroll"
+            use:viewport
+        >
 			<span class="text-[var(--color-schematic-primary)]">04.</span> Featured Projects
 		</h2>
 
 		<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-			{#each projects as project}
-				<div class="min-w-0 bg-zinc-900/50 border border-zinc-800 p-8 hover:border-[var(--color-schematic-primary)] transition-all duration-300 group flex flex-col h-full relative hover:bg-zinc-900/80 hover:shadow-[0_0_20px_rgba(34,211,238,0.1)]">
+			{#each projects as project, i}
+				<div 
+                    class="min-w-0 bg-zinc-900/50 border border-zinc-800 p-8 hover:border-[var(--color-schematic-primary)] transition-all duration-300 group flex flex-col h-full relative hover:bg-zinc-900/80 hover:shadow-[0_0_20px_rgba(34,211,238,0.1)] animate-on-scroll"
+                    style="transition-delay: {i * 100}ms"
+                    use:viewport
+                >
                     
                     <!-- Schematic Corner Brackets -->
                     <div class="absolute -top-px -left-px w-6 h-6 border-t-2 border-l-2 border-[var(--color-schematic-primary)] opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none"></div>

@@ -1,8 +1,49 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
+    import { onMount } from "svelte";
+    import { Emulator } from "../../../wasm/pkg/wasm.js";
+
+    // --- INTERFACES FOR WASM STATE ---
+    // These match the structure returned by emulator.get_state()
+
+    
+    interface Operand {
+        type: "Register" | "MemoryAddress" | "Immediate" | "Port";
+        data: number;
+    }
+
+    interface Instruction {
+        operation: string;
+        args: string;
+        a: Operand;
+        b: Operand;
+        address: number;
+        sourceLine: number;
+    }
+
+    interface AluFlags {
+        equals: boolean;
+        greater: boolean;
+        less: boolean;
+        overflow: boolean;
+    }
+
+    interface EmulatorState {
+        pc: number;
+        sp: number;
+        regs: number[];
+        acc: number;
+        ports: number[];
+        ram: number[];
+        flags: AluFlags;
+        fetch: Instruction;
+        decode: Instruction;
+        execute: Instruction;
+        writeback: Instruction;
+        waiting_for_input: boolean;
+        input_register: number;
+    }
 
     // --- 1. EXAMPLE PROGRAMS ---
-// --- 1. EXAMPLE PROGRAMS ---
     const EXAMPLES = {
         "Intro": `; This system is a faithful emulation
 ; of my Electron Redstone CPU,
@@ -11,7 +52,7 @@
 
 ; The emulator was originally written
 ; in Rust, but I have ported it to
-; TypeScript to run in the browser.
+; WASM to run in the browser.
 ; Feel free to write your own programs!
 
 START:
@@ -34,6 +75,8 @@ OUT %7 R7
 IMM R1 B01000010
 NOOP
 OUT %0 R1
+NOOP
+NOOP
 
 
 ; --- Draw Face ---
@@ -211,66 +254,8 @@ NOP           ; Wait for writeback
 ADD R1 R3     ; Double it
 RET           ; Return to caller`
 };
-    // --- 2. CONSTANTS & TYPES ---
-    const Operation = {
-        NOOP: "NOOP", IMM: "IMM", MOV: "MOV",
-        ADD: "ADD", ADDC: "ADDC", SUB: "SUB",
-        OR: "OR", XOR: "XOR", AND: "AND",
-        SHR: "SHR", NOT: "NOT",
-        OUT: "OUT", INP: "INP",
-        JMP: "JMP", BIE: "BIE", BIG: "BIG", BIL: "BIL", BIO: "BIO",
-        STORE: "STORE", LOAD: "LOAD",
-        PUSH: "PUSH", POP: "POP",
-        CALL: "CALL", RET: "RET"
-    } as const;
-    type Operation = typeof Operation[keyof typeof Operation];
-
-    const OperationArgs = {
-        None: "None", S: "S", U: "U", X: "X"
-    } as const;
-    type OperationArgs = typeof OperationArgs[keyof typeof OperationArgs];
-
-    const OperandType = {
-        Register: 0, MemoryAddress: 1, Immediate: 2, Port: 3
-    } as const;
-    type OperandType = typeof OperandType[keyof typeof OperandType];
-
-    class Operand {
-        type: OperandType;
-        data: number;
-        constructor(type: OperandType, data: number) {
-            this.type = type;
-            this.data = data;
-        }
-    }
-
-    class Instruction {
-        operation: Operation;
-        args: OperationArgs;
-        a: Operand;
-        b: Operand;
-        address: number;
-        sourceLine: number;
-
-        constructor(operation: Operation, args: OperationArgs, a: Operand, b: Operand, address: number = -1, sourceLine: number = 0) {
-            this.operation = operation;
-            this.args = args;
-            this.a = a;
-            this.b = b;
-            this.address = address;
-            this.sourceLine = sourceLine;
-        }
-
-        static none(): Instruction {
-            return new Instruction(Operation.NOOP, OperationArgs.None, new Operand(OperandType.Immediate, 0), new Operand(OperandType.Immediate, 0), -1);
-        }
-
-        clone(): Instruction {
-            return new Instruction(this.operation, this.args, this.a, this.b, this.address, this.sourceLine);
-        }
-    }
-
-    // --- 3. PARSER LOGIC ---
+    
+    // --- 3. PARSER LOGIC (UI HELPERS) ---
     function getLineToAddressMap(code: string): (number | string)[] {
         const lines = code.split('\n');
         const map: (number | string)[] = [];
@@ -300,7 +285,7 @@ RET           ; Return to caller`
         return map;
     }
 
-function highlightSyntax(code: string): string {
+    function highlightSyntax(code: string): string {
         // Escape HTML to prevent injection
         let escaped = code
             .replace(/&/g, "&amp;")
@@ -353,546 +338,6 @@ function highlightSyntax(code: string): string {
         }).join('\n');
     }
 
-    class Parser {
-        static parseLine(line: string, address: number, sourceLine: number, labels: { [key: string]: number }): Instruction | null {
-            const commentIdx = line.indexOf(';');
-            if (commentIdx !== -1) line = line.substring(0, commentIdx);
-            
-            line = line.trim().toUpperCase();
-            if (line.length === 0) return null;
-
-            const labelMatch = line.match(/^(\w+):/);
-            if (labelMatch) {
-                line = line.substring(labelMatch[0].length).trim();
-            }
-            if (line.length === 0) return null; // Line was just a label, no instruction
-
-            const tokens = line.split(/[\s,]+/).filter(s => s.length > 0);
-            if (tokens.length === 0) return null;
-
-            const opStr = tokens[0];
-            const { op, args } = this.parseOperation(opStr);
-            const needed = this.getNeededOperands(op, args);
-            
-            let tokenIdx = 1;
-            let valA = new Operand(OperandType.Immediate, 0);
-            let valB = new Operand(OperandType.Immediate, 0);
-
-            if (needed[0]) {
-                if (tokenIdx < tokens.length) valA = this.parseOperand(tokens[tokenIdx++], labels);
-            }
-            if (needed[1]) {
-                if (tokenIdx < tokens.length) valB = this.parseOperand(tokens[tokenIdx++], labels);
-            }
-
-            return new Instruction(op, args, valA, valB, address, sourceLine);
-        }
-
-        static parseOperation(str: string): { op: Operation, args: OperationArgs } {
-            let op = this.matchOp(str);
-            if (op) return { op, args: OperationArgs.None };
-
-            const prefix = str.charAt(0);
-            const suffix = str.substring(1);
-            op = this.matchOp(suffix);
-            
-            // ALU Ops that support S, U, X prefixes
-            const aluOps = [Operation.ADD, Operation.ADDC, Operation.SUB, Operation.OR, Operation.XOR, Operation.AND];
-            
-            if (op && aluOps.includes(op)) {
-                let args: OperationArgs = OperationArgs.None;
-                if (prefix === 'S') args = OperationArgs.S;
-                else if (prefix === 'U') args = OperationArgs.U;
-                else if (prefix === 'X') args = OperationArgs.X;
-                return { op, args };
-            }
-            throw new Error(`Invalid operation: ${str}`);
-        }
-
-        static matchOp(str: string): Operation | null {
-            switch(str) {
-                case "IMM": return Operation.IMM;
-                case "MOV": return Operation.MOV;
-                case "ADD": return Operation.ADD;
-                case "ADDC": return Operation.ADDC;
-                case "SUB": return Operation.SUB;
-                case "OR": return Operation.OR;
-                case "XOR": return Operation.XOR;
-                case "AND": return Operation.AND;
-                case "SHR": return Operation.SHR;
-                case "NOT": return Operation.NOT;
-                case "OUT": return Operation.OUT;
-                case "INP": return Operation.INP;
-                case "JMP": return Operation.JMP;
-                case "BIE": return Operation.BIE;
-                case "BIG": return Operation.BIG;
-                case "BIL": return Operation.BIL;
-                case "BIO": return Operation.BIO;
-                case "STORE": return Operation.STORE;
-                case "LOAD": return Operation.LOAD;
-                case "PUSH": return Operation.PUSH;
-                case "POP": return Operation.POP;
-                case "NOOP": case "NOP": return Operation.NOOP;
-                case "CALL": return Operation.CALL;
-                case "RET": return Operation.RET;
-                default: return null;
-            }
-        }
-
-        static getNeededOperands(op: Operation, args: OperationArgs): [boolean, boolean] {
-            switch (op) {
-                case Operation.NOOP: return [false, false];
-                case Operation.IMM: return [true, true]; 
-                case Operation.MOV: return [true, true]; 
-                case Operation.ADD:
-                case Operation.ADDC: 
-                case Operation.SUB:
-                case Operation.OR:
-                case Operation.XOR:
-                case Operation.AND:
-                    return args === OperationArgs.X ? [false, true] : [true, true];
-                case Operation.SHR:
-                case Operation.NOT: return [true, true];
-                case Operation.OUT: return [true, true]; 
-                case Operation.JMP: 
-                case Operation.BIE: 
-                case Operation.BIG: 
-                case Operation.BIO:
-                case Operation.BIL: return [true, false]; 
-                case Operation.INP: return [true, false];
-                case Operation.STORE: return [true, true]; // STORE #addr reg
-                case Operation.LOAD: return [true, true]; // LOAD reg #addr
-                case Operation.PUSH: return [true, false];
-                case Operation.POP: return [true, false];
-                case Operation.CALL: return [true, false]; // CALL address
-                case Operation.RET: return [false, false]; 
-                default: return [false, false];
-            }
-        }
-
-        static parseOperand(str: string,labels: { [key: string]: number } = {}): Operand {
-            const first = str.charAt(0);
-            const rest = str.substring(1);
-            if (first === 'R') {
-                const val = this.parseBinary(rest);
-                if (isNaN(val)) throw new Error(`Invalid register: ${str}`);
-                return new Operand(OperandType.Register, val);
-            }
-            else if (first === '#') {
-                const val = this.parseBinary(rest);
-                if (isNaN(val)) throw new Error(`Invalid memory address: ${str}`);
-                return new Operand(OperandType.MemoryAddress, val);
-            }
-            else if (first === '%') {
-                const val = this.parseBinary(rest);
-                if (isNaN(val)) throw new Error(`Invalid port: ${str}`);
-                return new Operand(OperandType.Port, val);
-            }
-            else {
-                let val = NaN;
-                if (str.startsWith('B')) val = parseInt(str.substring(1).replace(/_/g, ''), 2);
-                else val = parseInt(str.replace(/_/g, ''));
-
-                if (isNaN(val)) {
-                    // It's not a number. Is it a Label?
-                    if (str in labels) {
-                        return new Operand(OperandType.Immediate, labels[str]);
-                    }
-                    throw new Error(`Invalid value or unknown label: ${str}`);
-                }
-                return new Operand(OperandType.Immediate, val);
-            }
-        }
-
-        static parseBinary(str: string): number {
-            str = str.replace(/_/g, '');
-            let val;
-            if (str.startsWith('B')) val = parseInt(str.substring(1), 2);
-            else val = parseInt(str);
-            
-            if (isNaN(val)) throw new Error(`Invalid number format: ${str}`);
-            return val;
-        }
-    }
-
-    // --- 4. EMULATOR LOGIC ---
-    class Registers {
-        private regs = new Uint8Array(8);     // The value at the START of the cycle
-        private nextRegs = new Uint8Array(8); // The value being written DURING the cycle
-
-        constructor() {
-            this.regs.fill(0);
-            this.nextRegs.fill(0);
-        }
-
-        // Prepare for new cycle: sync buffer with current state
-        beginCycle() {
-            this.nextRegs.set(this.regs);
-        }
-
-        // Commit changes: latch the buffer into the main registers
-        endCycle() {
-            this.regs.set(this.nextRegs);
-        }
-
-        read(addr: number): number { 
-            // Read from the OLD state (simulating the hazard)
-            return addr === 0 ? 0 : (this.regs[addr] || 0); 
-        }
-
-        write(addr: number, data: number) { 
-            if (addr > 0 && addr < 8) {
-                // Write to the BUFFER (not visible yet)
-                this.nextRegs[addr] = data & 0xFF; 
-            }
-        }
-
-        getAll(): number[] { return Array.from(this.regs); }
-    }
-
-    class ALU {
-        accumulator: number = 0;
-        flags = { equals: false, greater: false, less: false, overflow: false };
-
-        execute(registers: Registers, instr: Instruction, emuRef: Emulator) {
-            // Determine Operand A (Reg/Imm or Acc)
-            let a_data = 0;
-            if (instr.args === OperationArgs.U || instr.args === OperationArgs.X) {
-                a_data = this.accumulator;
-            } else {
-                a_data = registers.read(instr.a.data);
-            }
-
-            // Determine Operand B
-            let b_data = registers.read(instr.b.data); // Default: Read register
-            
-            // Special cases where B is immediate (logic ops usually take regs, but parser logic above assigns types)
-            // Note: The ISA definition says logic/math ops take Register, Register.
-            // However, the parser might return Immediate if user typed a number.
-            // We follow the strict ISA: Math ops read from registers. 
-            // Only IMM reads immediate. 
-            // EXCEPT: If the instruction implies immediate? The ISA provided says ADD is Register Register.
-            // We will trust registers.read handles it. 
-
-            let result = 0;
-            let op = instr.operation;
-
-            // Math & Logic
-            if (op === Operation.ADD) result = a_data + b_data;
-            else if (op === Operation.ADDC) result = a_data + b_data + 1;
-            else if (op === Operation.SUB) result = a_data - b_data;
-            else if (op === Operation.OR) result = a_data | b_data;
-            else if (op === Operation.XOR) result = a_data ^ b_data;
-            else if (op === Operation.AND) result = a_data & b_data;
-            else if (op === Operation.SHR) result = b_data >> 1;
-            else if (op === Operation.NOT) result = (~b_data) & 0xFF;
-            
-            else if (op === Operation.INP) {
-                emuRef.waitingForInput = true;
-                emuRef.inputRegister = instr.a.data;
-                result = 0; // Temp result
-            }
-
-            // Flags
-            this.flags.equals = a_data === b_data;
-            this.flags.greater = a_data > b_data;
-            this.flags.less = a_data < b_data;
-            this.flags.overflow = result > 255 || result < 0; // Simple overflow check
-            
-            // Wrap Result
-            if (result > 255) result = result % 256;
-            if (result < 0) result = (result + 256) % 256; // Handle negative from SUB
-
-            // Store to Accumulator for ALU ops
-            const isAluOp = [
-                Operation.ADD, Operation.ADDC, Operation.SUB, 
-                Operation.OR, Operation.XOR, Operation.AND, 
-                Operation.SHR, Operation.NOT
-            ].includes(op);
-
-            if (isAluOp) {
-                this.accumulator = result & 0xFF;
-            }
-        }
-    }
-
-    class Emulator {
-        instructions: Instruction[] = [];
-        // Update types to include 'addr'
-        errors: { line: number, addr: number, message: string }[] = [];
-        warnings: { line: number, addr: number, message: string }[] = [];
-        pc: number = 0;
-        sp: number = 15;
-        
-        // Pipeline Registers
-        fetch_reg = Instruction.none();
-        decode_reg = Instruction.none();
-        execute_reg = Instruction.none();
-        writeback_reg = Instruction.none();
-        
-        registers = new Registers();
-        alu = new ALU();
-        portsOut = new Uint8Array(8);
-        ram = new Uint8Array(16);
-
-        waitingForInput = false;
-        inputRegister = 0;
-
-        constructor(code: string) { this.loadProgram(code); }
-
-        loadProgram(code: string) {
-            this.instructions = [];
-            this.errors = [];
-            this.warnings = [];
-            
-            const lines = code.split('\n');
-            let addrCounter = 0;
-
-            const labels: { [key: string]: number } = {}; // Store found labels here
-            
-            // --- Pass 0: Scan for Labels ---
-            let scanAddr = 0;
-            lines.forEach((line) => {
-                // remove comments and trim
-                let clean = line.split(';')[0].trim().toUpperCase();
-                
-                // Regex to find "LABEL:" at start of line
-                const match = clean.match(/^(\w+):/);
-                if (match) {
-                    const labelName = match[1];
-                    labels[labelName] = scanAddr; // Map label -> Current Address
-                    
-                    // Strip the label to see if there is an instruction after it
-                    clean = clean.substring(match[0].length).trim();
-                }
-
-                // If there is code left on this line, it consumes an address slot
-                if (clean.length > 0) {
-                    scanAddr++;
-                }
-            });
-            
-            // --- First Pass: Parse ---
-            lines.forEach((line, i) => {
-                try {
-                    // Pass 'i + 1' as the sourceLine (1-based index for UI highlighting)
-                    const instr = Parser.parseLine(line, addrCounter, i + 1, labels);
-                    if (instr) {
-                        this.instructions.push(instr);
-                        addrCounter++;
-                    }
-                } catch (e: any) {
-                    // Syntax errors: Use 'addrCounter' as the ROM address
-                    this.errors.push({ line: i + 1, addr: addrCounter, message: e.message });
-                }
-            });
-
-            // --- Second Pass: Analyze for Warnings ---
-            for (let i = 0; i < this.instructions.length; i++) {
-                const instr = this.instructions[i];
-                const nextInstr = (i + 1 < this.instructions.length) ? this.instructions[i + 1] : null;
-                
-                const op = instr.operation;
-                const currentLine = instr.sourceLine; 
-                const currentAddr = instr.address; // Use the Instruction's ROM Address
-
-                // 1. Write to Zero Register
-                if (
-                    (op === Operation.MOV && instr.a.data === 0) ||
-                    (op === Operation.IMM && instr.a.data === 0) ||
-                    (op === Operation.POP && instr.a.data === 0) ||
-                    (op === Operation.LOAD && instr.a.data === 0) ||
-                    (op === Operation.INP && instr.a.data === 0)
-                ) {
-                    this.warnings.push({ line: currentLine, addr: currentAddr, message: "Writing to R0 has no effect (always 0)." });
-                }
-
-                // 2. Out of Bounds
-                if (op === Operation.STORE && instr.a.type === OperandType.MemoryAddress && instr.a.data > 15) {
-                    this.warnings.push({ line: currentLine, addr: currentAddr, message: `Memory address ${instr.a.data} out of bounds (Max 15).` });
-                }
-                if (op === Operation.LOAD && instr.b.type === OperandType.MemoryAddress && instr.b.data > 15) {
-                    this.warnings.push({ line: currentLine, addr: currentAddr, message: `Memory address ${instr.b.data} out of bounds (Max 15).` });
-                }
-                if (op === Operation.OUT && instr.a.type === OperandType.Port && instr.a.data > 7) {
-                    this.warnings.push({ line: currentLine, addr: currentAddr, message: `Port %${instr.a.data} out of bounds (Max %7).` });
-                }
-
-                // 3. Pipeline Hazard (Read-After-Write)
-                if (nextInstr) {
-                    const nextOp = nextInstr.operation;
-                    const nextLine = nextInstr.sourceLine;
-                    const nextAddr = nextInstr.address;
-                    
-                    let destReg = -1;
-                    if ([Operation.MOV, Operation.IMM, Operation.POP, Operation.LOAD, Operation.INP, Operation.SHR, Operation.NOT].includes(op)) {
-                        destReg = instr.a.data;
-                    } else if ([Operation.ADD, Operation.ADDC, Operation.SUB, Operation.OR, Operation.XOR, Operation.AND].includes(op)) {
-                        if (instr.args !== OperationArgs.X) destReg = instr.a.data;
-                    }
-
-                    if (destReg !== -1 && destReg !== 0 && nextOp !== Operation.OUT) { 
-                        let readsReg = false;
-                        
-                        if (nextInstr.a.type === OperandType.Register && nextInstr.a.data === destReg) {
-                            const pureOverwrites = [Operation.MOV, Operation.IMM, Operation.POP, Operation.LOAD, Operation.INP];
-                            if (!pureOverwrites.includes(nextOp)) readsReg = true; 
-                        }
-                        if (nextInstr.b.type === OperandType.Register && nextInstr.b.data === destReg) readsReg = true;
-                        if (nextOp === Operation.PUSH && nextInstr.a.data === destReg) readsReg = true;
-                        if (nextOp === Operation.STORE && nextInstr.b.data === destReg) readsReg = true;
-
-                        if (readsReg) {
-                            this.warnings.push({ 
-                                line: nextLine,
-                                addr: nextAddr,
-                                message: `Pipeline Hazard: Reads R${destReg} immediately after write. Insert NOOP.` 
-                            });
-                        }
-                    }
-                }
-
-                // 4. Dead Code (Branch Flush)
-                if ([Operation.JMP, Operation.RET].includes(op)) {
-                    
-                    // Check if the next instruction exists and isn't just a spacer NOOP
-                    if (nextInstr && nextInstr.operation !== Operation.NOOP) {
-                        this.warnings.push({ 
-                            line: nextInstr.sourceLine, 
-                            addr: nextInstr.address, 
-                            message: "Unreachable: Instruction flushed by preceding branch." 
-                        });
-                    }
-                }
-            }
-
-            while (this.instructions.length < 255) this.instructions.push(Instruction.none());
-            
-            this.pc = 0;
-            this.sp = 15;
-            this.ram.fill(0);
-            this.waitingForInput = false;
-        }
-
-        resolveInput(val: number) {
-            this.alu.accumulator = val & 0xFF;
-            this.waitingForInput = false;
-        }
-
-        clock() {
-            if (this.waitingForInput) return;
-
-            // 1. Snapshot current state (Writes will go to buffer)
-            this.registers.beginCycle();
-
-            // 2. Run Pipeline Stages
-            this.writeBackStage(); // Writes to R3 (buffer only!)
-            this.executeStage();   // Reads R3 (sees OLD value!)
-            this.decodeStage();
-            this.fetchStage();
-
-            // 3. Update PC
-            this.incrementPc();
-
-            // 4. Latch data (New values become visible for NEXT cycle)
-            this.registers.endCycle();
-        }
-
-        private incrementPc() {
-            this.pc++;
-            if (this.pc >= 255) this.pc = 0;
-        }
-        private fetchStage() {
-            this.fetch_reg = (this.instructions[this.pc]) ? this.instructions[this.pc].clone() : Instruction.none();
-        }
-        private decodeStage() { this.decode_reg = this.fetch_reg.clone(); }
-        
-        private executeStage() {
-            this.execute_reg = this.decode_reg.clone();
-            const op = this.execute_reg.operation;
-            
-            // Branching
-            let takeBranch = false;
-            if (op === Operation.JMP) takeBranch = true;
-            else if (op === Operation.CALL) takeBranch = true;
-            else if (op === Operation.BIE && this.alu.flags.equals) takeBranch = true;
-            else if (op === Operation.BIG && this.alu.flags.greater) takeBranch = true;
-            else if (op === Operation.BIO && this.alu.flags.overflow) takeBranch = true;
-            else if (op === Operation.BIL && this.alu.flags.less) takeBranch = true;
-
-            if (takeBranch) {
-                this.pc = this.execute_reg.a.data;
-                this.fetch_reg = Instruction.none(); // Flush
-            }
-
-            this.alu.execute(this.registers, this.execute_reg, this);
-        }
-
-        private writeBackStage() {
-            this.writeback_reg = this.execute_reg.clone();
-            const op = this.writeback_reg.operation;
-            const a = this.writeback_reg.a.data; 
-            const b = this.writeback_reg.b.data; 
-            const address = this.writeback_reg.address;
-
-            if (op === Operation.IMM) {
-                this.registers.write(a, b);
-            }
-            else if (op === Operation.MOV) {
-                this.registers.write(a, this.registers.read(b));
-            }
-            else if (
-                op === Operation.ADD || op === Operation.ADDC || op === Operation.SUB ||
-                op === Operation.OR || op === Operation.XOR || op === Operation.AND
-            ) {
-                const args = this.writeback_reg.args;
-                if (args === OperationArgs.S || args === OperationArgs.U || args === OperationArgs.None) {
-                    this.registers.write(a, this.alu.accumulator);
-                }
-            }
-            else if (op === Operation.SHR || op === Operation.NOT) {
-                this.registers.write(a, this.alu.accumulator);
-            }
-            else if (op === Operation.INP) {
-                this.registers.write(a, this.alu.accumulator);
-            }
-            else if (op === Operation.OUT && a < 8) {
-                this.portsOut[a] = this.registers.read(b);
-            }
-            else if (op === Operation.STORE) {
-                if (a < 16) this.ram[a] = this.registers.read(b);
-            }
-            else if (op === Operation.LOAD) {
-                if (b < 16) this.registers.write(a, this.ram[b]);
-            }
-            else if (op === Operation.PUSH) {
-                if (this.sp >= 0) {
-                    this.ram[this.sp] = this.registers.read(a);
-                    this.sp--;
-                    if (this.sp < 0) this.sp = 15; 
-                }
-            }
-            else if (op === Operation.POP) {
-                this.sp++;
-                if (this.sp > 15) this.sp = 0; 
-                this.registers.write(a, this.ram[this.sp]);
-            }
-            else if (op === Operation.CALL) {
-                if (this.sp >= 0) {
-                    this.ram[this.sp] = address + 1;
-                    this.sp--;
-                    if (this.sp < 0) this.sp = 15; 
-                }
-            }
-            else if (op === Operation.RET) {
-                this.sp++;
-                if (this.sp > 15) this.sp = 0; 
-                const returnAddress = this.ram[this.sp];
-                this.pc = returnAddress; 
-            }
-        }
-    }
-
     // --- 5. SVELTE UI ---
     let canvas: HTMLCanvasElement;
     let ctx: CanvasRenderingContext2D;
@@ -933,16 +378,8 @@ function highlightSyntax(code: string): string {
     // Watch code changes to re-compile and update errors in real-time
     $effect(() => {
         if (emulator) {
-            emulator.loadProgram(code);
-            compilationErrors = emulator.errors;
-            compilationWarnings = emulator.warnings;
-            
-            // Auto-open panel if new issues appear
-            if (compilationErrors.length > lastErrorCount || compilationWarnings.length > lastWarningCount) {
-                showDiagnosticsPanel = true;
-            }
-            lastErrorCount = compilationErrors.length;
-            lastWarningCount = compilationWarnings.length;
+            emulator.load_program(code);
+            updateDiagnostics();
         }
     });
 
@@ -965,11 +402,87 @@ function highlightSyntax(code: string): string {
     let lastErrorCount = 0;
     let lastWarningCount = 0;
     
+    function updateDiagnostics() {
+        if (!emulator) return;
+        
+        try {
+            // @ts-ignore
+            const rawErrors: string[] = emulator.get_errors();
+
+            compilationErrors = rawErrors.map(errStr => {
+                 const match = errStr.match(/^Line (\d+): (.*)$/);
+                 if (match) {
+                     const line = parseInt(match[1]);
+                     const addrVal = lineMap ? lineMap[line - 1] : -1;
+                     const addr = typeof addrVal === 'number' ? addrVal : -1;
+                     return {
+                         line,
+                         addr, 
+                         message: match[2]
+                 };
+                 } else {
+                     return {
+                         line: 0,
+                         addr: -1,
+                         message: errStr
+                     };
+                 }
+            });
+            
+            // Check if get_warnings exists before calling to prevent crash on stale WASM
+            // @ts-ignore
+            if (typeof emulator.get_warnings === 'function') {
+                // @ts-ignore
+                const rawWarnings: string[] = emulator.get_warnings();
+
+                compilationWarnings = rawWarnings.map(warnStr => {
+                     const match = warnStr.match(/^Line (\d+): (.*)$/);
+                     if (match) {
+                         const line = parseInt(match[1]);
+                         const addrVal = lineMap ? lineMap[line - 1] : -1;
+                         const addr = typeof addrVal === 'number' ? addrVal : -1;
+                         return {
+                             line,
+                             addr, 
+                             message: match[2]
+                         };
+                     } else {
+                         return {
+                             line: 0,
+                             addr: -1,
+                             message: warnStr
+                         };
+                     }
+                });
+            } else {
+                compilationWarnings = [];
+            }
+            
+            if (compilationErrors.length > lastErrorCount || compilationWarnings.length > lastWarningCount) {
+                 showDiagnosticsPanel = true;
+            }
+            lastErrorCount = compilationErrors.length;
+            lastWarningCount = compilationWarnings.length;
+
+        } catch (e) {
+            console.error("Error in updateDiagnostics:", e);
+        }
+    }
+
     // Pipeline State
-    let pipeF = $state(Instruction.none());
-    let pipeD = $state(Instruction.none());
-    let pipeE = $state(Instruction.none());
-    let pipeW = $state(Instruction.none());
+    // Initialize with a default object instead of Instruction.none() which no longer exists
+    const defaultInst: Instruction = { 
+        operation: "NOOP", args: "None", 
+        a: { type: "Immediate", data: 0 }, 
+        b: { type: "Immediate", data: 0 }, 
+        address: -1, sourceLine: 0 
+    };
+
+    let pipeF = $state(defaultInst);
+    let pipeD = $state(defaultInst);
+    let pipeE = $state(defaultInst);
+    let pipeW = $state(defaultInst);
+
 
     // --- NEW: Auto Scroll Effect ---
     $effect(() => {
@@ -1042,6 +555,7 @@ function highlightSyntax(code: string): string {
 
     function initEmulator() {
         emulator = new Emulator(code);
+        updateDiagnostics();
         updateStats();
         draw();
         codeChanged = false; // Reset dirty flag
@@ -1084,8 +598,10 @@ function highlightSyntax(code: string): string {
         if (showInputModal) return;
 
         emulator!.clock();
-
-        if (emulator!.waitingForInput) {
+        
+        // Get state to check waiting_for_input
+        const state = emulator!.get_state();
+        if (state.waiting_for_input) {
             handleInputInterrupt();
         }
 
@@ -1096,7 +612,9 @@ function highlightSyntax(code: string): string {
     function handleInputInterrupt() {
         isRunning = false;
         cancelAnimationFrame(animationId);
-        inputRegIndex = emulator!.inputRegister;
+        // We need to get state to access input_register
+        const state = emulator!.get_state();
+        inputRegIndex = state.input_register;
         inputValue = "";
         showInputModal = true;
         setTimeout(() => inputRef?.focus(), 50);
@@ -1105,7 +623,7 @@ function highlightSyntax(code: string): string {
     function submitInput() {
         let num = parseInt(inputValue);
         if (isNaN(num)) num = 0;
-        emulator!.resolveInput(num);
+        emulator!.resolve_input(num);
         showInputModal = false;
         isRunning = true;
         loop();
@@ -1136,24 +654,58 @@ function highlightSyntax(code: string): string {
     
     function updateStats() {
         if (emulator) {
-            pc = emulator.pc;
-            sp = emulator.sp;
-            execAddr = emulator.execute_reg.address;
-            registers = emulator.registers.getAll();
-            acc = emulator.alu.accumulator;
-            ports = Array.from(emulator.portsOut);
-            ram = new Uint8Array(emulator.ram);
-            flags = {...emulator.alu.flags};
+            const state: EmulatorState = emulator.get_state();
             
-            pipeF = emulator.fetch_reg.clone();
-            pipeD = emulator.decode_reg.clone();
-            pipeE = emulator.execute_reg.clone();
-            pipeW = emulator.writeback_reg.clone();
-            compilationErrors = emulator.errors;
-            compilationWarnings = emulator.warnings;
+            pc = state.pc;
+            sp = state.sp;
+            execAddr = state.execute.address;
+            registers = state.regs;
+            acc = state.acc;
+            ports = state.ports;
+            ram = new Uint8Array(state.ram);
+            flags = {...state.flags};
+            
+            pipeF = state.fetch;
+            pipeD = state.decode;
+            pipeE = state.execute;
+            pipeW = state.writeback;
+            
+            // Errors/Warnings are managed by updateDiagnostics() on code change
         }
     }
     
+    // Helper to get needed operands for formatting, adapted from original Parser logic
+    function getNeededOperands(op: string, args: string): [boolean, boolean] {
+        switch (op) {
+            case "NOOP": return [false, false];
+            case "IMM": return [true, true]; 
+            case "MOV": return [true, true]; 
+            case "ADD":
+            case "ADDC": 
+            case "SUB":
+            case "OR":
+            case "XOR":
+            case "AND":
+                return args === "X" ? [false, true] : [true, true];
+            case "SHR":
+            case "NOT": return [true, true];
+            case "OUT": return [true, true]; 
+            case "JMP": 
+            case "BIE": 
+            case "BIG": 
+            case "BIO":
+            case "BIL": return [true, false]; 
+            case "INP": return [true, false];
+            case "STORE": return [true, true]; // STORE #addr reg
+            case "LOAD": return [true, true]; // LOAD reg #addr
+            case "PUSH": return [true, false];
+            case "POP": return [true, false];
+            case "CALL": return [true, false]; // CALL address
+            case "RET": return [false, false]; 
+            default: return [false, false];
+        }
+    }
+
     function formatInstr(inst: Instruction) {
         if (inst.operation === "NOOP") return "-";
         
@@ -1161,13 +713,13 @@ function highlightSyntax(code: string): string {
         if (inst.args !== "None") s += inst.args;
         
         const formatOp = (op: Operand) => {
-            if (op.type === 0) return `R${op.data}`; // Reg
-            if (op.type === 1) return `#${op.data}`; // Mem
-            if (op.type === 3) return `%${op.data}`; // Port
-            return `${op.data}`;
+            if (op.type === "Register") return `R${op.data}`;
+            if (op.type === "MemoryAddress") return `#${op.data}`;
+            if (op.type === "Port") return `%${op.data}`;
+            return `${op.data}`; // Immediate
         };
 
-        const needed = Parser.getNeededOperands(inst.operation, inst.args);
+        const needed = getNeededOperands(inst.operation, inst.args);
         if (needed[0]) s += " " + formatOp(inst.a);
         if (needed[1]) s += " " + formatOp(inst.b);
         return s;
@@ -1179,12 +731,15 @@ function highlightSyntax(code: string): string {
         ctx.fillStyle = '#000000';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
+        const state = emulator.get_state();
+        const portsOut = state.ports;
+
         const gridSizeX = 8; const gridSizeY = 8;
         const cellW = canvas.width / gridSizeX;
         const cellH = canvas.height / gridSizeY;
 
         for (let port = 0; port < gridSizeY; port++) {
-            const val = emulator.portsOut[port];
+            const val = portsOut[port];
             
             for (let bitIndex = 0; bitIndex < gridSizeX; bitIndex++) {
                 const bitShift = 7 - bitIndex;

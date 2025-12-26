@@ -51,20 +51,32 @@
 		location: "Chula Vista, CA",
 		courses: ["Data Structures & Algorithms", "Object-Oriented Programming", "Computer Architecture"]
 	};
+    
+    import { viewport } from '$lib/actions';
 </script>
 
 <section id="experience" class="py-10 relative">
 	<div class="container mx-auto px-6">
-		<h2 class="text-3xl font-bold font-mono text-white flex items-center gap-4 mb-16">
+		<h2 
+            class="text-3xl font-bold font-mono text-white flex items-center gap-4 mb-16 animate-on-scroll"
+            use:viewport
+        >
 			<span class="text-[var(--color-schematic-primary)]">03.</span> Experience
 		</h2>
 
 		<div class="grid lg:grid-cols-3 gap-8">
 			<div class="lg:col-span-2 space-y-8">
-				<h3 class="text-xl text-white font-mono uppercase tracking-widest mb-6 border-l-2 border-[var(--color-schematic-primary)] pl-4">Work History</h3>
+				<h3 
+                    class="text-xl text-white font-mono uppercase tracking-widest mb-6 border-l-2 border-[var(--color-schematic-primary)] pl-4 animate-on-scroll"
+                    use:viewport
+                >Work History</h3>
 				<div class="relative space-y-8 border-l-2 border-[var(--color-schematic-primary)] ml-3 pl-8">
-					{#each experiences as exp}
-						<div class="relative">
+					{#each experiences as exp, i}
+						<div 
+                            class="relative animate-on-scroll" 
+                            style="transition-delay: {i * 100}ms"
+                            use:viewport
+                        >
 							<!-- Timeline dot -->
 							<div class="absolute -left-[41px] top-2 w-5 h-5 bg-zinc-900 border-2 border-[var(--color-schematic-primary)] rounded-full z-10"></div>
 							
@@ -97,8 +109,14 @@
 			</div>
 
 			<div>
-				<h3 class="text-xl text-white font-mono uppercase tracking-widest mb-6 border-l-2 border-[var(--color-schematic-primary)] pl-4">Education</h3>
-				<div class="bg-zinc-900/50 border border-zinc-800 p-6 sticky top-24">
+				<h3 
+                    class="text-xl text-white font-mono uppercase tracking-widest mb-6 border-l-2 border-[var(--color-schematic-primary)] pl-4 animate-on-scroll delay-200"
+                    use:viewport
+                >Education</h3>
+				<div 
+                    class="bg-zinc-900/50 border border-zinc-800 p-6 sticky top-24 animate-on-scroll delay-300"
+                    use:viewport
+                >
 					<div class="mb-6">
 						<h4 class="text-lg font-bold text-white font-mono">{education.school}</h4>
 						<p class="text-[var(--color-schematic-primary)] font-mono text-sm">{education.degree}</p>

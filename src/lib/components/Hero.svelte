@@ -4,9 +4,15 @@
 
 	let displayText = $state('');
 	let currentIndex = $state(0);
+    let showDetails = $state(false);
 	const fullText = "Hello, I'm Eli Perez";
 
 	onMount(() => {
+        // Trigger details fade-in slightly after start
+        setTimeout(() => {
+            showDetails = true;
+        }, 500);
+
 		const interval = setInterval(() => {
 			if (currentIndex < fullText.length) {
 				displayText += fullText[currentIndex];
@@ -35,7 +41,7 @@
 				</p>
 			</div>
 			
-			<div class="space-y-1 font-mono text-sm text-zinc-500 border-l-2 border-zinc-800 pl-4">
+			<div class="space-y-1 font-mono text-sm text-zinc-500 border-l-2 border-zinc-800 pl-4 animate-on-scroll delay-100" class:viewport-enter={showDetails}>
 				<div class="flex items-center gap-3">
 					<span class="text-[var(--color-schematic-primary)]">LAST_ROLE</span>
 					<span>Lead Software Engineer & Founder</span>
@@ -57,11 +63,11 @@
 
 			</div>
 			
-			<p class="text-lg text-zinc-400 leading-relaxed font-sans max-w-lg">
+			<p class="text-lg text-zinc-400 leading-relaxed font-sans max-w-lg animate-on-scroll delay-200" class:viewport-enter={showDetails}>
 				I engineer high-performance systems in Rust. From designing custom CPU architectures and bare-metal firmware to scaling geospatial platforms for thousands of users.
 			</p>
 
-			<div class="flex flex-wrap gap-4 pt-4">
+			<div class="flex flex-wrap gap-4 pt-4 animate-on-scroll delay-300" class:viewport-enter={showDetails}>
 				<a href="#projects" class="px-8 py-3 bg-[var(--color-schematic-primary)] text-black font-mono font-bold uppercase tracking-wider hover:bg-white transition-all transform hover:scale-105">
 					View Projects
 				</a>
