@@ -49,8 +49,8 @@
 
                     <!-- Gallery Integration -->
                     {#if project.gallery}
-                        <div class="mb-6 border-zinc-800 py-4 bg-zinc-850/30 overflow-hidden -mx-4 px-4 sm:-mx-8 sm:px-8 relative z-10 pointer-events-none">
-                            <div class="pointer-events-auto">
+                        <div class="mb-6 border-zinc-800 py-4 bg-zinc-850/30 px-0 relative z-10 pointer-events-none">
+                            <div class="pointer-events-auto overflow-hidden">
                                 <Gallery path={project.gallery.path} images={project.gallery.images} />
                             </div>
                         </div>

@@ -14,21 +14,24 @@
             </h2>
 
             <div class="space-y-6 text-zinc-400 leading-relaxed text-lg">
+
                 <p>
-                    I am a <span class="text-white">Systems Engineer</span> and the <span class="text-white">Technical Lead for the IEEE Embedded Systems division</span>, currently architecting firmware for autonomous aerial robotics. My focus is on high-performance infrastructure, embedded control systems, and computer architecture.
+                    I am a <span class="text-white">Systems Engineer</span> driven by an obsession with understanding how things work—down to the bare metal. My journey didn't begin in a bootcamp; it began in <span class="text-white">Minecraft</span>, where I manually routed clock signals and debugged race conditions with redstone before I ever wrote a line of code.
                 </p>
 
                 <p>
-                    I specialize in <span class="text-white">Rust for safety-critical environments</span>. I recently engineered a fault-tolerant telemetry system for a nuclear startup, implementing a <span class="text-white">voting logic algorithm</span> to synthesize data from triple-redundant Rockwell PLCs, neutron flux detectors, and seismometers with sub-10ms latency.
+                    That curiosity evolved into <strong>Electron</strong>, a <span class="text-white">custom 8-bit CPU</span> I designed from first principles. Refusing to stop at the hardware simulation, I built a complete ecosystem in <span class="text-white">Rust</span>—including an assembler, cycle-accurate emulator, and <span class="text-white">VS Code extension</span>—to validate my architecture against real-world constraints.
                 </p>
 
                 <p>
-                    My passion for low-level architecture led me to design "Electron," a <span class="text-white">custom 8-bit CPU</span> built from logic gates. I developed the entire ecosystem in Rust—including an assembler, a cycle-accurate emulator, and a <span class="text-white">VS Code extension</span>—to validate the custom instruction set.
+                    Professionally, I apply that same rigor to safety-critical infrastructure. As the <span class="text-white">Technical Lead for the IEEE Embedded Systems division</span>, I architect firmware for autonomous aerial robotics. I also engineered a fault-tolerant telemetry system for a nuclear startup, implementing voting logic to synthesize data from <span class="text-white">triple-redundant PLCs</span> with sub-10ms latency.
                 </p>
 
                 <p>
-                    On the web, I architected <span class="text-white">"Until Every Cage is Empty"</span>, a high-performance geospatial platform. I built the system in Rust (Axum) and Vanilla JS to serve over <span class="text-[var(--color-schematic-primary)]">56,000 data points</span> to more than <span class="text-[var(--color-schematic-primary)]">3,000 monthly users</span>, securing a seed grant from The Pollination Project.
+                    I believe rigorous engineering should drive social change. I architected <span class="text-white">"Until Every Cage is Empty"</span>, a geospatial platform serving <span class="text-[var(--color-schematic-primary)]">56,000+ data points</span>. The project's impact on data transparency earned a <span class="text-white">Seed Grant from The Pollination Project</span>, validating its technical foundation and mission.
                 </p>
+
+
             </div>
         </div>
 

@@ -233,8 +233,7 @@
 
                             <!-- HUD -->
                             <div class="absolute top-4 left-4 font-mono text-[10px] text-[var(--color-schematic-primary)] z-40 flex flex-col gap-1 tracking-widest opacity-80">
-                                <div class="font-bold border-b border-[var(--color-schematic-primary)]/30 pb-1 mb-1">SAT_UPLINK_V4</div>
-                                <div>TGT: USDA_DATACENTER</div>
+                                <div class="font-bold border-b border-[var(--color-schematic-primary)]/30 pb-1 mb-1">LIVE WEBSITE DEMO</div>
                                 <div>LAT: {displayLat}</div>
                                 <div>LNG: {displayLng}</div>
                                 <div>ALT: {displayAlt} // ORBITAL</div>
@@ -243,13 +242,11 @@
                             <!-- Top Right Info -->
                             <div class="absolute top-4 right-4 font-mono text-[10px] text-[var(--color-schematic-primary)] z-40 text-right opacity-80">
                                 <div>{timeString}</div>
-                                <div>SPECTRAL: RGB+IR</div>
                             </div>
 
                              <!-- Bottom Right HUD -->
                             <div class="absolute bottom-4 right-4 font-mono text-[10px] text-[var(--color-schematic-primary)] z-40 text-right opacity-80">
                                 <div>LINK_STATUS: STABLE</div>
-                                <div>BW: 12.4 TB/s</div>
                             </div>
 
                             <!-- Bottom Left Scale -->
