@@ -27,7 +27,7 @@ export const projects: Project[] = [
         slug: "until-every-cage-is-empty",
         title: "Until Every Cage is Empty",
         subtitle: "Interactive data-driven map of global animal exploitation infrastructure",
-        description: "An interactive, data-driven map exposing the global infrastructure of animal exploitation. Serves 38,500+ data points to 3,000+ monthly users globally with 100,000+ social media reach.",
+        description: "An interactive, data-driven map exposing the global infrastructure of animal exploitation. Serves 56,000+ data points to 3,000+ monthly users globally with 100,000+ social media reach.",
         technologies: ["Rust", "Axum", "Python", "JavaScript", "Leaflet.js", "Netlify"],
         features: [
             "Serves 54,000+ data points to 3,000+ monthly users",

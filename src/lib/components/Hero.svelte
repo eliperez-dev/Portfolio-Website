@@ -31,14 +31,14 @@
 				<div class="h-1 w-20 bg-[var(--color-schematic-primary)] mb-6"></div>
 				
 				<p class="text-2xl text-zinc-300 font-medium font-sans mb-2">
-					Rust <span class="text-[var(--color-schematic-primary)]">•</span> Systems • Full-Stack Engineer
+					Systems Software Enginerer <span class="text-[var(--color-schematic-primary)]">•</span> Rust <span class="text-[var(--color-schematic-primary)]">•</span> Embedded
 				</p>
 			</div>
 			
 			<div class="space-y-1 font-mono text-sm text-zinc-500 border-l-2 border-zinc-800 pl-4">
 				<div class="flex items-center gap-3">
 					<span class="text-[var(--color-schematic-primary)]">LAST_ROLE</span>
-					<span>Software Engineer @ Fish Defender</span>
+					<span>Lead Software Engineer</span>
 				</div>
 				<div class="flex items-center gap-3">
 					<span class="text-[var(--color-schematic-primary)]">EDUCATION</span>
@@ -51,14 +51,14 @@
 				<div class="flex items-center gap-3">
 					<span class="text-[var(--color-schematic-primary)]">STATUS</span>
 					<span class="flex items-center gap-2">
-						Seeking full-time opportunities!
+						Available for immediate full-time employment
 					</span>
 				</div>
 
 			</div>
 			
 			<p class="text-lg text-zinc-400 leading-relaxed font-sans max-w-lg">
-				I build full-stack applications in Rust, Python, and TypeScript. My passion lies in low-level systems, from performant REST APIs to custom CPU architectures and embedded.
+				I engineer high-performance systems in Rust. From designing custom CPU architectures and bare-metal firmware to scaling geospatial platforms for thousands of users.
 			</p>
 
 			<div class="flex flex-wrap gap-4 pt-4">

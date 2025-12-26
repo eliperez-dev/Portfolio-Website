@@ -167,10 +167,6 @@
                             </span>
                         </div>
                         <div class="flex justify-between border-b border-zinc-800 pb-2">
-                            <span>Written In</span>
-                            <span class="text-[var(--color-schematic-primary)]">Rust, Python, JS</span>
-                        </div>
-                        <div class="flex justify-between border-b border-zinc-800 pb-2">
                             <span>Live Website</span>
                             <a href="https://untileverycage.org" target="_blank" rel="noopener noreferrer" class="text-[var(--color-schematic-primary)] hover:underline truncate ml-4">untileverycage.org</a>
                         </div>

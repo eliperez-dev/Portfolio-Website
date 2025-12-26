@@ -1,6 +1,41 @@
 <script>
+	import { onMount } from 'svelte';
 	import profileImage from '$lib/assets/pfp.jpeg';
 
+	let imgElement;
+	let grayscaleVal = 100;
+
+	function updateGrayscale() {
+		if (!imgElement) return;
+
+		const rect = imgElement.getBoundingClientRect();
+		const imgCenterY = rect.top + rect.height / 2;
+		const viewportCenterY = window.innerHeight / 2;
+
+		// Calculate vertical distance from center
+		const distY = Math.abs(viewportCenterY - imgCenterY);
+		
+		// Map distance to grayscale (0% at center, 100% at 400px away)
+		const maxDist = 400;
+		grayscaleVal = Math.min(100, (distY / maxDist) * 100);
+	}
+
+	onMount(() => {
+		const handleScroll = () => {
+			requestAnimationFrame(updateGrayscale);
+		};
+
+		window.addEventListener('scroll', handleScroll);
+		window.addEventListener('resize', handleScroll);
+		
+		// Initial check
+		updateGrayscale();
+
+		return () => {
+			window.removeEventListener('scroll', handleScroll);
+			window.removeEventListener('resize', handleScroll);
+		};
+	});
 </script>
 
 <section id="about" class="py-10 relative">
@@ -28,7 +63,7 @@
                 </p>
 
                 <p>
-                    I believe rigorous engineering should drive social change. I architected <span class="text-white">"Until Every Cage is Empty"</span>, a geospatial platform serving <span class="text-[var(--color-schematic-primary)]">56,000+ data points</span>. The project's impact on data transparency earned a <span class="text-white">Seed Grant from The Pollination Project</span>, validating its technical foundation and mission.
+                    I believe rigorous engineering should drive social change. I architected <span class="text-white">"Until Every Cage is Empty"</span>, a geospatial platform serving <span class="text-[var(--color-schematic-primary)]">56,000+ data points</span> and  <span class="text-[var(--color-schematic-primary)]">3,000+ users</span>. The project's impact on data transparency earned a <span class="text-white">Seed Grant from The Pollination Project</span>, validating its technical foundation and mission.
                 </p>
 
 
@@ -39,7 +74,7 @@
             <div class="relative group max-w-sm mx-auto lg:max-w-s lg:ml-auto">
                 <div class="absolute inset-0 border-2 border-[var(--color-schematic-primary)] translate-x-4 translate-y-4 rounded-sm transition-transform group-hover:translate-x-2 group-hover:translate-y-2"></div>
                 <div class="relative rounded-sm overflow-hidden bg-zinc-800 border border-zinc-700">
-                    <img src={profileImage} alt="Eli Perez" class="w-full h-auto grayscale hover:grayscale-0 transition-all duration-500" />
+                    <img bind:this={imgElement} src={profileImage} alt="Eli Perez" class="w-full h-auto" style="filter: grayscale({grayscaleVal}%);" />
                     <div class="absolute inset-0 bg-[var(--color-schematic-primary)]/10 pointer-events-none mix-blend-multiply"></div>
                 </div>
             </div>

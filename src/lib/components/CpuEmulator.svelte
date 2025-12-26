@@ -34,6 +34,10 @@ OUT %4 R4
 OUT %5 R5
 OUT %6 R6
 OUT %7 R7
+IMM R1 B01000010
+NOOP
+OUT %0 R1
+
 
 ; --- Draw Face ---
 IMM R1 60      ; 00111100 (Hair)
