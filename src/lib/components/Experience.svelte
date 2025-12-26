@@ -16,6 +16,20 @@
 		},
 		{
 			id: 2,
+			title: "Technical Lead – Embedded Systems",
+			company: "IEEE Student Branch",
+			period: "Nov 2025 - Present",
+			location: "Chula Vista, CA",
+			type: "Volunteer",
+			description: "Spearheading technical strategy for autonomous robotics.",
+			highlights: [
+				"Defining software roadmap for autonomous aerial robotics",
+				"Leading hardware evaluation (flight controllers, IMUs)",
+				"Organizing technical workshops for firmware development"
+			]
+		},
+		{
+			id: 3,
 			title: "Software Engineer",
 			company: "Fish Defender",
 			period: "Oct 2025 - Dec 2025",
@@ -28,20 +42,6 @@
 				"Integrated Google Sheets API for data management"
 			]
 		},
-		{
-			id: 3,
-			title: "Lead Embedded Software Engineer",
-			company: "IEEE Student Branch",
-			period: "Nov 2025 - Present",
-			location: "Chula Vista, CA",
-			type: "Volunteer",
-			description: "Spearheading technical strategy for autonomous robotics.",
-			highlights: [
-				"Defining software roadmap for autonomous aerial robotics",
-				"Leading hardware evaluation (flight controllers, IMUs)",
-				"Organizing technical workshops for firmware development"
-			]
-		}
 	];
 
 	const education = {
@@ -49,7 +49,6 @@
 		degree: "A.S. in Computer Science",
 		period: "Current",
 		location: "Chula Vista, CA",
-		gpa: "3.41 GPA",
 		courses: ["Data Structures & Algorithms", "Object-Oriented Programming", "Computer Architecture"]
 	};
 </script>
@@ -110,11 +109,6 @@
 					</div>
 
 					<div class="space-y-4">
-						<div class="flex justify-between items-center bg-zinc-800/50 p-3 rounded border border-zinc-700">
-							<span class="text-zinc-400 text-sm">GPA</span>
-							<span class="text-white font-mono font-bold">{education.gpa}</span>
-						</div>
-
 						<div>
 							<p class="text-zinc-500 text-xs uppercase tracking-wider mb-2">Key Coursework</p>
 							<div class="flex flex-wrap gap-2">

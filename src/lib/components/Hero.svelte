@@ -71,6 +71,9 @@
 				<a href="#projects" class="px-8 py-3 bg-[var(--color-schematic-primary)] text-black font-mono font-bold uppercase tracking-wider hover:bg-white transition-all transform hover:scale-105">
 					View Projects
 				</a>
+				<a href="/PerezEli_Resume_2025.pdf" download="PerezEli_Resume_2025.pdf" class="px-8 py-3 border border-zinc-700 text-white font-mono font-bold uppercase tracking-wider hover:border-[var(--color-schematic-primary)] hover:text-[var(--color-schematic-primary)] transition-colors">
+					Download Resume
+				</a>
 				<a href="#contact" class="px-8 py-3 border border-zinc-700 text-white font-mono font-bold uppercase tracking-wider hover:border-[var(--color-schematic-primary)] hover:text-[var(--color-schematic-primary)] transition-colors">
 					Contact Me
 				</a>

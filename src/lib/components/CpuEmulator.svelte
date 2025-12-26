@@ -42,7 +42,7 @@ IMM R3 165     ; 10100101 (Eyes Open)
 IMM R4 129     ; 10000001 (Nose Bridge)
 IMM R5 165     ; 10100101 Smile
 IMM R6 153     ; 10011001
-IMM R7 b01000010 ; (Chin)
+IMM R7 B01000010 ; (Chin)
 OUT %0 R1
 OUT %1 R2
 OUT %2 R3
@@ -72,7 +72,7 @@ OUT %5 R6
 OUT %6 R7
 OUT %7 R0
 
---- Store Heart To RAM ---
+; --- Store Heart To RAM ---
 PUSH R1
 PUSH R2
 PUSH R3
@@ -150,20 +150,19 @@ OUT %6 R2
 OUT %7 R1
 OUT %7 R2
 
--- Pop Heart From RAM --
+; --- Pop Heart From RAM ---
 ; This wont do anything,
-; but shocases RAM usage.
+; but it showcases RAM usage.
 
-POP R0 ; Load to Zero Reg
-POP R0
-POP R0
-POP R0
-POP R0
-POP R0
-POP R0
+POP R1 ; Pop value on stack to
+POP R1 ; Register 1
+POP R1
+POP R1
+POP R1
+POP R1
+POP R1
 
-JMP 0
-`,
+JMP 0`,
         "Input Test": `; Input Instruction Test
 ; Run this! It will popup a custom UI.
 INP R1          ; Ask user for value
@@ -242,13 +241,15 @@ RET           ; Return to caller`
         a: Operand;
         b: Operand;
         address: number;
+        sourceLine: number;
 
-        constructor(operation: Operation, args: OperationArgs, a: Operand, b: Operand, address: number = -1) {
+        constructor(operation: Operation, args: OperationArgs, a: Operand, b: Operand, address: number = -1, sourceLine: number = 0) {
             this.operation = operation;
             this.args = args;
             this.a = a;
             this.b = b;
             this.address = address;
+            this.sourceLine = sourceLine;
         }
 
         static none(): Instruction {
@@ -256,7 +257,7 @@ RET           ; Return to caller`
         }
 
         clone(): Instruction {
-            return new Instruction(this.operation, this.args, this.a, this.b, this.address);
+            return new Instruction(this.operation, this.args, this.a, this.b, this.address, this.sourceLine);
         }
     }
 
@@ -277,8 +278,68 @@ RET           ; Return to caller`
         return map;
     }
 
+    // --- NEW: Syntax Highlighting Logic ---
+    function highlightSyntax(code: string): string {
+        // Escape HTML to prevent injection
+        let escaped = code
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+
+        // Keywords
+        const keywords = [
+            "IMM", "MOV", "ADD", "ADDC", "SUB", "OR", "XOR", "AND", "SHR", "NOT",
+            "OUT", "INP", "JMP", "BIE", "BIG", "BIL", "BIO", "STORE", "LOAD",
+            "PUSH", "POP", "CALL", "RET", "NOOP", "NOP"
+        ];
+        
+        // Add S, U, X prefixed variants for ALU ops
+        const aluOps = ["ADD", "ADDC", "SUB", "OR", "XOR", "AND"];
+        const prefixes = ["S", "U", "X"];
+        prefixes.forEach(p => {
+            aluOps.forEach(op => keywords.push(p + op));
+        });
+        
+        // Regex Patterns
+        // 1. Comments: ; ... (end of line)
+        // 2. Keywords: Whole words only
+        // 3. Registers: R0-R7
+        // 4. Ports: %0-%7
+        // 5. Numbers: Dec/Bin (#123, 123, B1010)
+        
+        // We process line by line to handle comments safely
+        return escaped.split('\n').map(line => {
+            const commentIndex = line.indexOf(';');
+            let codePart = line;
+            let commentPart = '';
+            
+            if (commentIndex !== -1) {
+                codePart = line.substring(0, commentIndex);
+                commentPart = `<span class="text-zinc-500">${line.substring(commentIndex)}</span>`;
+            }
+
+            // Highlight Code Part
+
+            // 1. Numbers (123, B101, #123) - Do this FIRST to avoid matching numbers in class names later
+            // We ensure the number is NOT preceded by a '%' sign (for ports like %0)
+            codePart = codePart.replace(/(^|[^%])\b(\d+|B[01_]+)\b/g, '$1<span class="text-blue-400">$2</span>');
+
+            // 2. Keywords
+            const kwRegex = new RegExp(`\\b(${keywords.join('|')})\\b`, 'g');
+            codePart = codePart.replace(kwRegex, '<span class="text-[var(--color-schematic-primary)] font-bold">$1</span>');
+
+            // 3. Registers (R0-R7)
+            codePart = codePart.replace(/\b(R[0-7])\b/g, '<span class="text-purple-400 font-bold">$1</span>');
+
+            // 4. Ports (%0-%7)
+            codePart = codePart.replace(/(%[0-7])/g, '<span class="text-yellow-400 font-bold">$1</span>');
+            
+            return codePart + commentPart;
+        }).join('\n');
+    }
+
     class Parser {
-        static parseLine(line: string, address: number): Instruction | null {
+        static parseLine(line: string, address: number, sourceLine: number): Instruction | null {
             const commentIdx = line.indexOf(';');
             if (commentIdx !== -1) line = line.substring(0, commentIdx);
             
@@ -303,7 +364,7 @@ RET           ; Return to caller`
                 if (tokenIdx < tokens.length) valB = this.parseOperand(tokens[tokenIdx++]);
             }
 
-            return new Instruction(op, args, valA, valB, address);
+            return new Instruction(op, args, valA, valB, address, sourceLine);
         }
 
         static parseOperation(str: string): { op: Operation, args: OperationArgs } {
@@ -391,19 +452,36 @@ RET           ; Return to caller`
         static parseOperand(str: string): Operand {
             const first = str.charAt(0);
             const rest = str.substring(1);
-            if (first === 'R') return new Operand(OperandType.Register, this.parseBinary(rest));
-            else if (first === '#') return new Operand(OperandType.MemoryAddress, this.parseBinary(rest));
-            else if (first === '%') return new Operand(OperandType.Port, this.parseBinary(rest));
+            if (first === 'R') {
+                const val = this.parseBinary(rest);
+                if (isNaN(val)) throw new Error(`Invalid register: ${str}`);
+                return new Operand(OperandType.Register, val);
+            }
+            else if (first === '#') {
+                const val = this.parseBinary(rest);
+                if (isNaN(val)) throw new Error(`Invalid memory address: ${str}`);
+                return new Operand(OperandType.MemoryAddress, val);
+            }
+            else if (first === '%') {
+                const val = this.parseBinary(rest);
+                if (isNaN(val)) throw new Error(`Invalid port: ${str}`);
+                return new Operand(OperandType.Port, val);
+            }
             else {
-                try { return new Operand(OperandType.Immediate, this.parseBinary(str)); } 
-                catch { return new Operand(OperandType.Immediate, 0); }
+                const val = this.parseBinary(str);
+                if (isNaN(val)) throw new Error(`Invalid immediate value: ${str}`);
+                return new Operand(OperandType.Immediate, val);
             }
         }
 
         static parseBinary(str: string): number {
             str = str.replace(/_/g, '');
-            if (str.startsWith('B')) return parseInt(str.substring(1), 2);
-            return parseInt(str);
+            let val;
+            if (str.startsWith('B')) val = parseInt(str.substring(1), 2);
+            else val = parseInt(str);
+            
+            if (isNaN(val)) throw new Error(`Invalid number format: ${str}`);
+            return val;
         }
     }
 
@@ -483,6 +561,8 @@ RET           ; Return to caller`
 
     class Emulator {
         instructions: Instruction[] = [];
+        errors: { line: number, message: string }[] = [];
+        warnings: { line: number, message: string }[] = [];
         pc: number = 0;
         sp: number = 15; // FIXED: Stack Pointer starts at 15 (end of 16-byte RAM)
         
@@ -502,22 +582,109 @@ RET           ; Return to caller`
 
         constructor(code: string) { this.loadProgram(code); }
 
-        loadProgram(code: string) {
+loadProgram(code: string) {
             this.instructions = [];
+            this.errors = [];
+            this.warnings = [];
+            
             const lines = code.split('\n');
             let addrCounter = 0;
-            for (let line of lines) {
+            
+            // --- First Pass: Parse ---
+            lines.forEach((line, i) => {
                 try {
-                    const instr = Parser.parseLine(line, addrCounter);
+                    // Pass 'i + 1' as the sourceLine (1-based index for UI)
+                    const instr = Parser.parseLine(line, addrCounter, i + 1);
                     if (instr) {
                         this.instructions.push(instr);
                         addrCounter++;
                     }
-                } catch (e) { console.error(e); }
+                } catch (e: any) {
+                    // Syntax errors use the loop index 'i' directly
+                    this.errors.push({ line: i + 1, message: e.message });
+                }
+            });
+
+            // --- Second Pass: Analyze for Warnings ---
+            // Now we can iterate the instructions directly!
+            for (let i = 0; i < this.instructions.length; i++) {
+                const instr = this.instructions[i];
+                const nextInstr = (i + 1 < this.instructions.length) ? this.instructions[i + 1] : null;
+                
+                const op = instr.operation;
+                const currentLine = instr.sourceLine; // <--- Retrieve correct text editor line
+
+                // 1. Write to Zero Register
+                if (
+                    (op === Operation.MOV && instr.a.data === 0) ||
+                    (op === Operation.IMM && instr.a.data === 0) ||
+                    (op === Operation.POP && instr.a.data === 0) ||
+                    (op === Operation.LOAD && instr.a.data === 0) ||
+                    (op === Operation.INP && instr.a.data === 0)
+                ) {
+                    this.warnings.push({ line: currentLine, message: "Writing to R0 has no effect (always 0)." });
+                }
+
+                // 2. Out of Bounds
+                if (op === Operation.STORE && instr.a.type === OperandType.MemoryAddress && instr.a.data > 15) {
+                    this.warnings.push({ line: currentLine, message: `Memory address ${instr.a.data} out of bounds (Max 15).` });
+                }
+                if (op === Operation.LOAD && instr.b.type === OperandType.MemoryAddress && instr.b.data > 15) {
+                    this.warnings.push({ line: currentLine, message: `Memory address ${instr.b.data} out of bounds (Max 15).` });
+                }
+                if (op === Operation.OUT && instr.a.type === OperandType.Port && instr.a.data > 7) {
+                    this.warnings.push({ line: currentLine, message: `Port %${instr.a.data} out of bounds (Max %7).` });
+                }
+
+                // 3. Pipeline Hazard (Read-After-Write)
+                if (nextInstr) {
+                    const nextOp = nextInstr.operation;
+                    const nextLine = nextInstr.sourceLine; // <--- Use next instruction's source line
+                    
+                    let destReg = -1;
+                    if ([Operation.MOV, Operation.IMM, Operation.POP, Operation.LOAD, Operation.INP, Operation.SHR, Operation.NOT].includes(op)) {
+                        destReg = instr.a.data;
+                    } else if ([Operation.ADD, Operation.ADDC, Operation.SUB, Operation.OR, Operation.XOR, Operation.AND].includes(op)) {
+                        if (instr.args !== OperationArgs.X) destReg = instr.a.data;
+                    }
+
+                    if (destReg !== -1 && destReg !== 0 && nextOp !== Operation.OUT) { 
+                        let readsReg = false;
+                        
+                        if (nextInstr.a.type === OperandType.Register && nextInstr.a.data === destReg) {
+                            const pureOverwrites = [Operation.MOV, Operation.IMM, Operation.POP, Operation.LOAD, Operation.INP];
+                            if (!pureOverwrites.includes(nextOp)) readsReg = true; 
+                        }
+                        if (nextInstr.b.type === OperandType.Register && nextInstr.b.data === destReg) readsReg = true;
+                        if (nextOp === Operation.PUSH && nextInstr.a.data === destReg) readsReg = true;
+                        if (nextOp === Operation.STORE && nextInstr.b.data === destReg) readsReg = true;
+
+                        if (readsReg) {
+                            this.warnings.push({ 
+                                line: nextLine, 
+                                message: `Pipeline Hazard: Reads R${destReg} immediately after write. Insert NOOP.` 
+                            });
+                        }
+                    }
+                }
+
+                // 4. Dead Code (Branch Flush)
+                if ([Operation.JMP, Operation.CALL, Operation.RET, Operation.BIE, Operation.BIG, Operation.BIL, Operation.BIO].includes(op)) {
+                    if (nextInstr) {
+                        this.warnings.push({ 
+                            line: nextInstr.sourceLine, 
+                            message: "Unreachable: Instruction flushed by preceding branch." 
+                        });
+                    }
+                }
             }
+
+            // Fill remainder of ROM
             while (this.instructions.length < 255) this.instructions.push(Instruction.none());
+            
+            // Reset state
             this.pc = 0;
-            this.sp = 15; // FIXED: Reset to 15
+            this.sp = 15;
             this.ram.fill(0);
             this.waitingForInput = false;
         }
@@ -560,10 +727,10 @@ RET           ; Return to caller`
 
             if (takeBranch) {
                 this.pc = this.execute_reg.a.data;
-                // Pipeline Flush simulation (In real hardware, we'd invalidate F and D)
-                // The prompt says "Next 3 instructions already in pipeline complete"
-                // This architecture doesn't flush, it just updates PC. 
-                // The previous stages (already fetched) will ripple through.
+                // Pipeline Flush:
+                // We must invalidate the instruction currently in the fetch register
+                // so it doesn't proceed to decode/execute.
+                this.fetch_reg = Instruction.none();
             }
 
             // ALU Execution
@@ -674,6 +841,7 @@ RET           ; Return to caller`
 
     // Line Number Scrolling
     let textareaEl: HTMLTextAreaElement;
+    let backdropEl: HTMLDivElement; // NEW: Ref for backdrop
     let lineNumEl: HTMLDivElement;
     
     // --- NEW: Auto Scroll State ---
@@ -683,6 +851,26 @@ RET           ; Return to caller`
     // Default Code
     let code = $state(EXAMPLES["Intro"]);
     let lineMap = $derived(getLineToAddressMap(code));
+    let highlightedCode = $derived(highlightSyntax(code)); // NEW: Derived highlighted HTML
+    
+    // Track if code has changed since last run/reset
+    let codeChanged = $state(false);
+
+    // Watch code changes to re-compile and update errors in real-time
+    $effect(() => {
+        if (emulator) {
+            emulator.loadProgram(code);
+            compilationErrors = emulator.errors;
+            compilationWarnings = emulator.warnings;
+            
+            // Auto-open panel if new issues appear
+            if (compilationErrors.length > lastErrorCount || compilationWarnings.length > lastWarningCount) {
+                showDiagnosticsPanel = true;
+            }
+            lastErrorCount = compilationErrors.length;
+            lastWarningCount = compilationWarnings.length;
+        }
+    });
 
     // Reactive Stats
     let pc = $state(0);
@@ -693,6 +881,15 @@ RET           ; Return to caller`
     let ports = $state([0,0,0,0,0,0,0,0]);
     let ram = $state(new Uint8Array(16));
     let flags = $state({ equals: false, greater: false, less: false, overflow: false });
+    let compilationErrors = $state<{ line: number, message: string }[]>([]);
+    let compilationWarnings = $state<{ line: number, message: string }[]>([]);
+    
+    // --- NEW: Diagnostics UI State ---
+    let showDiagnosticsPanel = $state(true);
+    let ignoreErrors = $state(false);
+    let ignoreWarnings = $state(false);
+    let lastErrorCount = 0;
+    let lastWarningCount = 0;
     
     // Pipeline State
     let pipeF = $state(Instruction.none());
@@ -753,6 +950,7 @@ RET           ; Return to caller`
     function handleScroll() {
         if (textareaEl && lineNumEl) {
             lineNumEl.scrollTop = textareaEl.scrollTop;
+            if (backdropEl) backdropEl.scrollTop = textareaEl.scrollTop; // Sync backdrop
         }
 
         // --- NEW: Detection Logic ---
@@ -772,6 +970,7 @@ RET           ; Return to caller`
         emulator = new Emulator(code);
         updateStats();
         draw();
+        codeChanged = false; // Reset dirty flag
     }
 
     function loadExample(e: Event) {
@@ -783,6 +982,18 @@ RET           ; Return to caller`
 
     function toggleRun() {
         if (showInputModal) return; 
+        
+        // If code changed while paused, reset first to load new code
+        if (!isRunning && codeChanged) {
+             reset();
+             // Then fall through to start running
+             setTimeout(() => {
+                isRunning = true;
+                loop();
+             }, 0);
+             return;
+        }
+
         isRunning = !isRunning;
         if (isRunning) {
             if (!emulator) {
@@ -864,6 +1075,8 @@ RET           ; Return to caller`
             pipeD = emulator.decode_reg.clone();
             pipeE = emulator.execute_reg.clone();
             pipeW = emulator.writeback_reg.clone();
+            compilationErrors = emulator.errors;
+            compilationWarnings = emulator.warnings;
         }
     }
     
@@ -977,32 +1190,46 @@ RET           ; Return to caller`
                         </p>
                     </div>
 
+                    <section class="mb-6">
+                        <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">Specifications</h3>
+                        <ul class="list-disc list-inside text-zinc-400 text-[11px] space-y-1">
+                            <li><strong class="text-zinc-300">Registers:</strong> 7 General Purpose (R1-R7) + 1 Zero Register (R0).</li>
+                            <li><strong class="text-zinc-300">Memory:</strong> 16 Bytes of RAM (Shared with Stack).</li>
+                            <li><strong class="text-zinc-300">Display:</strong> 8x8 Pixel Grid (Mapped to 8 Ports, 8 bits each).</li>
+                            <li><strong class="text-zinc-300">ROM:</strong> 256 Lines of Program Memory.</li>
+                        </ul>
+                    </section>
+
                     <section class="bg-red-900/10 border border-red-900/30 p-4 rounded-md">
                         <h3 class="text-red-400 font-bold mb-3 uppercase tracking-widest text-[10px]">⚠ Hardware Constraints</h3>
                         <p class="text-red-300/70 mb-4 text-[11px]">
-                            This architecture utilizes a raw pipeline without hardware interlocking. Instructions do not automatically stall for dependencies.
+                            This architecture utilizes a raw pipeline without hardware interlocking.
                         </p>
                         
-                        <div class="grid md:grid-cols-2 gap-6 text-[11px]">
+                        <div class="text-[11px] space-y-4">
                             <div>
-                                <strong class="text-zinc-200 block mb-1">1. Read-After-Write Latency</strong>
+                                <strong class="text-zinc-200 block mb-1">Read-After-Write Latency</strong>
                                 <p class="text-zinc-500 mb-2">
-                                    Registers update in the final pipeline stage. Reading a register immediately after writing to it yields the <b>OLD</b> value.
-                                </p>
-                                <p class="text-zinc-300">
-                                    <span class="text-green-500">Fix:</span> Insert a <span class="text-[var(--color-schematic-primary)]">NOOP</span> between the write and the read.
+                                    Registers generally update in the <b>WriteBack</b> (Final) stage. Reading a register immediately after writing it usually yields the <b>OLD</b> value.
                                 </p>
                             </div>
 
-                            <div>
-                                <strong class="text-zinc-200 block mb-1">2. Branch Delay Slot</strong>
-                                <p class="text-zinc-500 mb-2">
-                                    The pipeline <b>does not flush</b> on branches. The instruction physically located immediately following a <span class="text-[var(--color-schematic-primary)]">JMP</span> or Branch <b>will execute</b> before the jump occurs.
+                            <div class="border-t border-red-900/20 pt-3">
+                                <strong class="text-[var(--color-schematic-primary)] block mb-1">The "OUT" Exception</strong>
+                                <p class="text-zinc-400 mb-2">
+                                    The <span class="text-white">OUT</span> instruction is unique. It captures the value of Register B during its <b>Execute</b> stage.
+                                </p>
+                                <p class="text-zinc-500">
+                                    Because its Execute stage coincides with the previous instruction's WriteBack stage, <span class="text-white">OUT</span> can safely read a register written by the instruction immediately before it without needing a <span class="text-white">NOOP</span>.
                                 </p>
                             </div>
+
+                            <p class="text-zinc-300">
+                                <span class="text-green-500">Note:</span> Pure overwrites (like <span class="text-white">POP</span> or <span class="text-white">IMM</span>) following each other do not trigger hazards, as they do not depend on the previous register state.
+                            </p>
                         </div>
                     </section>
-                    
+                        
                     <section>
                         <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">Assignments</h3>
                         <div class="grid grid-cols-[60px_100px_1fr] gap-y-2 text-zinc-400 border-b border-zinc-800/50 pb-4">
@@ -1153,6 +1380,21 @@ RET           ; Return to caller`
                             <span>No Operation (Do nothing).</span>
                         </div>
                     </section>
+                    <section class="bg-zinc-950/50 border border-zinc-800 p-4 rounded-md mb-6">
+                    <h3 class="text-zinc-500 font-bold mb-3 uppercase tracking-widest text-[10px]">Compilation & Validation</h3>
+                    <div class="space-y-3 text-[11px]">
+                        <div>
+                            <strong class="text-red-400 block mb-1">ERRORS</strong>
+                            <p class="text-zinc-400">Syntax errors, invalid mnemonics, or illegal characters. Errors prevent the program from loading into ROM.</p>
+                        </div>
+                        <div>
+                            <strong class="text-amber-400 block mb-1">WARNINGS</strong>
+                            <p class="text-zinc-400">Code that is technically valid but may result in unintended behavior, such as writing to <span class="text-white">R0</span>, memory/port out-of-bounds, or pipeline hazards.</p>
+                        </div>
+                    </div>
+                </section>
+
+                
                 </div>
 
             </div>
@@ -1190,19 +1432,120 @@ RET           ; Return to caller`
                             class:text-zinc-200={pc === addr && addr !== ""} 
                             class:text-[var(--color-schematic-primary)]={execAddr === addr && addr !== ""}
                             class:font-bold={execAddr === addr}
+                            class:text-red-500={compilationErrors.some(e => e.line === i + 1)}
+                            class:bg-red-900={compilationErrors.some(e => e.line === i + 1)}
+                            class:bg-opacity-20={compilationErrors.some(e => e.line === i + 1)}
+                            class:text-yellow-500={!compilationErrors.some(e => e.line === i + 1) && compilationWarnings.some(w => w.line === i + 1)}
+                            class:bg-yellow-900={!compilationErrors.some(e => e.line === i + 1) && compilationWarnings.some(w => w.line === i + 1)}
+                            class:bg-opacity-10={!compilationErrors.some(e => e.line === i + 1) && compilationWarnings.some(w => w.line === i + 1)}
                         >
                             {addr !== "" ? addr : "•"}
                         </div>
                     {/each}
                 </div>
-                <textarea 
-                    bind:this={textareaEl}
-                    bind:value={code}
-                    onscroll={handleScroll}
-                    oninput={() => autoScroll = false}
-                    class="flex-grow bg-transparent text-zinc-300 font-mono p-2 text-xs leading-5 outline-none resize-none whitespace-pre"
-                    spellcheck="false"
-                ></textarea>
+                <div class="relative flex-grow flex min-h-0">
+                    <!-- NEW: Backdrop for Syntax Highlighting -->
+                    <div 
+                        bind:this={backdropEl}
+                        class="absolute inset-0 pointer-events-none p-2 text-xs leading-5 font-mono whitespace-pre overflow-hidden z-0"
+                        aria-hidden="true"
+                    >
+                        <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+                        {@html highlightedCode}
+                    </div>
+
+                    <textarea 
+                        bind:this={textareaEl}
+                        bind:value={code}
+                        onscroll={handleScroll}
+                        oninput={() => {
+                            autoScroll = false;
+                            codeChanged = true;
+                        }}
+                        class="flex-grow bg-transparent text-transparent caret-white font-mono p-2 text-xs leading-5 outline-none resize-none whitespace-pre z-10 relative selection:bg-white/20"
+                        spellcheck="false"
+                    ></textarea>
+
+                    {#if (compilationErrors.length > 0 && !ignoreErrors) || (compilationWarnings.length > 0 && !ignoreWarnings)}
+                         <!-- Minimized / Re-open Button (Only if hidden manually) -->
+                         {#if !showDiagnosticsPanel}
+                            <button 
+                                onclick={() => showDiagnosticsPanel = true}
+                                class="absolute bottom-2 right-2 bg-zinc-900 border border-zinc-700 text-zinc-400 p-1.5 rounded shadow-lg z-30 hover:text-white hover:border-zinc-500 transition-colors flex items-center gap-2 text-[10px] font-mono"
+                            >
+                                {#if compilationErrors.length > 0 && !ignoreErrors}
+                                    <span class="text-red-500 font-bold">⚠ {compilationErrors.length} Errors</span>
+                                {:else}
+                                    <span class="text-yellow-500 font-bold">⚠ {compilationWarnings.length} Warnings</span>
+                                {/if}
+                            </button>
+                         {:else}
+                            <!-- Full Panel -->
+                             <div class="absolute bottom-2 right-2 left-2 rounded p-2 z-30 shadow-lg text-[10px] font-mono backdrop-blur-md flex flex-col gap-2 transition-colors duration-200
+                                {compilationErrors.length > 0 && !ignoreErrors ? 'bg-red-950/90 border border-red-800' : 'bg-yellow-950/90 border border-yellow-800'}"
+                             >
+                                <div class="flex justify-between items-start border-b pb-1 mb-1 {compilationErrors.length > 0 && !ignoreErrors ? 'border-red-800/50' : 'border-yellow-800/50'}">
+                                    <div>
+                                        <div class="font-bold flex items-center gap-2 {compilationErrors.length > 0 && !ignoreErrors ? 'text-red-300' : 'text-yellow-300'}">
+                                            {#if compilationErrors.length > 0 && !ignoreErrors}
+                                                <span>COMPILATION ERRORS ({compilationErrors.length})</span>
+                                            {:else}
+                                                <span>COMPILATION WARNINGS ({compilationWarnings.length})</span>
+                                            {/if}
+                                        </div>
+                                        <p class="text-[9px] opacity-70 {compilationErrors.length > 0 && !ignoreErrors ? 'text-red-400' : 'text-yellow-400'}">
+                                            {#if compilationErrors.length > 0 && !ignoreErrors}
+                                                Code cannot run with errors.
+                                            {:else}
+                                                Potential issues detected.
+                                            {/if}
+                                        </p>
+                                    </div>
+                                    
+                                    <div class="flex items-center gap-3">
+                                        <label class="flex items-center gap-1.5 cursor-pointer hover:opacity-100 opacity-80 transition-opacity">
+                                            <input 
+                                                type="checkbox" 
+                                                checked={compilationErrors.length > 0 && !ignoreErrors ? ignoreErrors : ignoreWarnings}
+                                                onchange={(e) => {
+                                                    if (compilationErrors.length > 0 && !ignoreErrors) ignoreErrors = e.currentTarget.checked;
+                                                    else ignoreWarnings = e.currentTarget.checked;
+                                                }}
+                                                class="w-3 h-3 rounded-sm accent-current"
+                                            />
+                                            <span class="{compilationErrors.length > 0 && !ignoreErrors ? 'text-red-300' : 'text-yellow-300'}">Ignore</span>
+                                        </label>
+                                        
+                                        <button 
+                                            onclick={() => showDiagnosticsPanel = false} 
+                                            class="hover:bg-black/20 rounded p-0.5 transition-colors {compilationErrors.length > 0 && !ignoreErrors ? 'text-red-300' : 'text-yellow-300'}"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="max-h-24 overflow-y-auto space-y-1 pr-1 custom-scrollbar">
+                                    {#if compilationErrors.length > 0 && !ignoreErrors}
+                                        {#each compilationErrors as err}
+                                            <div class="text-red-400 flex gap-2">
+                                                <span class="text-red-500 font-bold shrink-0">L{err.line}:</span>
+                                                <span>{err.message}</span>
+                                            </div>
+                                        {/each}
+                                    {:else}
+                                        {#each compilationWarnings as warn}
+                                            <div class="text-yellow-400 flex gap-2">
+                                                <span class="text-yellow-500 font-bold shrink-0">L{warn.line}:</span>
+                                                <span>{warn.message}</span>
+                                            </div>
+                                        {/each}
+                                    {/if}
+                                </div>
+                            </div>
+                         {/if}
+                    {/if}
+                </div>
             </div>
             
             <div class="shrink-0 flex items-center justify-end px-2 py-1 bg-zinc-900/50 border-t border-zinc-800">

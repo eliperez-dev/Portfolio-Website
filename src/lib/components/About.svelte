@@ -43,7 +43,7 @@
         </div>
 
         <div class="lg:col-span-2">
-            <div class="relative group max-w-sm mx-auto lg:max-w-none">
+            <div class="relative group max-w-sm mx-auto lg:max-w-s lg:ml-auto">
                 <div class="absolute inset-0 border-2 border-[var(--color-schematic-primary)] translate-x-4 translate-y-4 rounded-sm transition-transform group-hover:translate-x-2 group-hover:translate-y-2"></div>
                 <div class="relative rounded-sm overflow-hidden bg-zinc-800 border border-zinc-700">
                     <img src={profileImage} alt="Eli Perez" class="w-full h-auto grayscale hover:grayscale-0 transition-all duration-500" />
@@ -53,12 +53,11 @@
         </div>
     </div>
 
-    <div class="mt-16 grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
+    <div class="mt-16 grid grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
         {#each [
             { label: 'Data Points Served', value: '54.5K+' },
             { label: 'Monthly Users', value: '3K+' },
             { label: 'People Reached', value: '100K+' },
-            { label: 'Years Programming', value: '4+' }
         ] as stat}
             <div class="bg-zinc-900/50 border border-zinc-800 p-4 text-center hover:border-[var(--color-schematic-primary)]/50 transition-colors">
                 <div class="text-2xl font-bold text-white font-mono mb-1">{stat.value}</div>
