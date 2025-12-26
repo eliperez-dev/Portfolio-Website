@@ -56,7 +56,7 @@
 <section id="experience" class="py-10 relative">
 	<div class="container mx-auto px-6">
 		<h2 class="text-3xl font-bold font-mono text-white flex items-center gap-4 mb-16">
-			<span class="text-[var(--color-schematic-primary)]">02.</span> Experience
+			<span class="text-[var(--color-schematic-primary)]">03.</span> Experience
 		</h2>
 
 		<div class="grid lg:grid-cols-3 gap-8">

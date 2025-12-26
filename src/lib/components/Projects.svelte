@@ -6,7 +6,7 @@
 <section id="projects" class="py-10 relative">
 	<div class="container mx-auto px-6">
 		<h2 class="text-3xl font-bold font-mono text-white flex items-center gap-4 mb-16">
-			<span class="text-[var(--color-schematic-primary)]">03.</span> Featured Projects
+			<span class="text-[var(--color-schematic-primary)]">04.</span> Featured Projects
 		</h2>
 
 		<div class="grid lg:grid-cols-2 gap-8">
@@ -85,9 +85,7 @@
                                     VIEW SOURCE <span class="transition-transform inline-block">→</span>
                                 </a>
                             {/if}
-                            <button on:click|stopPropagation={() => { window.location.href = `/projects/${project.slug}`; }} class="text-zinc-300 font-mono text-xs tracking-wider border border-zinc-600 px-2 py-1 hover:border-[var(--color-schematic-primary)] hover:text-[var(--color-schematic-primary)] transition-colors">
-                                [ ACCESS PROJECT DATA ]
-                            </button>
+
                         </div>
 					</div>
 				</div>

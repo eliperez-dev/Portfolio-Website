@@ -188,16 +188,17 @@ JMP 2`,
 
 IMM R1 3
 OUT %0 R1
-CALL 6        ; Call "double_r1" function
-NOP           ; Wait for flush       
+CALL 7        ; Call "double_r1" function
 OUT %0 R1     ; Output result 
 JMP 2         ; Loop forever
+NOOP
 
 ; --- Function: double_r1 ---
 ; Expects argument in R1
 ; Returns result in R1
-IMM R2 2      ; Line 6
+IMM R2 2
 MOV R3 R1
+NOP           ; Wait for writeback
 ADD R1 R3     ; Double it
 RET           ; Return to caller`
 };
@@ -339,12 +340,18 @@ RET           ; Return to caller`
     }
 
     class Parser {
-        static parseLine(line: string, address: number, sourceLine: number): Instruction | null {
+        static parseLine(line: string, address: number, sourceLine: number, labels: { [key: string]: number }): Instruction | null {
             const commentIdx = line.indexOf(';');
             if (commentIdx !== -1) line = line.substring(0, commentIdx);
             
             line = line.trim().toUpperCase();
             if (line.length === 0) return null;
+
+            const labelMatch = line.match(/^(\w+):/);
+            if (labelMatch) {
+                line = line.substring(labelMatch[0].length).trim();
+            }
+            if (line.length === 0) return null; // Line was just a label, no instruction
 
             const tokens = line.split(/[\s,]+/).filter(s => s.length > 0);
             if (tokens.length === 0) return null;
@@ -358,10 +365,10 @@ RET           ; Return to caller`
             let valB = new Operand(OperandType.Immediate, 0);
 
             if (needed[0]) {
-                if (tokenIdx < tokens.length) valA = this.parseOperand(tokens[tokenIdx++]);
+                if (tokenIdx < tokens.length) valA = this.parseOperand(tokens[tokenIdx++], labels);
             }
             if (needed[1]) {
-                if (tokenIdx < tokens.length) valB = this.parseOperand(tokens[tokenIdx++]);
+                if (tokenIdx < tokens.length) valB = this.parseOperand(tokens[tokenIdx++], labels);
             }
 
             return new Instruction(op, args, valA, valB, address, sourceLine);
@@ -449,7 +456,7 @@ RET           ; Return to caller`
             }
         }
 
-        static parseOperand(str: string): Operand {
+        static parseOperand(str: string,labels: { [key: string]: number } = {}): Operand {
             const first = str.charAt(0);
             const rest = str.substring(1);
             if (first === 'R') {
@@ -468,8 +475,17 @@ RET           ; Return to caller`
                 return new Operand(OperandType.Port, val);
             }
             else {
-                const val = this.parseBinary(str);
-                if (isNaN(val)) throw new Error(`Invalid immediate value: ${str}`);
+                let val = NaN;
+                if (str.startsWith('B')) val = parseInt(str.substring(1).replace(/_/g, ''), 2);
+                else val = parseInt(str.replace(/_/g, ''));
+
+                if (isNaN(val)) {
+                    // It's not a number. Is it a Label?
+                    if (str in labels) {
+                        return new Operand(OperandType.Immediate, labels[str]);
+                    }
+                    throw new Error(`Invalid value or unknown label: ${str}`);
+                }
                 return new Operand(OperandType.Immediate, val);
             }
         }
@@ -487,9 +503,36 @@ RET           ; Return to caller`
 
     // --- 4. EMULATOR LOGIC ---
     class Registers {
-        private regs = new Uint8Array(8);
-        read(addr: number): number { return addr === 0 ? 0 : (this.regs[addr] || 0); }
-        write(addr: number, data: number) { if (addr > 0 && addr < 8) this.regs[addr] = data & 0xFF; }
+        private regs = new Uint8Array(8);     // The value at the START of the cycle
+        private nextRegs = new Uint8Array(8); // The value being written DURING the cycle
+
+        constructor() {
+            this.regs.fill(0);
+            this.nextRegs.fill(0);
+        }
+
+        // Prepare for new cycle: sync buffer with current state
+        beginCycle() {
+            this.nextRegs.set(this.regs);
+        }
+
+        // Commit changes: latch the buffer into the main registers
+        endCycle() {
+            this.regs.set(this.nextRegs);
+        }
+
+        read(addr: number): number { 
+            // Read from the OLD state (simulating the hazard)
+            return addr === 0 ? 0 : (this.regs[addr] || 0); 
+        }
+
+        write(addr: number, data: number) { 
+            if (addr > 0 && addr < 8) {
+                // Write to the BUFFER (not visible yet)
+                this.nextRegs[addr] = data & 0xFF; 
+            }
+        }
+
         getAll(): number[] { return Array.from(this.regs); }
     }
 
@@ -561,10 +604,11 @@ RET           ; Return to caller`
 
     class Emulator {
         instructions: Instruction[] = [];
-        errors: { line: number, message: string }[] = [];
-        warnings: { line: number, message: string }[] = [];
+        // Update types to include 'addr'
+        errors: { line: number, addr: number, message: string }[] = [];
+        warnings: { line: number, addr: number, message: string }[] = [];
         pc: number = 0;
-        sp: number = 15; // FIXED: Stack Pointer starts at 15 (end of 16-byte RAM)
+        sp: number = 15;
         
         // Pipeline Registers
         fetch_reg = Instruction.none();
@@ -575,44 +619,68 @@ RET           ; Return to caller`
         registers = new Registers();
         alu = new ALU();
         portsOut = new Uint8Array(8);
-        ram = new Uint8Array(16); // FIXED: 16 Byte Memory
+        ram = new Uint8Array(16);
 
         waitingForInput = false;
         inputRegister = 0;
 
         constructor(code: string) { this.loadProgram(code); }
 
-loadProgram(code: string) {
+        loadProgram(code: string) {
             this.instructions = [];
             this.errors = [];
             this.warnings = [];
             
             const lines = code.split('\n');
             let addrCounter = 0;
+
+            const labels: { [key: string]: number } = {}; // Store found labels here
+            
+            // --- Pass 0: Scan for Labels ---
+            let scanAddr = 0;
+            lines.forEach((line) => {
+                // remove comments and trim
+                let clean = line.split(';')[0].trim().toUpperCase();
+                
+                // Regex to find "LABEL:" at start of line
+                const match = clean.match(/^(\w+):/);
+                if (match) {
+                    const labelName = match[1];
+                    labels[labelName] = scanAddr; // Map label -> Current Address
+                    
+                    // Strip the label to see if there is an instruction after it
+                    clean = clean.substring(match[0].length).trim();
+                }
+
+                // If there is code left on this line, it consumes an address slot
+                if (clean.length > 0) {
+                    scanAddr++;
+                }
+            });
             
             // --- First Pass: Parse ---
             lines.forEach((line, i) => {
                 try {
-                    // Pass 'i + 1' as the sourceLine (1-based index for UI)
-                    const instr = Parser.parseLine(line, addrCounter, i + 1);
+                    // Pass 'i + 1' as the sourceLine (1-based index for UI highlighting)
+                    const instr = Parser.parseLine(line, addrCounter, i + 1, labels);
                     if (instr) {
                         this.instructions.push(instr);
                         addrCounter++;
                     }
                 } catch (e: any) {
-                    // Syntax errors use the loop index 'i' directly
-                    this.errors.push({ line: i + 1, message: e.message });
+                    // Syntax errors: Use 'addrCounter' as the ROM address
+                    this.errors.push({ line: i + 1, addr: addrCounter, message: e.message });
                 }
             });
 
             // --- Second Pass: Analyze for Warnings ---
-            // Now we can iterate the instructions directly!
             for (let i = 0; i < this.instructions.length; i++) {
                 const instr = this.instructions[i];
                 const nextInstr = (i + 1 < this.instructions.length) ? this.instructions[i + 1] : null;
                 
                 const op = instr.operation;
-                const currentLine = instr.sourceLine; // <--- Retrieve correct text editor line
+                const currentLine = instr.sourceLine; 
+                const currentAddr = instr.address; // Use the Instruction's ROM Address
 
                 // 1. Write to Zero Register
                 if (
@@ -622,24 +690,25 @@ loadProgram(code: string) {
                     (op === Operation.LOAD && instr.a.data === 0) ||
                     (op === Operation.INP && instr.a.data === 0)
                 ) {
-                    this.warnings.push({ line: currentLine, message: "Writing to R0 has no effect (always 0)." });
+                    this.warnings.push({ line: currentLine, addr: currentAddr, message: "Writing to R0 has no effect (always 0)." });
                 }
 
                 // 2. Out of Bounds
                 if (op === Operation.STORE && instr.a.type === OperandType.MemoryAddress && instr.a.data > 15) {
-                    this.warnings.push({ line: currentLine, message: `Memory address ${instr.a.data} out of bounds (Max 15).` });
+                    this.warnings.push({ line: currentLine, addr: currentAddr, message: `Memory address ${instr.a.data} out of bounds (Max 15).` });
                 }
                 if (op === Operation.LOAD && instr.b.type === OperandType.MemoryAddress && instr.b.data > 15) {
-                    this.warnings.push({ line: currentLine, message: `Memory address ${instr.b.data} out of bounds (Max 15).` });
+                    this.warnings.push({ line: currentLine, addr: currentAddr, message: `Memory address ${instr.b.data} out of bounds (Max 15).` });
                 }
                 if (op === Operation.OUT && instr.a.type === OperandType.Port && instr.a.data > 7) {
-                    this.warnings.push({ line: currentLine, message: `Port %${instr.a.data} out of bounds (Max %7).` });
+                    this.warnings.push({ line: currentLine, addr: currentAddr, message: `Port %${instr.a.data} out of bounds (Max %7).` });
                 }
 
                 // 3. Pipeline Hazard (Read-After-Write)
                 if (nextInstr) {
                     const nextOp = nextInstr.operation;
-                    const nextLine = nextInstr.sourceLine; // <--- Use next instruction's source line
+                    const nextLine = nextInstr.sourceLine;
+                    const nextAddr = nextInstr.address;
                     
                     let destReg = -1;
                     if ([Operation.MOV, Operation.IMM, Operation.POP, Operation.LOAD, Operation.INP, Operation.SHR, Operation.NOT].includes(op)) {
@@ -661,7 +730,8 @@ loadProgram(code: string) {
 
                         if (readsReg) {
                             this.warnings.push({ 
-                                line: nextLine, 
+                                line: nextLine,
+                                addr: nextAddr,
                                 message: `Pipeline Hazard: Reads R${destReg} immediately after write. Insert NOOP.` 
                             });
                         }
@@ -669,20 +739,21 @@ loadProgram(code: string) {
                 }
 
                 // 4. Dead Code (Branch Flush)
-                if ([Operation.JMP, Operation.CALL, Operation.RET, Operation.BIE, Operation.BIG, Operation.BIL, Operation.BIO].includes(op)) {
-                    if (nextInstr) {
+                if ([Operation.JMP, Operation.RET].includes(op)) {
+                    
+                    // Check if the next instruction exists and isn't just a spacer NOOP
+                    if (nextInstr && nextInstr.operation !== Operation.NOOP) {
                         this.warnings.push({ 
                             line: nextInstr.sourceLine, 
+                            addr: nextInstr.address, 
                             message: "Unreachable: Instruction flushed by preceding branch." 
                         });
                     }
                 }
             }
 
-            // Fill remainder of ROM
             while (this.instructions.length < 255) this.instructions.push(Instruction.none());
             
-            // Reset state
             this.pc = 0;
             this.sp = 15;
             this.ram.fill(0);
@@ -696,11 +767,21 @@ loadProgram(code: string) {
 
         clock() {
             if (this.waitingForInput) return;
-            this.writeBackStage();
-            this.executeStage();
+
+            // 1. Snapshot current state (Writes will go to buffer)
+            this.registers.beginCycle();
+
+            // 2. Run Pipeline Stages
+            this.writeBackStage(); // Writes to R3 (buffer only!)
+            this.executeStage();   // Reads R3 (sees OLD value!)
             this.decodeStage();
             this.fetchStage();
+
+            // 3. Update PC
             this.incrementPc();
+
+            // 4. Latch data (New values become visible for NEXT cycle)
+            this.registers.endCycle();
         }
 
         private incrementPc() {
@@ -716,7 +797,7 @@ loadProgram(code: string) {
             this.execute_reg = this.decode_reg.clone();
             const op = this.execute_reg.operation;
             
-            // Branching (Happens in Execute)
+            // Branching
             let takeBranch = false;
             if (op === Operation.JMP) takeBranch = true;
             else if (op === Operation.CALL) takeBranch = true;
@@ -727,38 +808,29 @@ loadProgram(code: string) {
 
             if (takeBranch) {
                 this.pc = this.execute_reg.a.data;
-                // Pipeline Flush:
-                // We must invalidate the instruction currently in the fetch register
-                // so it doesn't proceed to decode/execute.
-                this.fetch_reg = Instruction.none();
+                this.fetch_reg = Instruction.none(); // Flush
             }
 
-            // ALU Execution
             this.alu.execute(this.registers, this.execute_reg, this);
         }
 
         private writeBackStage() {
             this.writeback_reg = this.execute_reg.clone();
             const op = this.writeback_reg.operation;
-            const a = this.writeback_reg.a.data; // Dest
-            const b = this.writeback_reg.b.data; // Src
-            const address = this.writeback_reg.address; // Current line number
+            const a = this.writeback_reg.a.data; 
+            const b = this.writeback_reg.b.data; 
+            const address = this.writeback_reg.address;
 
-            // --- 1. Immediate Load ---
             if (op === Operation.IMM) {
                 this.registers.write(a, b);
             }
-            // --- 2. Register Move ---
             else if (op === Operation.MOV) {
                 this.registers.write(a, this.registers.read(b));
             }
-            // --- 3. ALU Operations (Write Accumulator to Register) ---
             else if (
                 op === Operation.ADD || op === Operation.ADDC || op === Operation.SUB ||
                 op === Operation.OR || op === Operation.XOR || op === Operation.AND
             ) {
-                // Write back if args is S (Store), U (Use+Store), or None (Default)
-                // X (eXecute only) does not write back
                 const args = this.writeback_reg.args;
                 if (args === OperationArgs.S || args === OperationArgs.U || args === OperationArgs.None) {
                     this.registers.write(a, this.alu.accumulator);
@@ -767,54 +839,42 @@ loadProgram(code: string) {
             else if (op === Operation.SHR || op === Operation.NOT) {
                 this.registers.write(a, this.alu.accumulator);
             }
-            // --- 4. Input ---
             else if (op === Operation.INP) {
                 this.registers.write(a, this.alu.accumulator);
             }
-            // --- 5. Output ---
             else if (op === Operation.OUT && a < 8) {
                 this.portsOut[a] = this.registers.read(b);
             }
-            // --- 6. Memory Store (Register -> Memory) ---
             else if (op === Operation.STORE) {
-                // Syntax: STORE #addr reg
                 if (a < 16) this.ram[a] = this.registers.read(b);
             }
-            // --- 7. Memory Load (Memory -> Register) ---
             else if (op === Operation.LOAD) {
-                // Syntax: LOAD reg #addr
                 if (b < 16) this.registers.write(a, this.ram[b]);
             }
-            // --- 8. Push (Register -> Stack) ---
             else if (op === Operation.PUSH) {
                 if (this.sp >= 0) {
                     this.ram[this.sp] = this.registers.read(a);
                     this.sp--;
-                    if (this.sp < 0) this.sp = 15; // FIXED: Wrap to 15
+                    if (this.sp < 0) this.sp = 15; 
                 }
             }
-            // --- 9. Pop (Stack -> Register) ---
             else if (op === Operation.POP) {
                 this.sp++;
-                if (this.sp > 15) this.sp = 0; // FIXED: Wrap if > 15
+                if (this.sp > 15) this.sp = 0; 
                 this.registers.write(a, this.ram[this.sp]);
             }
-
             else if (op === Operation.CALL) {
                 if (this.sp >= 0) {
-                    // Push the *next* instruction address (current + 1)
                     this.ram[this.sp] = address + 1;
                     this.sp--;
-                    if (this.sp < 0) this.sp = 15; // FIXED: Wrap to 15
+                    if (this.sp < 0) this.sp = 15; 
                 }
             }
-
-            // --- NEW: RET (Pop Return Address & Jump) ---
             else if (op === Operation.RET) {
                 this.sp++;
-                if (this.sp > 15) this.sp = 0; // FIXED: Wrap if > 15
+                if (this.sp > 15) this.sp = 0; 
                 const returnAddress = this.ram[this.sp];
-                this.pc = returnAddress; // Restore PC
+                this.pc = returnAddress; 
             }
         }
     }
@@ -881,8 +941,8 @@ loadProgram(code: string) {
     let ports = $state([0,0,0,0,0,0,0,0]);
     let ram = $state(new Uint8Array(16));
     let flags = $state({ equals: false, greater: false, less: false, overflow: false });
-    let compilationErrors = $state<{ line: number, message: string }[]>([]);
-    let compilationWarnings = $state<{ line: number, message: string }[]>([]);
+    let compilationErrors = $state<{ line: number, addr: number, message: string }[]>([]);
+    let compilationWarnings = $state<{ line: number, addr: number, message: string }[]>([]);
     
     // --- NEW: Diagnostics UI State ---
     let showDiagnosticsPanel = $state(true);
@@ -1529,14 +1589,14 @@ loadProgram(code: string) {
                                     {#if compilationErrors.length > 0 && !ignoreErrors}
                                         {#each compilationErrors as err}
                                             <div class="text-red-400 flex gap-2">
-                                                <span class="text-red-500 font-bold shrink-0">L{err.line}:</span>
+                                                <span class="text-red-500 font-bold shrink-0">ROM {err.addr}:</span>
                                                 <span>{err.message}</span>
                                             </div>
                                         {/each}
                                     {:else}
                                         {#each compilationWarnings as warn}
                                             <div class="text-yellow-400 flex gap-2">
-                                                <span class="text-yellow-500 font-bold shrink-0">L{warn.line}:</span>
+                                                <span class="text-yellow-500 font-bold shrink-0">ROM {warn.addr}:</span>
                                                 <span>{warn.message}</span>
                                             </div>
                                         {/each}

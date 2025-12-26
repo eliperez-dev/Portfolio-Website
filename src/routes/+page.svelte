@@ -10,7 +10,7 @@
 
 <Hero />
 <About />
+<TelemetryLink />
 <Experience />
 <Projects />
-<TelemetryLink />
 <Contact />

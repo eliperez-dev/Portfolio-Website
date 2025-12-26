@@ -1,17 +1,14 @@
 <script>
-    let formData = {
-        name: '',
-        email: '',
-        subject: '',
-        message: ''
-    };
+	const modules = import.meta.glob('$lib/posts/*.md', { eager: true });
+	const posts = Object.entries(modules).map(([path, module]) => {
+		const slug = path.split('/').pop().replace('.md', '');
+		return {
+			slug,
+			...module.metadata
+		};
+	}).sort((a, b) => new Date(b.date) - new Date(a.date));
 
-    function handleSubmit(e) {
-        e.preventDefault();
-        const subject = encodeURIComponent(formData.subject || 'Portfolio Contact');
-        const body = encodeURIComponent(formData.message);
-        window.location.href = `mailto:eliperez0024@gmail.com?subject=${subject}&body=${body}`;
-    }
+	const latestPosts = posts.slice(0, 2);
 
     const contactInfo = [
         {
@@ -20,10 +17,11 @@
             link: 'mailto:eliperez0024@gmail.com'
         },
         {
-            label: 'Location',
-            value: 'San Diego, CA',
-            link: null
+            label: 'Phone',
+            value: '619-565-5311',
+            link: 'tel:6195655311'
         },
+
         {
             label: 'LinkedIn',
             value: 'linkedin.com/in/eliperez-dev',
@@ -64,27 +62,40 @@
                 </div>
             </div>
 
+            {#if latestPosts.length > 0}
             <div>
-                <h3 class="text-xl text-white font-mono font-bold mb-4">Send a Message</h3>
-                <form on:submit={handleSubmit} class="space-y-6 bg-zinc-900/50 border border-zinc-800 p-8">
-                    <div class="space-y-2">
-                        <label for="message" class="text-sm font-mono text-zinc-400">Message</label>
-                        <textarea
-                            id="message"
-                            bind:value={formData.message}
-                            required
-                            rows="6"
-                            placeholder="Message me! (Will open your email client)..."
-                            class="w-full bg-zinc-800 border border-zinc-700 text-white p-3 font-mono text-sm focus:border-[var(--color-schematic-primary)] focus:outline-none transition-colors"
-                        ></textarea>
-                    </div>
+                <h3 class="text-xl text-white font-mono font-bold mb-4">Recent Posts</h3>
+                <div class="space-y-4">
+                    {#each latestPosts as post}
+                        <a href="/blog/{post.slug}" class="block group">
+                            <div class="bg-zinc-900/50 border border-zinc-800 p-6 hover:border-[var(--color-schematic-primary)] transition-colors relative overflow-hidden flex flex-col">
+                                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <span class="text-6xl font-mono font-bold text-white">#</span>
+                                </div>
 
-                    <button type="submit" class="w-full py-3 bg-[var(--color-schematic-primary)] text-black font-mono font-bold uppercase tracking-wider hover:bg-white transition-colors flex items-center justify-center gap-2 group">
-                        <span>Send Message</span>
-                        <span class="group-hover:translate-x-1 transition-transform">→</span>
-                    </button>
-                </form>
+                                <div class="mb-2">
+                                    <h4 class="text-lg font-bold text-white group-hover:text-[var(--color-schematic-primary)] transition-colors font-mono mb-1">
+                                        {post.title}
+                                    </h4>
+                                    <span class="text-zinc-500 font-mono text-xs block">
+                                        {new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                    </span>
+                                </div>
+                                
+                                <p class="text-zinc-400 font-mono mb-4 text-xs flex-grow leading-relaxed line-clamp-2">
+                                    {post.description}
+                                </p>
+
+                                <div class="flex items-center gap-2 text-[var(--color-schematic-primary)] font-mono text-xs uppercase tracking-wider mt-auto">
+                                    <span>Read</span>
+                                    <span>→</span>
+                                </div>
+                            </div>
+                        </a>
+                    {/each}
+                </div>
             </div>
+            {/if}
         </div>
 
         <div class="mt-20 pt-8 border-t border-zinc-800 text-center text-zinc-500 font-mono text-sm">

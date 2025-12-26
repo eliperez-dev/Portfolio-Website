@@ -56,11 +56,16 @@
 					<span>Southwestern College (CS)</span>
 				</div>
 				<div class="flex items-center gap-3">
+					<span class="text-[var(--color-schematic-primary)]">LOCATION</span>
+					<span>San Diego, CA (Open to Relocate)</span>
+				</div>
+				<div class="flex items-center gap-3">
 					<span class="text-[var(--color-schematic-primary)]">STATUS</span>
 					<span class="flex items-center gap-2">
 						Seeking full-time opportunities!
 					</span>
 				</div>
+
 			</div>
 			
 			<p class="text-lg text-zinc-400 leading-relaxed font-sans max-w-lg">

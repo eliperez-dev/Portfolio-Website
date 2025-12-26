@@ -1,16 +1,6 @@
 <script>
 	import profileImage from '$lib/assets/pfp.jpeg';
 
-	const modules = import.meta.glob('$lib/posts/*.md', { eager: true });
-	const posts = Object.entries(modules).map(([path, module]) => {
-		const slug = path.split('/').pop().replace('.md', '');
-		return {
-			slug,
-			...module.metadata
-		};
-	}).sort((a, b) => new Date(b.date) - new Date(a.date));
-
-	const latestPost = posts[0];
 </script>
 
 <section id="about" class="py-10 relative">
@@ -66,39 +56,6 @@
         {/each}
     </div>
 
-    <!-- {#if latestPost}
-    <div class="mt-24 max-w-4xl mx-auto">
-        <h3 class="text-2xl font-bold font-mono text-white mb-8 flex items-center gap-4">
-            <span class="text-[var(--color-schematic-primary)]">Latest</span> Blog Post
-        </h3>
-        
-        <a href="/blog/{latestPost.slug}" class="block group">
-            <div class="bg-zinc-900/50 border border-zinc-800 p-8 hover:border-[var(--color-schematic-primary)] transition-colors relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <span class="text-6xl font-mono font-bold text-white">#</span>
-                </div>
-
-                <div class="flex flex-col md:flex-row md:justify-between md:items-baseline gap-4 mb-4">
-                    <h4 class="text-xl font-bold text-white group-hover:text-[var(--color-schematic-primary)] transition-colors font-mono">
-                        {latestPost.title}
-                    </h4>
-                    <span class="text-zinc-500 font-mono text-sm shrink-0">
-                        {new Date(latestPost.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                    </span>
-                </div>
-                
-                <p class="text-zinc-400 font-mono mb-6">
-                    {latestPost.description}
-                </p>
-
-                <div class="flex items-center gap-2 text-[var(--color-schematic-primary)] font-mono text-sm uppercase tracking-wider">
-                    <span>Read Article</span>
-                    <span>→</span>
-                </div>
-            </div>
-        </a>
-    </div>
-    {/if} -->
 
 </div>
 </section>
