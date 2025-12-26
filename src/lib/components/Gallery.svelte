@@ -88,9 +88,9 @@
         </div>
     </div>
 
-    <div class="relative group/gallery">
+    <div class="relative group/gallery overflow-hidden">
         <div 
-            class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth snap-x"
+            class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth snap-x w-full max-w-full"
             bind:this={scrollContainer}
         >
             {#each images as image, index}

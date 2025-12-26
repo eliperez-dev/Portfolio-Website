@@ -11,7 +11,7 @@
 </svelte:head>
 
 {#snippet sectionHeader(num, title)}
-	<h2 class="text-xl font-bold font-mono text-white mb-6 flex items-center gap-3 border-b border-zinc-800 pb-3">
+	<h2 class="text-xl font-bold font-mono text-white mb-6 flex items-center gap-3 border-b-2 border-zinc-700 pb-4">
 		<span class="text-[var(--color-schematic-primary)] text-sm">0{num}.</span>
 		{title}
 	</h2>
@@ -21,12 +21,12 @@
 	<div class="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
 
 	<div class="container mx-auto px-6 relative z-10">
-		<a href="/#projects" class="inline-flex items-center gap-2 text-zinc-500 hover:text-[var(--color-schematic-primary)] transition-colors mb-8 font-mono text-xs group uppercase tracking-widest">
+		<a href="/#projects" class="inline-flex items-center gap-2 text-zinc-400 hover:text-[var(--color-schematic-primary)] transition-colors mb-10 font-mono text-sm group uppercase tracking-widest font-medium">
 			<span class="group-hover:-translate-x-1 transition-transform">&lt;-</span>
-			Return to Index
+			Back to projects
 		</a>
 
-		<header class="mb-16 border-b border-zinc-800 pb-12">
+		<header class="mb-16 border-b-2 border-zinc-700 pb-12">
 			<div class="flex flex-col md:flex-row gap-8 justify-between items-start md:items-end">
 				<div class="max-w-3xl">
 					<div class="flex items-center gap-3 text-[var(--color-schematic-primary)] font-mono text-xs mb-4">
@@ -115,8 +115,8 @@
 			<aside class="lg:col-span-4 lg:sticky lg:top-32 space-y-8">
 				
 				<div class="border border-zinc-800 bg-zinc-900/50">
-					<div class="p-4 border-b border-zinc-800 bg-zinc-900">
-						<h3 class="font-mono text-xs uppercase tracking-widest text-zinc-400">
+					<div class="p-4 border-b-2 border-zinc-700 bg-zinc-900">
+						<h3 class="font-mono text-xs uppercase tracking-widest text-zinc-300 font-bold">
 							Technical Stack
 						</h3>
 					</div>
@@ -130,12 +130,12 @@
 				</div>
 
 				<div class="border border-zinc-800 bg-zinc-900/50">
-					<div class="p-4 border-b border-zinc-800 bg-zinc-900">
-						<h3 class="font-mono text-xs uppercase tracking-widest text-zinc-400">
+					<div class="p-4 border-b-2 border-zinc-700 bg-zinc-900">
+						<h3 class="font-mono text-xs uppercase tracking-widest text-zinc-300 font-bold">
 							Core Features
 						</h3>
 					</div>
-					<ul class="divide-y divide-zinc-800">
+					<ul class="divide-y-2 divide-zinc-700">
 						{#each project.features as feature}
 							<li class="p-4 text-sm text-zinc-400 font-mono hover:text-zinc-200 transition-colors flex gap-3">
 								<span class="text-zinc-700 select-none">></span>
