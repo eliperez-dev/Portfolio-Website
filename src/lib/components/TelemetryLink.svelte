@@ -167,8 +167,8 @@
                             </span>
                         </div>
                         <div class="flex justify-between border-b border-zinc-800 pb-2">
-                            <span>Data Source</span>
-                            <span class="text-[var(--color-schematic-primary)]">USDA / FOIA</span>
+                            <span>Written In</span>
+                            <span class="text-[var(--color-schematic-primary)]">Rust, Python, JS</span>
                         </div>
                         <div class="flex justify-between border-b border-zinc-800 pb-2">
                             <span>Live Website</span>
