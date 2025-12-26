@@ -1483,15 +1483,22 @@ function highlightSyntax(code: string): string {
                     <option value="Intro">Intro</option>
                     <option value="Input Test">Input Test</option>
                     <option value="Fibonacci">Fibonacci</option>
-                     <option value="Functions">Functions</option>
+                      <option value="Functions">Functions</option>
                 </select>
                 <button onclick={() => showDocs = !showDocs} class="ml-2 px-3 py-2 bg-zinc-800 text-zinc-200 text-xs font-mono font-bold hover:bg-zinc-700 rounded border border-zinc-700">DOCS</button>
             </div>
             
             <div class="flex gap-1">
-                <button onclick={toggleRun} class="px-2 py-1 bg-[var(--color-schematic-primary)] text-black text-[10px] font-mono font-bold hover:bg-white">{isRunning ? 'PAUSE' : 'RUN'}</button>
-                <button onclick={step} class="px-2 py-1 border border-zinc-700 text-zinc-300 text-[10px] font-mono hover:border-zinc-500">STEP</button>
-                <button onclick={reset} class="px-2 py-1 border border-zinc-700 text-zinc-300 text-[10px] font-mono hover:border-zinc-500">RESET</button>
+                <button onclick={toggleRun} class="px-2 py-1 bg-[var(--color-schematic-primary)] text-black text-[10px] font-mono font-bold hover:bg-white transition-colors">{isRunning ? 'PAUSE' : 'RUN'}</button>
+                <button onclick={step} class="px-2 py-1 border border-zinc-700 text-zinc-300 text-[10px] font-mono hover:border-zinc-500 transition-colors">STEP</button>
+                <button onclick={reset} class="px-2 py-1 border border-zinc-700 text-zinc-300 text-[10px] font-mono hover:border-zinc-500 transition-colors">RESET</button>
+                            <button 
+                    onclick={() => autoScroll = !autoScroll} 
+                    class="px-2 py-1 border text-[10px] font-mono transition-colors {autoScroll ? 'border-[var(--color-schematic-primary)] text-[var(--color-schematic-primary)] bg-zinc-900' : 'border-zinc-700 text-zinc-300 hover:border-zinc-500'}"
+                    title="Toggle Auto-Follow Execution"
+                >
+                    FOLLOW CODE EXECUTION
+                </button>
             </div>
         </div>
         
