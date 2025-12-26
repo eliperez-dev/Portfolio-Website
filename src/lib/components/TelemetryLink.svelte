@@ -212,7 +212,7 @@
         <div class="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-[var(--color-schematic-primary)] z-30"></div>
         <div class="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-[var(--color-schematic-primary)] z-30"></div>
 
-        {#if locationEnabled}
+        {#if locationEnabled && !isLocating}
             <iframe 
                 src={iframeUrl}
                 title="Until Every Cage Is Empty" 
