@@ -9,7 +9,7 @@
 			<span class="text-[var(--color-schematic-primary)]">04.</span> Featured Projects
 		</h2>
 
-		<div class="grid lg:grid-cols-2 gap-8">
+		<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 			{#each projects as project}
 				<div class="min-w-0 bg-zinc-900/50 border border-zinc-800 p-8 hover:border-[var(--color-schematic-primary)] transition-all duration-300 group flex flex-col h-full relative hover:bg-zinc-900/80 hover:shadow-[0_0_20px_rgba(34,211,238,0.1)]">
                     
