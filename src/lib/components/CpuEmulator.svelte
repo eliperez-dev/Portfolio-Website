@@ -13,8 +13,8 @@
 ; TypeScript to run in the browser.
 
 ; More examples and docs are right
-; above the text editor. Info on this
-; project and others is down below!
+; above the text editor. Feel free
+; to write your own programs!
 
 ; I hope you enjoy my portfolio!
 
