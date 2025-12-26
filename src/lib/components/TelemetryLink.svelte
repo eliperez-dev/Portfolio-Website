@@ -48,11 +48,11 @@
                 if (zoom) {
                     currentZoom = parseInt(zoom);
                     // Update scale/altitude derived values
-                    const altKm = Math.round(40000 / Math.pow(2, currentZoom));
-                    displayAlt = altKm > 10 ? `${altKm}KM` : `${altKm * 1000}M`;
+                    const altKm = 40000 / Math.pow(2, currentZoom);
+                    displayAlt = altKm > 10 ? `${Math.round(altKm)}KM` : `${Math.round(altKm * 1000)}M`;
                     
-                    const scaleKm = Math.round(10000 / Math.pow(2, currentZoom));
-                    displayScale = scaleKm > 1 ? `${scaleKm}km` : `${scaleKm * 1000}m`;
+                    const scaleKm = 10000 / Math.pow(2, currentZoom);
+                    displayScale = scaleKm > 1 ? `${Math.round(scaleKm)}km` : `${Math.round(scaleKm * 1000)}m`;
                 }
             }
         };
@@ -84,11 +84,11 @@
                 
                 // Map zoom level to altitude and scale
                 // Zoom 3 = 450km, Zoom 18 = 1km (approximate inverse log scale)
-                const altKm = Math.round(40000 / Math.pow(2, currentZoom));
-                displayAlt = altKm > 10 ? `${altKm}KM` : `${altKm * 1000}M`;
+                const altKm = 40000 / Math.pow(2, currentZoom);
+                displayAlt = altKm > 10 ? `${Math.round(altKm)}KM` : `${Math.round(altKm * 1000)}M`;
                 
-                const scaleKm = Math.round(10000 / Math.pow(2, currentZoom));
-                displayScale = scaleKm > 1 ? `${scaleKm}km` : `${scaleKm * 1000}m`;
+                const scaleKm = 10000 / Math.pow(2, currentZoom);
+                displayScale = scaleKm > 1 ? `${Math.round(scaleKm)}km` : `${Math.round(scaleKm * 1000)}m`;
             }
         } catch (e) {
             console.error("Failed to parse telemetry:", e);
@@ -198,80 +198,77 @@
 
             <!-- Right Panel: The Viewer -->
             <div class="lg:col-span-9">
-                <div class="relative w-full h-[500px] border border-zinc-700 bg-black/50 group overflow-hidden">
-                    <!-- Corner brackets -->
-                    <div class="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-[var(--color-schematic-primary)] z-30"></div>
-                    <div class="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-[var(--color-schematic-primary)] z-30"></div>
-                    <div class="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-[var(--color-schematic-primary)] z-30"></div>
-                    <div class="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-[var(--color-schematic-primary)] z-30"></div>
 
-                    {#if locationEnabled}
-                        <iframe 
-                            src={iframeUrl}
-                            title="Until Every Cage Is Empty" 
-                            allow="geolocation"
-                            class="w-full h-full border-0 relative z-10"
-                        ></iframe>
-                        
-                            <!-- Satellite Overlay -->
-                        <div class="pointer-events-none absolute inset-0 z-20 overflow-hidden">
-                            <!-- Digital Grid - subtle map grid -->
-                            <div class="absolute inset-0 bg-[linear-gradient(rgba(34,211,238,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(34,211,238,0.03)_1px,transparent_1px)] bg-[size:40px_40px] z-10"></div>
-                            
-                            <!-- Simplified Scanline Effect - No Moiré -->
-                            <div class="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.4)_50%)] bg-[size:100%_4px] z-10 opacity-20"></div>
+    <div class="md:hidden mb-3 w-full bg-zinc-900/80 border border-zinc-700 p-3 backdrop-blur-sm flex justify-between items-center font-mono text-xs text-[var(--color-schematic-primary)] shadow-sm">
+        <div class="flex-1 text-left">LAT: {displayLat}</div>
+        <div class="flex-1 text-center">LNG: {displayLng}</div>
+        <div class="flex-1 text-right">ALT: {displayAlt}</div>
+    </div>
 
-                            <!-- Moving Scanline -->
-                            <div class="absolute inset-0 h-full w-full bg-[linear-gradient(to_bottom,transparent,var(--color-schematic-primary-dim),transparent)] scan-bar z-20"></div>
-                            
-                            <!-- Vignette (Cleaner, less aggressive) -->
-                            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.6)_100%)] z-20"></div>
+    <div class="relative w-full h-[500px] border border-zinc-700 bg-black/50 group overflow-hidden">
+        
+        <div class="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-[var(--color-schematic-primary)] z-30"></div>
+        <div class="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-[var(--color-schematic-primary)] z-30"></div>
+        <div class="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-[var(--color-schematic-primary)] z-30"></div>
+        <div class="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-[var(--color-schematic-primary)] z-30"></div>
 
-                            <!-- HUD -->
-                            <div class="absolute top-4 left-4 font-mono text-[10px] text-[var(--color-schematic-primary)] z-40 flex flex-col gap-1 tracking-widest opacity-80">
-                                <div class="font-bold border-b border-[var(--color-schematic-primary)]/30 pb-1 mb-1">LIVE WEBSITE DEMO</div>
-                                <div>LAT: {displayLat}</div>
-                                <div>LNG: {displayLng}</div>
-                                <div>ALT: {displayAlt} // ORBITAL</div>
-                            </div>
+        {#if locationEnabled}
+            <iframe 
+                src={iframeUrl}
+                title="Until Every Cage Is Empty" 
+                allow="geolocation"
+                class="w-full h-full border-0 relative z-10"
+            ></iframe>
+            
+            <div class="pointer-events-none absolute inset-0 z-20 overflow-hidden">
+                <div class="absolute inset-0 bg-[linear-gradient(rgba(34,211,238,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(34,211,238,0.03)_1px,transparent_1px)] bg-[size:80px_80px] md:bg-[size:40px_40px] z-10"></div>
+                
+                <div class="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.4)_50%)] bg-[size:100%_4px] z-10 opacity-5 md:opacity-20"></div>
 
-                            <!-- Top Right Info -->
-                            <div class="absolute top-4 right-4 font-mono text-[10px] text-[var(--color-schematic-primary)] z-40 text-right opacity-80">
-                                <div>{timeString}</div>
-                            </div>
+                <div class="absolute inset-0 h-full w-full bg-[linear-gradient(to_bottom,transparent,var(--color-schematic-primary-dim),transparent)] scan-bar z-20"></div>
+                
+                <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_70%,rgba(0,0,0,0.5)_100%)] md:bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.6)_100%)] z-20"></div>
 
-                             <!-- Bottom Right HUD -->
-                            <div class="absolute bottom-4 right-4 font-mono text-[10px] text-[var(--color-schematic-primary)] z-40 text-right opacity-80">
-                                <div>LINK_STATUS: STABLE</div>
-                            </div>
-
-                            <!-- Bottom Left Scale -->
-                            <div class="absolute bottom-4 left-4 font-mono text-[10px] text-[var(--color-schematic-primary)] z-40 opacity-80 flex items-end gap-2">
-                                <div class="w-[1px] h-8 bg-[var(--color-schematic-primary)]/50"></div>
-                                <div class="h-[1px] w-24 bg-[var(--color-schematic-primary)]/50 relative">
-                                    <div class="absolute bottom-0 left-0 h-1 w-[1px] bg-[var(--color-schematic-primary)]"></div>
-                                    <div class="absolute bottom-0 right-0 h-1 w-[1px] bg-[var(--color-schematic-primary)]"></div>
-                                    <div class="absolute -top-4 left-0">0</div>
-                                    <div class="absolute -top-4 right-0">{displayScale}</div>
-                                </div>
-                            </div>
-
-                            <!-- Center Crosshairs (Minimal) -->
-                            <div class="absolute inset-0 z-10 pointer-events-none opacity-40">
-                                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 border border-[var(--color-schematic-primary)]/30 rounded-full"></div>
-                                <div class="absolute top-1/2 left-1/2 w-1 h-1 bg-[var(--color-schematic-primary)] rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-                            </div>
-                        </div>
-                    {:else}
-                        <div class="absolute inset-0 flex items-center justify-center flex-col gap-4">
-                            <div class="w-16 h-16 border-2 border-zinc-800 rounded-full flex items-center justify-center animate-[spin_10s_linear_infinite]">
-                                <div class="w-12 h-12 border-t-2 border-[var(--color-schematic-primary)] rounded-full"></div>
-                            </div>
-                            <p class="font-mono text-zinc-600 text-sm tracking-widest animate-pulse">Initializing...</p>
-                        </div>
-                    {/if}
+                <div class="hidden md:flex absolute top-4 left-4 font-mono text-[10px] text-[var(--color-schematic-primary)] z-40 flex-col gap-1 tracking-widest opacity-80">
+                    <div class="font-bold border-b border-[var(--color-schematic-primary)]/30 pb-1 mb-1">LIVE WEBSITE DEMO</div>
+                    <div>LAT: {displayLat}</div>
+                    <div>LNG: {displayLng}</div>
+                    <div>ALT: {displayAlt} // ORBITAL</div>
                 </div>
+
+                <div class="hidden md:block absolute top-4 right-4 font-mono text-[10px] text-[var(--color-schematic-primary)] z-40 text-right opacity-80">
+                    <div>{timeString}</div>
+                </div>
+
+                <div class="absolute bottom-4 right-4 font-mono text-[10px] text-[var(--color-schematic-primary)] z-40 text-right opacity-80">
+                    <div>LINK_STATUS: STABLE</div>
+                </div>
+
+                <div class="absolute bottom-4 left-4 font-mono text-[10px] text-[var(--color-schematic-primary)] z-40 opacity-80 flex items-end gap-2">
+                    <div class="w-[1px] h-8 bg-[var(--color-schematic-primary)]/50"></div>
+                    <div class="h-[1px] w-24 bg-[var(--color-schematic-primary)]/50 relative">
+                        <div class="absolute bottom-0 left-0 h-1 w-[1px] bg-[var(--color-schematic-primary)]"></div>
+                        <div class="absolute bottom-0 right-0 h-1 w-[1px] bg-[var(--color-schematic-primary)]"></div>
+                        <div class="absolute -top-4 left-0">0</div>
+                        <div class="absolute -top-4 right-0">{displayScale}</div>
+                    </div>
+                </div>
+
+                <!-- <div class="hidden md:block absolute inset-0 z-10 pointer-events-none opacity-80">
+                    <div class="absolute top-[65%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 border-5 border-[var(--color-schematic-primary)]/100 rounded-full"></div>
+                    <div class="absolute top-[65%] left-1/2 w-1 h-1 bg-[var(--color-schematic-primary)] rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+                </div> -->
             </div>
+        {:else}
+            <div class="absolute inset-0 flex items-center justify-center flex-col gap-4">
+                <div class="w-16 h-16 border-2 border-zinc-800 rounded-full flex items-center justify-center animate-[spin_10s_linear_infinite]">
+                    <div class="w-12 h-12 border-t-2 border-[var(--color-schematic-primary)] rounded-full"></div>
+                </div>
+                <p class="font-mono text-zinc-600 text-sm tracking-widest animate-pulse">Initializing...</p>
+            </div>
+        {/if}
+    </div>
+</div>
         </div>
     </div>
 </section>

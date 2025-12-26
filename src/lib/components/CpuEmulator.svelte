@@ -172,6 +172,7 @@ JMP 0`,
 INP R1          ; Ask user for value
 OUT %0 R1       ; Show input on Port 0
 IMM R2 1
+NOOP            ; Wait for writeback
 ADD R1 R2       ; Add 1 to Input
 OUT %1 R1       ; Show result on Port 1`,
 
@@ -1468,8 +1469,8 @@ RET           ; Return to caller`
     <div class="flex flex-col gap-2 h-full min-h-0" >
         <div class="flex flex-wrap items-center justify-between border-b border-zinc-800 pb-2 gap-2 shrink-0">
             <div class="flex items-center gap-2">
-                <span class="text-xs font-mono text-[var(--color-schematic-primary)] font-bold">ROM:</span>
-                <select onchange={loadExample} class="bg-zinc-950 text-[10px] text-zinc-400 border border-zinc-800 p-1 rounded font-mono outline-none">
+                <span class="text-sm font-mono text-[var(--color-schematic-primary)] font-bold">Select ROM -></span>
+                <select onchange={loadExample} class="bg-zinc-950 text-[11px] text-zinc-400 border border-zinc-800 p-2 rounded font-mono outline-none">
                     <option value="Intro">Intro</option>
                     <option value="Input Test">Input Test</option>
                     <option value="Fibonacci">Fibonacci</option>
