@@ -31,7 +31,7 @@
 				<div class="h-1 w-20 bg-[var(--color-schematic-primary)] mb-6"></div>
 				
 				<p class="text-2xl text-zinc-300 font-medium font-sans mb-2">
-					Systems Software Enginerer <span class="text-[var(--color-schematic-primary)]">•</span> Rust <span class="text-[var(--color-schematic-primary)]">•</span> Embedded
+					Systems Software Engineer <span class="text-[var(--color-schematic-primary)]">•</span> Rust <span class="text-[var(--color-schematic-primary)]">•</span> Embedded
 				</p>
 			</div>
 			
