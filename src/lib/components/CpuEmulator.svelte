@@ -2,22 +2,19 @@
     import { onMount } from 'svelte';
 
     // --- 1. EXAMPLE PROGRAMS ---
+// --- 1. EXAMPLE PROGRAMS ---
     const EXAMPLES = {
-        "Intro": `; This system is a faithful
-; emulation of my Electron CPU,
-; an entirely custom architature
+        "Intro": `; This system is a faithful emulation
+; of my Electron Redstone CPU,
+; an entirely custom architecture
 ; built in Minecraft on controller.
 
 ; The emulator was originally written
 ; in Rust, but I have ported it to
 ; TypeScript to run in the browser.
+; Feel free to write your own programs!
 
-; More examples and docs are right
-; above the text editor. Feel free
-; to write your own programs!
-
-; I hope you enjoy my portfolio!
-
+START:
 ; --- Crab ---
 IMM R1 B10000001
 IMM R2 B11011011
@@ -56,8 +53,6 @@ OUT %5 R6
 OUT %6 R7
 OUT %7 R1
 NOOP
-
-
 
 ; --- Heart --- 
 IMM R1 108
@@ -166,9 +161,12 @@ POP R1
 POP R1
 POP R1
 
-JMP 0`,
+JMP START`,
+
         "Input Test": `; Input Instruction Test
 ; Run this! It will popup a custom UI.
+
+START:
 INP R1          ; Ask user for value
 OUT %0 R1       ; Show input on Port 0
 IMM R2 1
@@ -180,6 +178,8 @@ OUT %1 R1       ; Show result on Port 1`,
 ; Output will be on Port %0
 IMM R1 0
 IMM R2 1
+
+LOOP:
 MOV R3 R1
 MOV R4 R2
 ADD R1 R2
@@ -187,18 +187,22 @@ UADD R5 R0
 OUT %0 R5
 MOV R1 R2
 MOV R2 R5
-JMP 2`,
+JMP LOOP`,
+
     "Functions": `; Function Call Test
 ; Main Program
 
 IMM R1 3
 OUT %0 R1
-CALL 7        ; Call "double_r1" function
+
+MAIN_LOOP:
+CALL DOUBLE_R1 ; Call function by Label
 OUT %0 R1     ; Output result 
-JMP 2         ; Loop forever
+JMP MAIN_LOOP ; Loop forever
 NOOP
 
 ; --- Function: double_r1 ---
+DOUBLE_R1:    ; Label defines entry point
 ; Expects argument in R1
 ; Returns result in R1
 IMM R2 2
@@ -207,7 +211,6 @@ NOP           ; Wait for writeback
 ADD R1 R3     ; Double it
 RET           ; Return to caller`
 };
-
     // --- 2. CONSTANTS & TYPES ---
     const Operation = {
         NOOP: "NOOP", IMM: "IMM", MOV: "MOV",
@@ -272,20 +275,32 @@ RET           ; Return to caller`
         const lines = code.split('\n');
         const map: (number | string)[] = [];
         let instructionCount = 0;
+
         for (let line of lines) {
-            const cleanLine = line.split(';')[0].trim();
+            // 1. Remove comments
+            let cleanLine = line.split(';')[0].trim();
+
+            // 2. Check if there is a label at the start
+            const labelMatch = cleanLine.match(/^(\w+):/);
+            if (labelMatch) {
+                // Remove the label from the line (e.g. "LOOP: MOV..." becomes "MOV...")
+                // If the line was JUST "LOOP:", cleanLine becomes empty string ""
+                cleanLine = cleanLine.substring(labelMatch[0].length).trim();
+            }
+
+            // 3. If there is still code left (an instruction), assign an address
             if (cleanLine.length > 0) {
                 map.push(instructionCount);
                 instructionCount++;
             } else {
+                // It is a blank line, a comment, or JUST a label
                 map.push(""); 
             }
         }
         return map;
     }
 
-    // --- NEW: Syntax Highlighting Logic ---
-    function highlightSyntax(code: string): string {
+function highlightSyntax(code: string): string {
         // Escape HTML to prevent injection
         let escaped = code
             .replace(/&/g, "&amp;")
@@ -306,14 +321,7 @@ RET           ; Return to caller`
             aluOps.forEach(op => keywords.push(p + op));
         });
         
-        // Regex Patterns
-        // 1. Comments: ; ... (end of line)
-        // 2. Keywords: Whole words only
-        // 3. Registers: R0-R7
-        // 4. Ports: %0-%7
-        // 5. Numbers: Dec/Bin (#123, 123, B1010)
-        
-        // We process line by line to handle comments safely
+        // Process line by line
         return escaped.split('\n').map(line => {
             const commentIndex = line.indexOf(';');
             let codePart = line;
@@ -324,10 +332,7 @@ RET           ; Return to caller`
                 commentPart = `<span class="text-zinc-500">${line.substring(commentIndex)}</span>`;
             }
 
-            // Highlight Code Part
-
-            // 1. Numbers (123, B101, #123) - Do this FIRST to avoid matching numbers in class names later
-            // We ensure the number is NOT preceded by a '%' sign (for ports like %0)
+            // 1. Numbers (123, B101) - Match word boundary to avoid coloring inside words
             codePart = codePart.replace(/(^|[^%])\b(\d+|B[01_]+)\b/g, '$1<span class="text-blue-400">$2</span>');
 
             // 2. Keywords
@@ -338,7 +343,11 @@ RET           ; Return to caller`
             codePart = codePart.replace(/\b(R[0-7])\b/g, '<span class="text-purple-400 font-bold">$1</span>');
 
             // 4. Ports (%0-%7)
-            codePart = codePart.replace(/(%[0-7])/g, '<span class="text-yellow-400 font-bold">$1</span>');
+            codePart = codePart.replace(/(%[0-7])/g, '<span class="text-orange-400 font-bold">$1</span>');
+
+            // 5. Labels (Matches "WORD:" at start of line)
+            // We use text-pink-400 to make them pop as "destinations"
+            codePart = codePart.replace(/^(\s*)(\w+):/g, '$1<span class="text-pink-400 font-bold">$2:</span>');
             
             return codePart + commentPart;
         }).join('\n');
@@ -1476,10 +1485,10 @@ RET           ; Return to caller`
                     <option value="Fibonacci">Fibonacci</option>
                      <option value="Functions">Functions</option>
                 </select>
+                <button onclick={() => showDocs = !showDocs} class="ml-2 px-3 py-2 bg-zinc-800 text-zinc-200 text-xs font-mono font-bold hover:bg-zinc-700 rounded border border-zinc-700">DOCS</button>
             </div>
             
             <div class="flex gap-1">
-                <button onclick={() => showDocs = !showDocs} class="px-2 py-1 bg-zinc-800 text-zinc-300 text-[10px] font-mono hover:bg-zinc-700">DOCS</button>
                 <button onclick={toggleRun} class="px-2 py-1 bg-[var(--color-schematic-primary)] text-black text-[10px] font-mono font-bold hover:bg-white">{isRunning ? 'PAUSE' : 'RUN'}</button>
                 <button onclick={step} class="px-2 py-1 border border-zinc-700 text-zinc-300 text-[10px] font-mono hover:border-zinc-500">STEP</button>
                 <button onclick={reset} class="px-2 py-1 border border-zinc-700 text-zinc-300 text-[10px] font-mono hover:border-zinc-500">RESET</button>

@@ -86,8 +86,8 @@
             { label: 'Data Points Served', value: '54.5K+' },
             { label: 'Monthly Users', value: '3K+' },
             { label: 'People Reached', value: '100K+' },
-        ] as stat}
-            <div class="bg-zinc-900/50 border border-zinc-800 p-4 text-center hover:border-[var(--color-schematic-primary)]/50 transition-colors">
+        ] as stat, i}
+            <div class="bg-zinc-900/50 border border-zinc-800 p-4 text-center hover:border-[var(--color-schematic-primary)]/50 transition-colors {i === 2 ? 'col-span-2 lg:col-span-1' : ''}">
                 <div class="text-2xl font-bold text-white font-mono mb-1">{stat.value}</div>
                 <div class="text-xs text-zinc-500 uppercase tracking-wider font-mono">{stat.label}</div>
             </div>
