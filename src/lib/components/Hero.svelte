@@ -38,7 +38,7 @@
 			<div class="space-y-1 font-mono text-sm text-zinc-500 border-l-2 border-zinc-800 pl-4">
 				<div class="flex items-center gap-3">
 					<span class="text-[var(--color-schematic-primary)]">LAST_ROLE</span>
-					<span>Lead Software Engineer</span>
+					<span>Lead Software Engineer & Founder</span>
 				</div>
 				<div class="flex items-center gap-3">
 					<span class="text-[var(--color-schematic-primary)]">EDUCATION</span>
