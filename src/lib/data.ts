@@ -130,7 +130,7 @@ export const projects: Project[] = [
             "Type-safe development with TypeScript"
         ],
         links: {
-            github: "https://github.com/eliperez-dev/Portfolio-Website"
+            github: "https://github.com/eliperez-dev/Portfolio-Website/tree/v2"
         },
         overview: "This project serves as a comprehensive demonstration of my technical proficiency in Rust, TypeScript, and WebAssembly. It combines a modern SvelteKit frontend with high-performance systems programming concepts to create an interactive and performant user experience.",
         challenges: [
