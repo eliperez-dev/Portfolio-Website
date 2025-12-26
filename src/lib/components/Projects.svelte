@@ -20,7 +20,7 @@
                     <div class="absolute -bottom-px -right-px w-6 h-6 border-b-2 border-r-2 border-[var(--color-schematic-primary)] opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none"></div>
 
                     <!-- Project Header -->
-					<div class="mb-6">
+					<div class="mb-0">
 						<div class="flex justify-between items-start gap-4 mb-4">
 							<h3 class="text-xl font-bold text-white font-mono group-hover:text-[var(--color-schematic-primary)] transition-colors flex items-center gap-2">
 								<a href="/projects/{project.slug}" class="hover:underline decoration-[var(--color-schematic-primary)] underline-offset-4 before:absolute before:inset-0 before:z-0">
@@ -49,7 +49,7 @@
 
                     <!-- Gallery Integration -->
                     {#if project.gallery}
-                        <div class="mb-6 border-zinc-800 py-4 bg-zinc-850/30 px-0 relative z-10 pointer-events-none w-full min-w-0">
+                        <div class="mb-3 border-zinc-800 py-0 bg-zinc-850/30 px-0 relative z-10 pointer-events-none w-full min-w-0">
                             <div class="pointer-events-auto overflow-hidden">
                                 <Gallery path={project.gallery.path} images={project.gallery.images} />
                             </div>

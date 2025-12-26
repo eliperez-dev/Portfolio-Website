@@ -65,7 +65,7 @@
 
 <svelte:window onkeydown={handleKeydown} />
 
-<div class="space-y-4">
+<div class="space-y-4 w-full min-w-0">
     <div class="flex justify-between items-end border-b border-zinc-800 pb-2">
         <h3 class="font-mono text-sm uppercase tracking-widest text-zinc-500">
             Gallery
@@ -88,9 +88,9 @@
         </div>
     </div>
 
-    <div class="relative group/gallery overflow-hidden">
+    <div class="relative group/gallery overflow-hidden w-full">
         <div 
-            class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth snap-x w-full max-w-full"
+            class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth snap-x w-full max-w-full min-w-0"
             bind:this={scrollContainer}
         >
             {#each images as image, index}
