@@ -1,23 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-    import CpuEmulator from '$lib/components/CpuEmulator.svelte';
-	import init, { add } from '$lib/wasm/wasm.js';
+	import CpuEmulator from '$lib/components/CpuEmulator.svelte';
 
 	let displayText = $state('');
 	let currentIndex = $state(0);
 	const fullText = "Hello, I'm Eli Perez";
-	let wasmReady = $state(false);
 
-	onMount(async () => {
-		// Initialize Wasm
-		try {
-			await init();
-			wasmReady = true;
-			console.log("Wasm Core Online. 10 + 20 =", add(10, 20));
-		} catch (e) {
-			console.error("Wasm initialization failed:", e);
-		}
-
+	onMount(() => {
 		const interval = setInterval(() => {
 			if (currentIndex < fullText.length) {
 				displayText += fullText[currentIndex];
