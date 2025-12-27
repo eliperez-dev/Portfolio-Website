@@ -3,7 +3,7 @@
 
     let locationEnabled = $state(false);
     let statusMessage = $state("Connecting...");
-    let iframeUrl = $state("https://untileverycage.org/?lat=37.92650&lng=-58.00781&zoom=3&country=all&state=all&layers=slaughter%2Cprocessing%2Clabs%2Cbreeders%2Cdealers%2Cexhibitors");
+    let iframeUrl = $state("https://untileverycage.org/?lat=38.02650&lng=-95.00781&zoom=3&country=all&state=all&layers=slaughter%2Cprocessing%2Clabs%2Cbreeders%2Cdealers%2Cexhibitors");
     let isLocating = $state(false);
     let timeString = $state("");
     
@@ -13,8 +13,8 @@
     let currentZoom = $state(3);
     
     // Derived values for display
-    let displayLat = $state("37.9265° N");
-    let displayLng = $state("58.0078° W");
+    let displayLat = $state("38.0265° N");
+    let displayLng = $state("-65.0078° W");
     let displayAlt = $state("450KM");
     let displayScale = $state("10km");
 
@@ -24,7 +24,7 @@
             timeString = now.toISOString().replace('T', ' ').split('.')[0] + " UTC";
             
             // Simulate micro-fluctuations in telemetry to make it look "live"
-            const jitter = (Math.random() - 0.5) * 0.0001;
+            const jitter = (Math.random() - 0.5) * 0.001;
             displayLat = (currentLat + jitter).toFixed(4) + "°";
             displayLng = (currentLng + jitter).toFixed(4) + "°";
         };

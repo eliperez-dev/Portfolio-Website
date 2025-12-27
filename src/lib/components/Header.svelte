@@ -3,20 +3,20 @@
 </script>
 
 <header class="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-sm">
-    <div class="container mx-auto px-6 h-20 flex items-center justify-between">
-        <a href="/" class="text-xl font-bold font-mono text-white flex items-center gap-2 group">
+    <div class="container mx-auto px-6 h-20 flex items-center justify-between relative">
+        <a href="/" class="text-xl font-bold font-mono text-white flex items-center gap-2 group z-10">
             <span class="text-[var(--color-schematic-primary)] group-hover:animate-pulse">></span>
             <span>eliperez.dev</span>
         </a>
 
-        <nav class="hidden md:flex items-center gap-8 font-mono text-sm uppercase tracking-wider">
+        <nav class="hidden md:flex items-center gap-8 font-mono text-sm uppercase tracking-wider absolute left-1/2 -translate-x-1/2">
             <a href="/#about" class="nav-link text-zinc-400 hover:text-[var(--color-schematic-primary)] transition-colors">About</a>
             <a href="/#projects" class="nav-link text-zinc-400 hover:text-[var(--color-schematic-primary)] transition-colors">Projects</a>
             <a href="/#contact" class="nav-link text-zinc-400 hover:text-[var(--color-schematic-primary)] transition-colors">Contact</a>
             <a href="/blog" class="nav-link text-zinc-400 hover:text-[var(--color-schematic-primary)] transition-colors">Blog</a>
         </nav>
 
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-4 z-10">
              <a 
                 href="/resume" 
                 class="hidden sm:block px-4 py-2 border border-zinc-700 text-zinc-300 text-xs font-mono uppercase hover:border-[var(--color-schematic-primary)] hover:text-[var(--color-schematic-primary)] transition-colors"
@@ -28,6 +28,7 @@
 </header>
 
 <style>
+    /* ... existing styles ... */
     .nav-link {
         position: relative;
     }
