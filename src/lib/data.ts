@@ -24,56 +24,55 @@ export interface Project {
 export const projects: Project[] = [
     {
         id: 1,
-        slug: "until-every-cage-is-empty",
-        title: "Until Every Cage is Empty",
-        subtitle: "Interactive data-driven map of global animal exploitation infrastructure",
-        description: "An interactive, data-driven map exposing the global infrastructure of animal exploitation. Serves 56,000+ data points to 3,000+ monthly users globally with 100,000+ social media reach.",
-        technologies: ["Rust", "Axum", "Python", "JavaScript", "Leaflet.js", "Netlify"],
+        slug: "nuclear-telemetry-sprint",
+        title: "Nuclear Safety Telemetry System",
+        subtitle: "High-frequency Async Rust interface for Industrial PLCs",
+        description: "A mission-critical telemetry interface built during a 9-hour engineering sprint for Valar Atomics. The system interfaces with triple-redundant safety PLCs using the EtherNet/IP protocol to stream real-time voltage and status data.",
+        technologies: ["Rust", "Tokio (Async)", "EtherNet/IP (CIP)", "Allen Bradley PLCs", "Industrial Automation"],
         features: [
-            "Serves 54,000+ data points to 3,000+ monthly users",
-            "Multi-layer interactive map with comprehensive filtering",
-            "Translated into Spanish, French, and German"
+            "Engineered a custom EtherNet/IP client in Async Rust",
+            "Achieved sub-10ms latency communication with Safety PLCs",
+            "Implemented robust error handling for industrial packet loss"
         ],
         links: {
-            live: "https://www.untileverycage.org/",
-            github: "https://github.com/eliperez-dev/UntilEveryCage"
+            
         },
-        overview: "Architected and led the development of a full-stack, open-source geospatial platform for animal rights. The project scales to serve 3,000+ monthly users and provides a high-performance RESTful API in Rust (Axum) to serve over 54,000 documented facilities to journalists, activists, and researchers.",
+        overview: "During an intensive on-site engineering sprint at Valar Atomics, I was tasked with building a fault-tolerant bridge between modern software infrastructure and legacy industrial hardware. In under 9 hours, I reverse-engineered the tag structure of an Allen Bradley Safety PLC and wrote a performant Rust driver to extract critical telemetry data.",
         challenges: [
-            "Developing robust Python ETL pipelines to aggregate, clean, and standardize data from dozens of disparate public sources",
-            "Engineering a high-performance API in Rust to handle thousands of concurrent requests without latency",
-            "Managing open-source development and collaborating with a global team of developers to secure funding"
+            "Interfacing modern Async Rust (Tokio) with the synchronous, legacy EtherNet/IP industrial protocol",
+            "Parsing complex Common Industrial Protocol (CIP) binary packets without vendor-provided libraries",
+            "Delivering a working, crash-resistant prototype within a strict single-day deadline"
         ],
         outcomes: [
-            "Drove project adoption through social media outreach, achieving over 100k views",
-            "Secured a seed grant from the Pollination Project and crowd-funded donations from around the world",
-            "Gained recognition from key organizations in the non-profit sector and mentioned in animal rights newsletters"
+            "Successfully established two-way communication with the Safety PLC hardware",
+            "Demonstrated the viability of using Rust for safety-critical nuclear instrumentation",
+            "Built a diagnostic TUI (Terminal User Interface) to visualize 'Alpha', 'Beta', and 'Gamma' redundant voltage readings in real-time"
         ],
         gallery: {
-            path: "geospatial",
-            images: ["5.png", "6.png","7.png", "4.png",  "2.png", "3.png",]
+            path: "valar-sprint",
+            images: ["floor.jpg", "plc.jpg", "control_panel.jpg",  "code.jpg"]
         }
     },
     {
         id: 2,
         slug: "electron-redstone-cpu",
         title: "Electron Redstone CPU",
-        subtitle: "Complete computer-architecture toolchain built from scratch in Rust",
-        description: "A complete computer-architecture toolchain built from scratch in Rust, centered around Electron, a custom 8-bit, Turing-complete, RISC-V-inspired CPU.",
-        technologies: ["Rust", "Custom Assembly", "VS Code Extension", "raylib-rs"],
+        subtitle: "4-Stage Pipelined 8-bit RISC-V Inspired CPU",
+        description: "A custom 8-bit ISA with a raw pipeline architecture, hand-wired using Redstone digital logic gates. Includes a custom Rust toolchain for static analysis and emulation.",
+        technologies: ["Rust", "Custom Assembly", "WebAssembly", "SvelteKit", "Redstone Logic"],
         features: [
-            "Custom 8-bit Turing-complete ISA with 4-stage pipeline",
-            "Complete toolchain: Assembler, Rust emulator with GUI",
-            "Minecraft Redstone implementation as proof-of-concept"
+            "Custom 8-bit ISA ('Electron 2') with raw pipeline architecture",
+            "Rust toolchain (Assembler/Emulator) performing static analysis",
+            "In-browser visual debugger via WebAssembly and SvelteKit"
         ],
         links: {
             github: "https://github.com/eliperez-dev/Electron"
         },
-        overview: "Designed and implemented a 4-stage pipelined, 8-bit CPU from first principles. This project involved hand-building the entire final CPU design within a pure logic-gate environment and developing a novel, Turing-complete Instruction Set Architecture (ISA).",
+        overview: "Designed 'Electron 2', a custom 8-bit ISA with a raw pipeline architecture, and hand-wired the implementation using Redstone digital logic gates in a simulation environment. The project includes a comprehensive toolchain engineered in Rust.",
         challenges: [
-            "Developing a complete computer-architecture toolchain from scratch in Rust, including a custom assembler and emulator",
-            "Designing a custom RISC-V inspired architecture that functions within strict 8-bit constraints",
-            "Creating a VS Code extension to support the novel assembly language with syntax highlighting and debugging"
+            "Engineering a Rust toolchain that performs static analysis to resolve data hazards inherent to the hardware design",
+            "Resolving interlocking constraints within a raw pipeline architecture",
+            "Porting the emulator to WebAssembly (WASM) to provide a performant in-browser visual debugger"
         ],
         outcomes: [
             "Successfully modeled a functional CPU that runs complex algorithms within a logic-gate environment",
@@ -87,29 +86,61 @@ export const projects: Project[] = [
     },
     {
         id: 3,
+        slug: "until-every-cage-is-empty",
+        title: "Until Every Cage is Empty",
+        subtitle: "Full-stack geospatial platform for animal rights",
+        description: "An open-source geospatial platform that aggregates data from dozens of public sources. It serves over 56,000 documented facilities to 3,000+ monthly users, including journalists and researchers.",
+        technologies: ["Rust", "Axum", "Python", "Shuttle", "Leaflet.js", "ETL Pipelines"],
+        features: [
+            "Serves 56,000+ documented facilities to 3,000+ monthly users",
+            "High-performance RESTful API engineered in Rust (Axum)",
+            "Robust Python ETL pipelines to aggregate and clean disparate data"
+        ],
+        links: {
+            live: "https://www.untileverycage.org/",
+            github: "https://github.com/eliperez-dev/UntilEveryCage"
+        },
+        overview: "Architected and led the development of a full-stack, open-source geospatial platform. The project engineered a high-performance RESTful API in Rust (Axum) to serve over 56,000 documented facilities to journalists, activists, and researchers, deployed on Shuttle.",
+        challenges: [
+            "Developing robust Python ETL pipelines to aggregate, clean, and standardize data from dozens of disparate public sources",
+            "Engineering a high-performance API in Rust to handle thousands of concurrent requests",
+            "Managing open-source development and collaborating with a global team to secure a seed grant from the Pollination Project"
+        ],
+        outcomes: [
+            "Drove project adoption through social media outreach, achieving over 100k views",
+            "Gained recognition from key organizations in the non-profit sector and mentioned in animal rights newsletters",
+            "Secured crowd-funded donations and a seed grant to sustain development"
+        ],
+        gallery: {
+            path: "geospatial",
+            images: ["5.png", "6.png", "7.png", "4.png", "2.png", "3.png"]
+        }
+    },
+    {
+        id: 4,
         slug: "portable-weather-station",
         title: "Portable Weather Station",
-        subtitle: "Full-stack IoT telemetry system in Bare Metal Rust",
-        description: "A portable weather station built on ESP32 that reads temperature and humidity from a DHT11 sensor, connects to WiFi, and sends data to a Flask web server.",
-        technologies: ["Embedded Rust", "ESP32", "Python", "Flask", "SQLite"],
+        subtitle: "Full-Stack IoT Telemetry Platform",
+        description: "A fault-tolerant IoT node engineered in Embedded Rust (no_std) using the Embassy async runtime. It visualizes high-frequency telemetry on a real-time dashboard.",
+        technologies: ["Embedded Rust (Embassy)", "ESP32", "Python", "Flask", "SQLite"],
         features: [
-            "High-Performance Embedded Rust firmware on ESP32",
-            "Time-Series Database with SQLite and live dashboard",
-            "Deep sleep and watchdog tasks for power conservation"
+            "Fault-tolerant IoT node using Embassy async runtime",
+            "Deep sleep implementation for power efficiency",
+            "Python Flask API with SQLite for high-frequency telemetry"
         ],
         links: {
             github: "https://github.com/eliperez-dev/Portable-Weather-Station"
         },
-        overview: "Engineered a full-stack IoT telemetry platform featuring a bare-metal sensor driver in Embedded Rust (no_std) for the ESP32. The system utilizes a Python Flask API with SQLite to ingest and persist high-frequency, real-time time-series data from the remote device.",
+        overview: "Engineered a fault-tolerant IoT node in Embedded Rust (no std) using the Embassy async runtime. The system implements deep sleep for power efficiency and watchdog timers for system resilience, connecting to a Python backend.",
         challenges: [
-            "Authoring a custom bare-metal sensor driver in a `no_std` Rust environment without standard library support",
-            "Engineering a robust backend to ingest high-frequency time-series data without data loss",
-            "Integrating disparate technologies (Embedded Rust, Python Flask, SQLite) into a seamless telemetry pipeline"
+            "Implementing deep sleep and watchdog timers for maximum system resilience in a `no_std` environment",
+            "Developing a Python Flask API to ingest high-frequency telemetry without data loss",
+            "Visualizing live and historical sensor trends on a real-time dashboard"
         ],
         outcomes: [
-            "Deployed a responsive JavaScript frontend on Cloudflare Pages to visualize live and historical data",
             "Achieved reliable persistence of high-frequency environmental data via the custom API",
-            "Created a scalable architecture capable of handling real-time IoT communication streams"
+            "Created a scalable architecture capable of handling real-time IoT communication streams",
+            "Successfully deployed a system using modern async embedded Rust patterns"
         ],
         gallery: {
             path: "iot-dashboard",
@@ -117,10 +148,10 @@ export const projects: Project[] = [
         }
     },
     {
-        id: 4,
+        id: 5,
         slug: "portfolio",
         title: "Portfolio Website",
-        subtitle: "This website! Built with SvelteKit, TypeScript, and Rust WASM",
+        subtitle: "Built with SvelteKit, TypeScript, and Rust WASM",
         description: "A personal portfolio website designed to showcase my projects and skills. It features a modern, responsive design and integrates Rust WebAssembly for high-performance computing tasks directly in the browser.",
         technologies: ["SvelteKit", "TypeScript", "Rust", "WebAssembly", "TailwindCSS"],
         features: [
@@ -147,5 +178,5 @@ export const projects: Project[] = [
             path: "portfolio",
             images: ["image.png"]
         }
-    }
+    },
 ];

@@ -52,11 +52,11 @@
             
             <div class="space-y-6 text-zinc-400 leading-relaxed text-lg">
                 <p>
-                    I am a <span class="text-[var(--color-schematic-primary)]">Systems Engineer</span> driven by an obsession with understanding how things work—down to the <span class="text-white">bare metal</span>. My journey didn't begin in a bootcamp; it began in <span class="text-white">Minecraft</span>, where I manually routed clock signals and debugged race conditions with redstone before I ever wrote a line of code.
+                    I am a <span class="text-[var(--color-schematic-primary)]">Systems Software Engineer</span> driven by an obsession with understanding how things work—down to the <span class="text-white">bare metal</span>. My journey didn't begin in a bootcamp; it began in <span class="text-white">Minecraft</span>, where I manually routed clock signals and debugged race conditions with redstone before I ever wrote a line of code.
                 </p>
 
                 <p>
-                    That curiosity evolved into <strong class="text-[var(--color-schematic-primary)]">Electron</strong>, a <span class="text-white">custom 8-bit CPU</span> I designed from first principles. Refusing to stop at simulation, I built a complete ecosystem in <span class="text-white">Rust</span>—including an assembler, <span class="text-white">cycle-accurate emulator</span>, and VS Code extension—to validate my architecture against real-world constraints.
+                    That curiosity evolved into <strong class="text-[var(--color-schematic-primary)]">Electron</strong>, a <span class="text-white">custom 8-bit RISC-V inspired CPU</span> I designed from first principles. Refusing to stop at simulation, I built a complete ecosystem in <span class="text-white">Rust</span>—including an assembler that performs <span class="text-white">static analysis</span> to resolve data hazards—to validate my architecture against real-world constraints.
                 </p>
 
                 <p>
@@ -64,7 +64,7 @@
                 </p>
 
                 <p>
-                    I believe rigorous engineering should drive social change. I architected <span class="text-[var(--color-schematic-primary)]">"Until Every Cage is Empty"</span>, a geospatial platform serving <span class="text-[var(--color-schematic-primary)]">56,000+ data points</span> to 3,000+ users. The project's impact on data transparency earned a <span class="text-white">Seed Grant</span> from The Pollination Project, validating its technical foundation.
+                    I believe rigorous engineering should drive social change. I architected <span class="text-[var(--color-schematic-primary)]">"Until Every Cage is Empty"</span>, a geospatial platform serving <span class="text-[var(--color-schematic-primary)]">56,000+ documented facilities</span> to 3,000+ monthly users. The project's impact on data transparency earned a <span class="text-white">Seed Grant</span> from The Pollination Project, validating its technical foundation.
                 </p>
             </div>
         </div>

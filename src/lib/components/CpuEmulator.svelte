@@ -537,7 +537,10 @@ RET           ; Return to caller`
     function handleScroll() {
         if (textareaEl && lineNumEl) {
             lineNumEl.scrollTop = textareaEl.scrollTop;
-            if (backdropEl) backdropEl.scrollTop = textareaEl.scrollTop; // Sync backdrop
+            if (backdropEl) {
+                backdropEl.scrollTop = textareaEl.scrollTop;
+                backdropEl.scrollLeft = textareaEl.scrollLeft;
+            }
         }
 
         // --- NEW: Detection Logic ---
@@ -1089,6 +1092,7 @@ RET           ; Return to caller`
                     <div 
                         bind:this={backdropEl}
                         class="absolute inset-0 pointer-events-none p-2 text-xs leading-5 font-mono whitespace-pre overflow-hidden z-0"
+                        style="tab-size: 4"
                         aria-hidden="true"
                     >
                         <!-- eslint-disable-next-line svelte/no-at-html-tags -->
@@ -1103,6 +1107,7 @@ RET           ; Return to caller`
                             autoScroll = false;
                             codeChanged = true;
                         }}
+                        style="tab-size: 4"
                         class="flex-grow bg-transparent text-transparent caret-white font-mono p-2 text-xs leading-5 outline-none resize-none whitespace-pre z-10 relative selection:bg-white/20"
                         spellcheck="false"
                     ></textarea>
@@ -1136,7 +1141,7 @@ RET           ; Return to caller`
                                         </div>
                                         <p class="text-[9px] opacity-70 {compilationErrors.length > 0 && !ignoreErrors ? 'text-red-400' : 'text-yellow-400'}">
                                             {#if compilationErrors.length > 0 && !ignoreErrors}
-                                                Code cannot run with errors.
+                                                May lead to undefined behavior.
                                             {:else}
                                                 Potential issues detected.
                                             {/if}
