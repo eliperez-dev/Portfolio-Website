@@ -37,10 +37,10 @@ export const projects: Project[] = [
         links: {
             
         },
-        overview: "During an intensive on-site engineering sprint at Valar Atomics, I was tasked with building a fault-tolerant bridge between modern software infrastructure and legacy industrial hardware. In under 9 hours, I reverse-engineered the tag structure of an Allen Bradley Safety PLC and wrote a performant Rust driver to extract critical telemetry data.",
+        overview: "During an intensive on-site engineering sprint at Valar Atomics, I was tasked with building a fault-tolerant bridge between modern software infrastructure and industrial hardware. In under 9 hours, I reverse-engineered the tag structure of an Allen Bradley Safety PLC and wrote a performant Rust driver to extract critical telemetry data.",
         challenges: [
             "Interfacing modern Async Rust (Tokio) with the synchronous, legacy EtherNet/IP industrial protocol",
-            "Parsing complex Common Industrial Protocol (CIP) binary packets without vendor-provided libraries",
+            "Parsing complex Common Industrial Protocol (CIP) binary packets",
             "Delivering a working, crash-resistant prototype within a strict single-day deadline"
         ],
         outcomes: [

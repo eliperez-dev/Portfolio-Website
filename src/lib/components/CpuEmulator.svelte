@@ -1,6 +1,8 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { Emulator } from "../../../wasm/pkg/wasm.js";
+    import type { Emulator } from "../../../wasm/pkg/wasm.js";
+
+    let EmulatorConstructor: { new (code: string): Emulator };
 
     // --- INTERFACES FOR WASM STATE ---
     // These match the structure returned by emulator.get_state()
@@ -501,7 +503,7 @@ RET           ; Return to caller`
         }
     });
 
-    onMount(() => {
+    onMount(async () => {
         onImg = new Image(); offImg = new Image();
         let loadCount = 0; let errorCount = 0;
         const checkStatus = () => {
@@ -530,7 +532,14 @@ RET           ; Return to caller`
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
         
-        initEmulator();
+        try {
+            const module = await import("../../../wasm/pkg/wasm.js");
+            EmulatorConstructor = module.Emulator;
+            initEmulator();
+        } catch (e) {
+            console.error("Failed to load WASM module:", e);
+        }
+
         return () => cancelAnimationFrame(animationId);
     });
 
@@ -557,7 +566,8 @@ RET           ; Return to caller`
     }
 
     function initEmulator() {
-        emulator = new Emulator(code);
+        if (!EmulatorConstructor) return;
+        emulator = new EmulatorConstructor(code);
         updateDiagnostics();
         updateStats();
         draw();
@@ -598,9 +608,10 @@ RET           ; Return to caller`
     
     function step() {
         if (!emulator) initEmulator();
+        if (!emulator) return;
         if (showInputModal) return;
 
-        emulator!.clock();
+        emulator.clock();
         
         // Get state to check waiting_for_input
         const state = emulator!.get_state();
