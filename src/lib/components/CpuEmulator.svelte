@@ -1528,7 +1528,6 @@ update_ram_2:
                         <div class="absolute top-full left-0 mt-1 bg-zinc-900 border border-zinc-700 shadow-xl z-50 flex flex-col min-w-[120px]">
                             <button onclick={() => setClock(1)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 border-t border-zinc-700 hover:text-white">1 Hz<br>(Real Time)</button>
                             <button onclick={() => setClock(10)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 border-t border-zinc-700 hover:text-white">10 Hz</button>
-                            <button onclick={() => setClock(1000)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 border-t border-zinc-700 hover:text-white">1 kHz</button>
                             <button onclick={() => setClock(100)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 border-t border-zinc-700 hover:text-white">100 Hz</button>
                             <button onclick={() => setClock(1000)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 border-t border-zinc-700 hover:text-white">1 kHz</button>
                             <button onclick={() => setClock(100000)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 border-t border-zinc-700 hover:text-white">100 kHz</button>
