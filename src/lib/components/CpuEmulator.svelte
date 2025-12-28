@@ -52,10 +52,12 @@
 ; an entirely custom architecture
 ; built in Minecraft on controller.
 
-; The emulator was originally written
-; in Rust, but I have ported it to
-; WASM to run in the browser.
-; Feel free to write your own programs!
+; I have ported the OG emulator to
+; Rust / WASM to run in the browser.
+; Feel free to bench the Rust backend
+; by writing your own programs or by
+; setting the clock speed to max. ;)
+; Enjoy!
 
 start:
 ; --- Crab ---
@@ -249,7 +251,7 @@ jmp loop`,
 
 ; NOTE: This one takes a while, so
 ; at 10hz, so i reccomend increasing
-; the clock speed to 100hz.
+; the clock speed to 100hz or higher.
 
 start:
 imm R1 5      ; Calculate Factorial(5)
@@ -761,6 +763,12 @@ jmp start`
         else if (hz === 1000) tickDelay = 1;
         else if (hz === 100000) tickDelay = 0.01; // 100kHz = 0.01ms per tick
         else if (hz === -1) tickDelay = 0; // Max Speed
+        
+        // Reset stats so we don't show stale Hz from previous speed
+        actualHz = 0; 
+        cycleCountSinceUpdate = 0;
+        timeSinceUpdate = 0;
+        
         clockMenuOpen = false;
     }
     
@@ -953,7 +961,14 @@ jmp start`
         // --- Stats Update ---
         cycleCountSinceUpdate += cyclesRun;
         timeSinceUpdate += deltaTime;
-        if (timeSinceUpdate >= 500) { // Update every 500ms
+
+        // Dynamic update interval:
+        // For very slow speeds (like 1Hz = 1000ms tick), we need a longer window
+        // to capture at least one cycle (preferably more) to average out jitter.
+        // Use 3x tickDelay or 500ms, whichever is larger.
+        const updateInterval = currentTickDelay > 0 ? Math.max(500, currentTickDelay * 3) : 500;
+
+        if (timeSinceUpdate >= updateInterval) { 
              actualHz = (cycleCountSinceUpdate / timeSinceUpdate) * 1000;
              cycleCountSinceUpdate = 0;
              timeSinceUpdate = 0;
@@ -1411,9 +1426,13 @@ jmp start`
                 <div class="relative">
                     <button 
                         onclick={() => clockMenuOpen = !clockMenuOpen} 
-                        class="px-2 py-1 border border-zinc-700 text-zinc-300 text-[10px] font-mono hover:border-zinc-500 transition-colors min-w-[80px]"
+                        class="px-2 py-1 border border-zinc-700 text-zinc-300 text-[10px] font-mono hover:border-zinc-500 transition-colors min-w-[100px] text-center"
                     >
-                        Clock: {getClockLabel()}
+                        {#if isRunning && actualHz > 0}
+                             {formatHz(actualHz)}
+                        {:else}
+                             Clock: {getClockLabel()}
+                        {/if}
                     </button>
                     {#if clockMenuOpen}
                         <!-- Backdrop to close menu -->
@@ -1432,13 +1451,6 @@ jmp start`
                     {/if}
                 </div>
                 
-                <!-- Speed Monitor -->
-                {#if isRunning}
-                    <div class="px-2 py-1 bg-zinc-900 border border-zinc-800 text-zinc-400 text-[10px] font-mono min-w-[60px] text-center">
-                        {formatHz(actualHz)}
-                    </div>
-                {/if}
-
                 <label 
                     class="px-2 py-1 border border-zinc-700 text-zinc-300 text-[10px] font-mono hover:border-zinc-500 transition-colors flex items-center gap-2 cursor-pointer select-none rounded-[2px]"
                     title="Toggle Auto-Follow Execution"
