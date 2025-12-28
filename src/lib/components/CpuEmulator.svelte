@@ -963,252 +963,289 @@ jmp start`
     {/if}
 
     {#if showDocs}
-        <div class="absolute inset-0 z-50 bg-black/80 flex items-center justify-center p-8 backdrop-blur-sm">
-            <div class="bg-zinc-900 border border-zinc-700 rounded-lg max-w-3xl w-full max-h-full flex flex-col shadow-2xl overflow-hidden">
-                
-                <div class="flex justify-between items-center p-4 border-b border-zinc-800 bg-zinc-950/50">
-                    <div>
-                        <h2 class="text-lg font-mono text-[var(--color-schematic-primary)] font-bold tracking-wider">ELECTRON 2 MANUAL</h2>
-                        <p class="text-[10px] text-zinc-500 font-mono mt-1">
-                            Operands <b>A</b> and <b>B</b> can be Registers (R0-R7), Numbers (0-255), or Ports (%0-%7).
-                        </p>
-                    </div>
-                    <button onclick={() => showDocs = false} class="text-zinc-500 hover:text-white px-2 text-xl">✕</button>
+    <div class="absolute inset-0 z-50 bg-black/80 flex items-center justify-center p-8 backdrop-blur-sm">
+        <div class="bg-zinc-900 border border-zinc-700 rounded-lg max-w-3xl w-full max-h-full flex flex-col shadow-2xl overflow-hidden">
+            
+            <div class="flex justify-between items-center p-4 border-b border-zinc-800 bg-zinc-950/50">
+                <div>
+                    <h2 class="text-lg font-mono text-[var(--color-schematic-primary)] font-bold tracking-wider">ELECTRON 2 MANUAL</h2>
+                    <p class="text-[10px] text-zinc-500 font-mono mt-1">
+                        Operands <b>A</b> and <b>B</b> can be Registers (R0-R7), Numbers (0-255), or Ports (%0-%7).
+                    </p>
                 </div>
+                <button onclick={() => showDocs = false} class="text-zinc-500 hover:text-white px-2 text-xl">✕</button>
+            </div>
+            
+            <div class="overflow-y-auto p-6 space-y-6 font-mono text-xs">
+
+                <div class="text-zinc-400 leading-relaxed border-b border-zinc-800/50 pb-6 space-y-4">
+                    <p>
+                        This system is a faithful emulation of <strong>Electron 2</strong>, the successor to the original Electron CPU. It is currently under active construction in Minecraft (PS5 Edition) to push the limits of redstone computing.
+                    </p>
+                    <p class="text-zinc-500 text-[11px] italic">
+                        <strong>Electron</strong>,  the original CPU (which features a simpler architecture but is fully documented) can be found in the project card further down the page.
+                    </p>
+                </div>
+
+                <section class="mb-6">
+                    <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">Specifications</h3>
+                    <ul class="list-disc list-inside text-zinc-400 text-[11px] space-y-1">
+                        <li><strong class="text-zinc-300">Registers:</strong> 7 General Purpose (R1-R7) + 1 Zero Register (R0).</li>
+                        <li><strong class="text-zinc-300">Memory:</strong> 16 Bytes of RAM (Shared with Stack).</li>
+                        <li><strong class="text-zinc-300">Display:</strong> 8x8 Pixel Grid (Mapped to 8 Ports, 8 bits each).</li>
+                        <li><strong class="text-zinc-300">ROM:</strong> 256 Lines of Program Memory.</li>
+                    </ul>
+                </section>
                 
-                <div class="overflow-y-auto p-6 space-y-6 font-mono text-xs">
+                <section class="mb-6">
+                    <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">Syntax & Formatting</h3>
+                    <ul class="list-disc list-inside text-zinc-400 text-[11px] space-y-1">
+                        <li><strong class="text-zinc-300">Case Insensitive:</strong> Operations and operands can be uppercase or lowercase (e.g., <span class="text-white">MOV</span>, <span class="text-white">mov</span>, <span class="text-white">R1</span>, <span class="text-white">r1</span>).</li>
+                        <li><strong class="text-zinc-300">Registers:</strong> Can be prefixed with 'R' or '$' (e.g., <span class="text-purple-400">R1</span>, <span class="text-purple-400">$1</span>).</li>
+                        <li><strong class="text-zinc-300">Memory Addresses:</strong> Can be prefixed with '#' or '@' (e.g., <span class="text-yellow-400">#10</span>, <span class="text-yellow-400">@5</span>).</li>
+                        <li><strong class="text-zinc-300">I/O Ports:</strong> Must be prefixed with '%' (e.g., <span class="text-orange-400">%0</span>).</li>
+                        <li><strong class="text-zinc-300">Binary Numbers:</strong> Can be prefixed with 'B' or 'b' (e.g., <span class="text-blue-400">B101</span>, <span class="text-blue-400">b101</span>).</li>
+                    </ul>
+                </section>
 
-                    <div class="text-zinc-400 leading-relaxed border-b border-zinc-800/50 pb-6 space-y-4">
-                        <p>
-                            This system is a faithful emulation of <strong>Electron 2</strong>, the successor to the original Electron CPU. It is currently under active construction in Minecraft (PS5 Edition) to push the limits of redstone computing.
-                        </p>
-                        <p class="text-zinc-500 text-[11px] italic">
-                           <strong>Electron</strong>,  the original CPU (which features a simpler architecture but is fully documented) can be found in the project card further down the page.
-                        </p>
-                    </div>
-
-                    <section class="mb-6">
-                        <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">Specifications</h3>
-                        <ul class="list-disc list-inside text-zinc-400 text-[11px] space-y-1">
-                            <li><strong class="text-zinc-300">Registers:</strong> 7 General Purpose (R1-R7) + 1 Zero Register (R0).</li>
-                            <li><strong class="text-zinc-300">Memory:</strong> 16 Bytes of RAM (Shared with Stack).</li>
-                            <li><strong class="text-zinc-300">Display:</strong> 8x8 Pixel Grid (Mapped to 8 Ports, 8 bits each).</li>
-                            <li><strong class="text-zinc-300">ROM:</strong> 256 Lines of Program Memory.</li>
-                        </ul>
-                    </section>
+                <section class="bg-red-900/10 border border-red-900/30 p-4 rounded-md">
+                    <h3 class="text-red-400 font-bold mb-3 uppercase tracking-widest text-[10px]">⚠ Hardware Constraints</h3>
+                    <p class="text-red-300/70 mb-4 text-[11px]">
+                        This architecture utilizes a raw pipeline without hardware interlocking.
+                    </p>
                     
-                    <section class="mb-6">
-                        <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">Syntax & Formatting</h3>
-                        <ul class="list-disc list-inside text-zinc-400 text-[11px] space-y-1">
-                            <li><strong class="text-zinc-300">Case Insensitive:</strong> Operations and operands can be uppercase or lowercase (e.g., <span class="text-white">MOV</span>, <span class="text-white">mov</span>, <span class="text-white">R1</span>, <span class="text-white">r1</span>).</li>
-                            <li><strong class="text-zinc-300">Registers:</strong> Can be prefixed with 'R' or '$' (e.g., <span class="text-purple-400">R1</span>, <span class="text-purple-400">$1</span>).</li>
-                            <li><strong class="text-zinc-300">Memory Addresses:</strong> Can be prefixed with '#' or '@' (e.g., <span class="text-yellow-400">#10</span>, <span class="text-yellow-400">@5</span>).</li>
-                            <li><strong class="text-zinc-300">I/O Ports:</strong> Must be prefixed with '%' (e.g., <span class="text-orange-400">%0</span>).</li>
-                            <li><strong class="text-zinc-300">Binary Numbers:</strong> Can be prefixed with 'B' or 'b' (e.g., <span class="text-blue-400">B101</span>, <span class="text-blue-400">b101</span>).</li>
-                        </ul>
-                    </section>
-
-                    <section class="bg-red-900/10 border border-red-900/30 p-4 rounded-md">
-                        <h3 class="text-red-400 font-bold mb-3 uppercase tracking-widest text-[10px]">⚠ Hardware Constraints</h3>
-                        <p class="text-red-300/70 mb-4 text-[11px]">
-                            This architecture utilizes a raw pipeline without hardware interlocking.
-                        </p>
-                        
-                        <div class="text-[11px] space-y-4">
-                            <div>
-                                <strong class="text-zinc-200 block mb-1">Read-After-Write Latency</strong>
-                                <p class="text-zinc-500 mb-2">
-                                    Registers generally update in the <b>WriteBack</b> (Final) stage. Reading a register immediately after writing it usually yields the <b>OLD</b> value.
-                                </p>
-                            </div>
-
-                            <p class="text-zinc-300">
-                                <span class="text-green-500">Note:</span> Pure overwrites (like <span class="text-white">pop</span> or <span class="text-white">imm</span>) following each other do not trigger hazards, as they do not depend on the previous register state.
+                    <div class="text-[11px] space-y-4">
+                        <div>
+                            <strong class="text-zinc-200 block mb-1">Read-After-Write Latency</strong>
+                            <p class="text-zinc-500 mb-2">
+                                Registers generally update in the <b>WriteBack</b> (Final) stage. Reading a register immediately after writing it usually yields the <b>OLD</b> value.
                             </p>
                         </div>
-                    </section>
+                    </div>
+                </section>
+                    
+                <section>
+                    <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">Assignments</h3>
+                    <div class="grid grid-cols-[60px_100px_1fr] gap-y-2 text-zinc-400 border-b border-zinc-800/50 pb-4">
+                        <div class="text-[9px] uppercase text-zinc-600">Op</div>
+                        <div class="text-[9px] uppercase text-zinc-600">Syntax</div>
+                        <div class="text-[9px] uppercase text-zinc-600">Effect</div>
+
+                        <span class="text-[var(--color-schematic-primary)]">imm</span>
+                        <span class="text-white">imm A B</span> 
+                        <span>Set Register <b>A</b> to value <b>B</b>.</span>
+
+                        <span class="text-[var(--color-schematic-primary)]">mov</span>
+                        <span class="text-white">mov A B</span> 
+                        <span>Copy value from Register <b>B</b> to <b>A</b>.</span>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">Math & Logic</h3>
+                    <div class="grid grid-cols-[60px_100px_1fr] gap-y-2 text-zinc-400 border-b border-zinc-800/50 pb-4">
                         
-                    <section>
-                        <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">Assignments</h3>
-                        <div class="grid grid-cols-[60px_100px_1fr] gap-y-2 text-zinc-400 border-b border-zinc-800/50 pb-4">
-                            <div class="text-[9px] uppercase text-zinc-600">Op</div>
-                            <div class="text-[9px] uppercase text-zinc-600">Syntax</div>
-                            <div class="text-[9px] uppercase text-zinc-600">Effect</div>
+                        <span class="text-[var(--color-schematic-primary)]">add</span>
+                        <span class="text-white">add A B</span> 
+                        <span><b>A</b> = <b>A</b> + <b>B</b></span>
 
-                            <span class="text-[var(--color-schematic-primary)]">imm</span>
-                            <span class="text-white">imm A B</span> 
-                            <span>Set Register <b>A</b> to value <b>B</b>.</span>
+                        <span class="text-[var(--color-schematic-primary)]">addc</span>
+                        <span class="text-white">addc A B</span> 
+                        <span><b>A</b> = <b>A</b> + <b>B</b> + <b>Overflow Flag</b> (from prev op)</span>
 
-                            <span class="text-[var(--color-schematic-primary)]">mov</span>
-                            <span class="text-white">mov A B</span> 
-                            <span>Copy value from Register <b>B</b> to <b>A</b>.</span>
+                        <span class="text-[var(--color-schematic-primary)]">sub</span>
+                        <span class="text-white">sub A B</span> 
+                        <span><b>A</b> = <b>A</b> - <b>B</b></span>
+
+                        <span class="text-[var(--color-schematic-primary)]">and</span>
+                        <span class="text-white">and A B</span> 
+                        <span><b>A</b> = <b>A</b> &amp; <b>B</b> (Bitwise AND)</span>
+
+                        <span class="text-[var(--color-schematic-primary)]">or</span>
+                        <span class="text-white">or A B</span> 
+                        <span><b>A</b> = <b>A</b> | <b>B</b> (Bitwise OR)</span>
+
+                        <span class="text-[var(--color-schematic-primary)]">xor</span>
+                        <span class="text-white">xor A B</span> 
+                        <span><b>A</b> = <b>A</b> ^ <b>B</b> (Bitwise XOR)</span>
+
+                        <span class="text-[var(--color-schematic-primary)]">shr</span>
+                        <span class="text-white">shr A B</span> 
+                        <span><b>A</b> = <b>B</b> shifted right by 1.</span>
+
+                        <span class="text-[var(--color-schematic-primary)]">not</span>
+                        <span class="text-white">not A B</span> 
+                        <span><b>A</b> = Inverted bits of <b>B</b></span>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">ALU Prefixes (U, X)</h3>
+                    <p class="text-zinc-500 mb-4 text-[11px]">
+                        Prefix <strong>any</strong> Math or Logic op (ADD, SUB, XOR, etc) to change the operands.
+                    </p>
+
+                    <div class="grid grid-cols-[40px_80px_1fr] gap-y-3 text-zinc-400 border-b border-zinc-800/50 pb-4 items-center">
+                        <span class="text-zinc-600 text-[9px] uppercase">Prefix</span>
+                        <span class="text-zinc-600 text-[9px] uppercase">Example</span>
+                        <span class="text-zinc-600 text-[9px] uppercase">Behavior</span>
+
+                        <span class="text-zinc-500">-</span>
+                        <span class="text-white">add A B</span> 
+                        <div class="flex flex-col">
+                            <span class="text-zinc-300">A = A + B</span>
+                            <span class="text-[10px] text-zinc-500">Standard. Updates A & ACC.</span>
                         </div>
-                    </section>
 
-                    <section>
-                        <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">Math & Logic</h3>
-                        <div class="grid grid-cols-[60px_100px_1fr] gap-y-2 text-zinc-400 border-b border-zinc-800/50 pb-4">
-                            
-                            <span class="text-[var(--color-schematic-primary)]">add</span>
-                            <span class="text-white">add A B</span> 
-                            <span><b>A</b> = <b>A</b> + <b>B</b></span>
-
-                            <span class="text-[var(--color-schematic-primary)]">addc</span>
-                            <span class="text-white">addc A B</span> 
-                            <span><b>A</b> = <b>A</b> + <b>B</b> + <b>Overflow Flag</b> (from prev op)</span>
-
-                            <span class="text-[var(--color-schematic-primary)]">sub</span>
-                            <span class="text-white">sub A B</span> 
-                            <span><b>A</b> = <b>A</b> - <b>B</b></span>
-
-                            <span class="text-[var(--color-schematic-primary)]">and</span>
-                            <span class="text-white">and A B</span> 
-                            <span><b>A</b> = <b>A</b> &amp; <b>B</b> (Bitwise AND)</span>
-
-                            <span class="text-[var(--color-schematic-primary)]">or</span>
-                            <span class="text-white">or A B</span> 
-                            <span><b>A</b> = <b>A</b> | <b>B</b> (Bitwise OR)</span>
-
-                            <span class="text-[var(--color-schematic-primary)]">xor</span>
-                            <span class="text-white">xor A B</span> 
-                            <span><b>A</b> = <b>A</b> ^ <b>B</b> (Bitwise XOR)</span>
-
-                            <span class="text-[var(--color-schematic-primary)]">shr</span>
-                            <span class="text-white">shr A B</span> 
-                            <span><b>A</b> = <b>B</b> shifted right by 1.</span>
-
-                            <span class="text-[var(--color-schematic-primary)]">not</span>
-                            <span class="text-white">not A B</span> 
-                            <span><b>A</b> = Inverted bits of <b>B</b></span>
+                        <span class="text-[var(--color-schematic-primary)]">U</span>
+                        <span class="text-white">uadd A B</span> 
+                        <div class="flex flex-col">
+                            <span class="text-zinc-300">A = ACC + B</span>
+                            <span class="text-[10px] text-zinc-500">Chain calculation. Uses ACC input.</span>
                         </div>
-                    </section>
 
-                    <section class="bg-blue-900/10 border border-blue-900/30 p-4 rounded-md mt-4">
-                        <h3 class="text-blue-400 font-bold mb-3 uppercase tracking-widest text-[10px]">Instruction Variations (U, X)</h3>
-                        <p class="text-blue-300/70 mb-4 text-[11px]">
-                            Math and Logic operations can be prefixed to change how they interact with the <b>Accumulator (ACC)</b> and <b>Registers</b>.
-                        </p>
-                        
-                        <div class="grid gap-3 text-[11px]">
-                            <div class="grid grid-cols-[80px_1fr] gap-2">
-                                <code class="text-white bg-zinc-800 px-1 rounded text-center">No Prefix</code>
-                                <span class="text-zinc-400"><b>add R1 R2</b>: Reads R1 and R2, stores result in <b>ACC</b> AND <b>R1</b>.</span>
-                            </div>
-                            <div class="grid grid-cols-[80px_1fr] gap-2">
-                                <code class="text-white bg-zinc-800 bg-zinc-800 px-1 rounded text-center">U </code>
-                                <span class="text-zinc-400"><b>uadd R1 R2</b>: Uses <b>ACC</b> as Operand A instead of R1. Stores result in <b>ACC</b> and <b>R1</b>.</span>
-                            </div>
-                            <div class="grid grid-cols-[80px_1fr] gap-2">
-                                <code class="text-white bg-zinc-800 bg-zinc-800 px-1 rounded text-center">X</code>
-                                <span class="text-zinc-400"><b>xadd R0 R2</b>: Uses <b>ACC</b> as Operand A. Result goes to <b>ACC ONLY</b>. Register A is ignored (useful for comparisons).</span>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section>
-                        <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">Memory (RAM)</h3>
-                        <div class="grid grid-cols-[60px_100px_1fr] gap-y-2 text-zinc-400 border-b border-zinc-800/50 pb-4">
-                            
-                            <span class="text-[var(--color-schematic-primary)]">store</span>
-                            <span class="text-white">store A B</span> 
-                            <span>Save Register <b>B</b> into Memory Address <b>A</b>.</span>
-
-                            <span class="text-[var(--color-schematic-primary)]">load</span>
-                            <span class="text-white">load A B</span> 
-                            <span>Load Memory Address <b>B</b> into Register <b>A</b>.</span>
-                        </div>
-                    </section>
-
-                    <section>
-                        <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">Flow Control</h3>
-                        <div class="grid grid-cols-[60px_100px_1fr] gap-y-2 text-zinc-400 border-b border-zinc-800/50 pb-4">
-                            
-                            <span class="text-[var(--color-schematic-primary)]">jmp</span>
-                            <span class="text-white">jmp A</span> 
-                            <span>Jump to Line Number <b>A</b>.</span>
-
-                            <span class="text-[var(--color-schematic-primary)]">bie</span>
-                            <span class="text-white">bie A</span> 
-                            <span>Jump to <b>A</b> if Equal (==).</span>
-
-                            <span class="text-[var(--color-schematic-primary)]">big</span>
-                            <span class="text-white">big A</span> 
-                            <span>Jump to <b>A</b> if Greater (&gt;).</span>
-
-                            <span class="text-[var(--color-schematic-primary)]">bil</span>
-                            <span class="text-white">bil A</span> 
-                            <span>Jump to <b>A</b> if Less (&lt;).</span>
-
-                            <span class="text-[var(--color-schematic-primary)]">bio</span>
-                            <span class="text-white">bio A</span> 
-                            <span>Jump to <b>A</b> if Overflow.</span>
-
-                            <span class="text-[var(--color-schematic-primary)]">call</span>
-                            <span class="text-white">call A</span> 
-                            <span>Run Function at Line <b>A</b>.</span>
-
-                            <span class="text-[var(--color-schematic-primary)]">ret</span>
-                            <span class="text-white">ret</span> 
-                            <span>Return from function.</span>
-                        </div>
-                    </section>
-
-                    <section>
-                        <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">System & I/O</h3>
-                        <div class="grid grid-cols-[60px_100px_1fr] gap-y-2 text-zinc-400">
-                            
-                            <span class="text-[var(--color-schematic-primary)]">out</span>
-                            <span class="text-white">out A B</span> 
-                            <span>Send Register <b>B</b> to Port <b>A</b> (%0-%7).</span>
-
-                            <span class="text-[var(--color-schematic-primary)]">rout</span>
-                            <span class="text-white">rout A B</span> 
-                            <span>Send Register <b>B</b> to Port in Register <b>A</b> (%0-%7).</span>
-
-                            <span class="text-[var(--color-schematic-primary)]">inp</span>
-                            <span class="text-white">inp A</span> 
-                            <span>Wait for user input, store in Register <b>A</b>.</span>
-
-                            <span class="text-[var(--color-schematic-primary)]">push</span>
-                            <span class="text-white">push A</span> 
-                            <span>Push Register <b>A</b> onto Stack.</span>
-
-                            <span class="text-[var(--color-schematic-primary)]">pop</span>
-                            <span class="text-white">pop A</span> 
-                            <span>Pop Stack into Register <b>A</b>.</span>
-
-                            <span class="text-[var(--color-schematic-primary)]">noop</span>
-                            <span class="text-white">noop</span> 
-                            <span>No Operation (Do nothing).</span>
-                        </div>
-                    </section>
-                    <section class="bg-zinc-950/50 border border-zinc-800 p-4 rounded-md mb-6">
-                    <h3 class="text-zinc-500 font-bold mb-3 uppercase tracking-widest text-[10px]">Compilation & Validation</h3>
-                    <div class="space-y-3 text-[11px]">
-                        <div>
-                            <strong class="text-red-400 block mb-1">ERRORS</strong>
-                            <p class="text-zinc-400">Syntax errors, invalid mnemonics, or illegal characters. Errors prevent the program from loading into ROM.</p>
-                        </div>
-                        <div>
-                            <strong class="text-amber-400 block mb-1">WARNINGS</strong>
-                            <p class="text-zinc-400">Code that is technically valid but may result in unintended behavior, such as writing to <span class="text-white">R0</span>, memory/port out-of-bounds, or pipeline hazards.</p>
+                        <span class="text-[var(--color-schematic-primary)]">X</span>
+                        <span class="text-white">xadd A B</span> 
+                        <div class="flex flex-col">
+                            <span class="text-zinc-300">ACC = ACC + B</span>
+                            <span class="text-[10px] text-zinc-500">Compare only. <b>A</b> is unchanged.</span>
                         </div>
                     </div>
                 </section>
 
-                
-                </div>
+                <section>
+                    <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">Memory (RAM)</h3>
+                    <div class="grid grid-cols-[60px_100px_1fr] gap-y-2 text-zinc-400 border-b border-zinc-800/50 pb-4">
+                        
+                        <span class="text-[var(--color-schematic-primary)]">store</span>
+                        <span class="text-white">store A B</span> 
+                        <span>Save Register <b>B</b> into Memory Address <b>A</b>.</span>
 
+                        <span class="text-[var(--color-schematic-primary)]">load</span>
+                        <span class="text-white">load A B</span> 
+                        <span>Load Memory Address <b>B</b> into Register <b>A</b>.</span>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">Flow Control</h3>
+                    <div class="grid grid-cols-[60px_100px_1fr] gap-y-2 text-zinc-400 border-b border-zinc-800/50 pb-4">
+                        
+                        <span class="text-[var(--color-schematic-primary)]">jmp</span>
+                        <span class="text-white">jmp A</span> 
+                        <span>Jump to Line Number <b>A</b>.</span>
+
+                        <span class="text-[var(--color-schematic-primary)]">bie</span>
+                        <span class="text-white">bie A</span> 
+                        <span>Jump to <b>A</b> if Equal (==).</span>
+
+                        <span class="text-[var(--color-schematic-primary)]">big</span>
+                        <span class="text-white">big A</span> 
+                        <span>Jump to <b>A</b> if Greater (&gt;).</span>
+
+                        <span class="text-[var(--color-schematic-primary)]">bil</span>
+                        <span class="text-white">bil A</span> 
+                        <span>Jump to <b>A</b> if Less (&lt;).</span>
+
+                        <span class="text-[var(--color-schematic-primary)]">bio</span>
+                        <span class="text-white">bio A</span> 
+                        <span>Jump to <b>A</b> if Overflow.</span>
+
+                        <span class="text-[var(--color-schematic-primary)]">call</span>
+                        <span class="text-white">call A</span> 
+                        <span>Run Function at Line <b>A</b>.</span>
+
+                        <span class="text-[var(--color-schematic-primary)]">ret</span>
+                        <span class="text-white">ret</span> 
+                        <span>Return from function.</span>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">System & I/O</h3>
+                    <div class="grid grid-cols-[60px_100px_1fr] gap-y-2 text-zinc-400">
+                        
+                        <span class="text-[var(--color-schematic-primary)]">out</span>
+                        <span class="text-white">out A B</span> 
+                        <span>Send Register <b>B</b> to Port <b>A</b> (%0-%7).</span>
+
+                        <span class="text-[var(--color-schematic-primary)]">rout</span>
+                        <span class="text-white">rout A B</span> 
+                        <span>Send Register <b>B</b> to Port in Register <b>A</b> (%0-%7).</span>
+
+                        <span class="text-[var(--color-schematic-primary)]">inp</span>
+                        <span class="text-white">inp A</span> 
+                        <span>Wait for user input, store in Register <b>A</b>.</span>
+
+                        <span class="text-[var(--color-schematic-primary)]">push</span>
+                        <span class="text-white">push A</span> 
+                        <span>Push Register <b>A</b> onto Stack.</span>
+
+                        <span class="text-[var(--color-schematic-primary)]">pop</span>
+                        <span class="text-white">pop A</span> 
+                        <span>Pop Stack into Register <b>A</b>.</span>
+
+                        <span class="text-[var(--color-schematic-primary)]">noop</span>
+                        <span class="text-white">noop</span> 
+                        <span>No Operation (Do nothing).</span>
+                    </div>
+                </section>
+
+                <section class="bg-emerald-900/10 border border-emerald-900/30 p-4 rounded-md mt-6">
+                    <h3 class="text-emerald-400 font-bold mb-3 uppercase tracking-widest text-[10px]">Pro Tips & Patterns</h3>
+                    
+                    <div class="space-y-4 text-[11px]">
+                        <div>
+                            <strong class="text-zinc-200 block mb-1">Non-Destructive Compare</strong>
+                            <p class="text-zinc-400">
+                                Use the <b>X</b> prefix to compare registers without overwriting them. 
+                                <br><code class="text-emerald-300">xsub R0 R2</code> subtracts R2 from the Accumulator (loaded from previous op) but discards the result, setting only the flags for branching.
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <strong class="text-zinc-200 block mb-1">The Zero Register (R0)</strong>
+                            <p class="text-zinc-400">
+                                <b>R0</b> is hardwired to 0. Use it as a source for clearing registers (<code class="text-emerald-300">mov R1 R0</code>) or for comparisons (<code class="text-emerald-300">sub R1 R0</code> checks if R1 is 0).
+                            </p>
+                        </div>
+
+                        <div>
+                            <strong class="text-zinc-200 block mb-1">Multiplication</strong>
+                            <p class="text-zinc-400">
+                                There is no MUL instruction. You must implement multiplication via repeated addition loops.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="bg-zinc-950/50 border border-zinc-800 p-4 rounded-md mb-6 mt-6">
+                <h3 class="text-zinc-500 font-bold mb-3 uppercase tracking-widest text-[10px]">Compilation & Validation</h3>
+                <div class="space-y-3 text-[11px]">
+                    <div>
+                        <strong class="text-red-400 block mb-1">ERRORS</strong>
+                        <p class="text-zinc-400">Syntax errors, invalid mnemonics, or illegal characters.</p>
+                    </div>
+                    <div>
+                        <strong class="text-amber-400 block mb-1">WARNINGS</strong>
+                        <p class="text-zinc-400">Code that is technically valid but may result in unintended behavior, such as writing to <span class="text-white">R0</span>, memory/port out-of-bounds, or pipeline hazards.</p>
+                    </div>
+                </div>
+            </section>
+
+            
             </div>
+
         </div>
-    {/if}
+    </div>
+{/if}
 
     <div class="flex flex-col gap-2 h-full min-h-0" >
         <div class="flex flex-wrap items-center justify-between border-b border-zinc-800 pb-2 gap-2 shrink-0">
             <div class="flex items-center gap-2">
                 <span class="text-sm font-mono text-[var(--color-schematic-primary)] font-bold">Select ROM -></span>
                 <select onchange={loadExample} class="bg-zinc-950 text-[11px] text-zinc-400 border border-zinc-800 p-2 rounded font-mono outline-none">
-                    <option value="Intro">Intro</option>
+                    <option value="Intro">Graphics Test</option>
                     <option value="Fibonacci">Fibonacci</option>
                     <option value="Recursive Sum">Recursive Sum</option>
                     <option value="Factorial">Factorial</option>
