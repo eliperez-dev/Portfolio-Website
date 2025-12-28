@@ -1492,7 +1492,7 @@ update_ram_2:
         <div class="flex flex-wrap items-center justify-between border-b border-zinc-800 pb-2 gap-2 shrink-0">
             <div class="flex items-center gap-2">
                 <span class="text-sm font-mono text-[var(--color-schematic-primary)] font-bold">Select ROM -></span>
-                <select onchange={loadExample} class="bg-zinc-950 text-[11px] text-zinc-400 border border-zinc-800 py-0.5 px-0 rounded font-mono outline-none">
+                <select onchange={loadExample} class="bg-zinc-950 text-[10px] text-zinc-300 border border-zinc-700 px-2 py-1 font-mono outline-none hover:border-zinc-500 transition-colors cursor-pointer">
                     <option value="Intro">Graphics Test</option>
                     <option value="Fibonacci">Fibonacci</option>
                     <option value="Recursive Sum">Recursive Sum</option>
@@ -1508,7 +1508,7 @@ update_ram_2:
                 <button onclick={toggleRun} class="px-2 py-1 bg-[var(--color-schematic-primary)] text-black text-[10px] font-mono font-bold hover:bg-white transition-colors">{isRunning ? 'PAUSE' : 'RUN'}</button>
                 <button onclick={step} class="px-2 py-1 border border-zinc-700 text-zinc-300 text-[10px] font-mono hover:border-zinc-500 transition-colors">STEP</button>
                 <button onclick={reset} class="px-2 py-1 border border-zinc-700 text-zinc-300 text-[10px] font-mono hover:border-zinc-500 transition-colors">RESET</button>
-                <div class="relative">
+                <div class="relative flex">
                     <button 
                         onclick={() => clockMenuOpen = !clockMenuOpen} 
                         class="px-2 py-1 border border-zinc-700 text-zinc-300 text-[10px] font-mono hover:border-zinc-500 transition-colors min-w-[80px] text-center"
@@ -1531,7 +1531,7 @@ update_ram_2:
                             <button onclick={() => setClock(100)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 hover:text-white">100 Hz</button>
                             <button onclick={() => setClock(1000)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 hover:text-white">1 kHz</button>
                             <button onclick={() => setClock(100000)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 hover:text-white">100 kHz</button>
-                            <button onclick={() => setClock(-1)} class="text-left px-3 py-2 text-[10px] font-mono text-[var(--color-schematic-primary)] font-bold hover:bg-zinc-800 hover:text-white border-t border-zinc-700">MAX SPEED (Bench)</button>
+                            <button onclick={() => setClock(-1)}     class="text-left px-3 py-2 text-[10px] font-mono text-[var(--color-schematic-primary)] font-bold hover:bg-zinc-800 hover:text-white border-zinc-700">MAX Mhz</button>
                         </div>
                     {/if}
                 </div>
