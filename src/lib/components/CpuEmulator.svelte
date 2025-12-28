@@ -413,7 +413,92 @@ out %8 R1
 store #20 R1
 
 ; Loop
-jmp start`
+jmp start`,
+        "64-bit Counter!!!" : `; 64-Bit Hybrid Counter
+; Counts to 9,223,372,036,854,775,807.
+; Low 40 bits in Registers (R1-R5)
+; High 24 bits in RAM (@0-@2)
+
+; Repersented using all 8 ports on 
+; the display.
+
+; This is the ultimate stress test.
+; Run at MAX clock speed to push the
+; limits of this rust/wasm emulator. 
+
+start:
+    imm R1 0    ; Reset Counter Byte 1 (Low)
+    imm R2 0    ; Reset Counter Byte 2
+    imm R3 0    ; Reset Counter Byte 3
+    imm R4 0    ; Reset Counter Byte 4
+    imm R5 0    ; Reset Counter Byte 5
+    imm R6 1    ; Set Incrementer (Constant 1)
+    imm R7 0    ; Set Temp/Swap to 0
+    noop
+    store @0 R7 ; Clear RAM Byte 6
+    store @1 R7 ; Clear RAM Byte 7
+    store @2 R7 ; Clear RAM Byte 8
+    noop        ; Pipeline Buffer
+    noop        ; Pipeline Buffer
+
+loop:
+    ; --- DISPLAY PHASE (READS) ---
+    out %0 R1
+    out %1 R2
+    out %2 R3
+    out %3 R4
+    out %4 R5
+
+    ; Load & Display RAM Bytes
+    load R7 @0
+    noop
+    out %5 R7
+    load R7 @1
+    noop
+    out %6 R7
+    load R7 @2
+    noop
+    out %7 R7
+
+    ; --- MATH PHASE (WRITES) ---
+    add R1 R6   ; R1 + 1
+    addc R2 R0  ; Propagate Carry
+    addc R3 R0
+    addc R4 R0
+    addc R5 R0
+
+    ; --- MEMORY EXTENSION ---
+    bio update_ram_0   ; If R5 overflows, handle RAM
+    noop               ; Safety Buffer
+    noop               ; Safety Buffer
+    jmp loop
+
+update_ram_0:
+    load R7 @0         ; Fetch Byte 6
+    noop
+    add R7 R6          ; Increment
+    noop
+    store @0 R7        ; Save
+    bio update_ram_1   ; If Byte 6 overflows, ripple up
+    jmp loop
+
+update_ram_1:
+    load R7 @1         ; Fetch Byte 7
+    noop
+    add R7 R6          ; Increment
+    noop
+    store @1 R7        ; Save
+    noop
+    bio update_ram_2   ; If Byte 7 overflows, ripple up
+    jmp loop
+
+update_ram_2:
+    load R7 @2         ; Fetch Byte 8 (Top)
+    noop
+    add R7 R6          ; Increment
+    noop
+    store @2 R7        ; Save
+    jmp loop`
 };
     
     // --- 3. PARSER LOGIC (UI HELPERS) ---
@@ -773,13 +858,13 @@ jmp start`
     }
     
     function getClockLabel() {
-        if (tickDelay === 1000) return "1Hz";
-        if (tickDelay === 100) return "10Hz";
-        if (tickDelay === 10) return "100Hz";
-        if (tickDelay === 1) return "1kHz";
-        if (tickDelay === 0.01) return "100kHz";
+        if (tickDelay === 1000) return "1.00Hz";
+        if (tickDelay === 100) return "10.00Hz";
+        if (tickDelay === 10) return "100.00Hz";
+        if (tickDelay === 1) return "1.00kHz";
+        if (tickDelay === 0.01) return "100.00kHz";
         if (tickDelay === 0) return "MAX";
-        return "10Hz";
+        return "10.00Hz";
     }
 
     function toggleRun() {
@@ -871,8 +956,8 @@ jmp start`
     }
 
     function formatHz(hz: number) {
-        if (hz < 1000) return `${Math.round(hz)} Hz`;
-        if (hz < 1000000) return `${(hz / 1000).toFixed(1)} kHz`;
+        if (hz < 1000) return `${hz.toFixed(2)} Hz`;
+        if (hz < 1000000) return `${(hz / 1000).toFixed(2)} kHz`;
         return `${(hz / 1000000).toFixed(2)} MHz`;
     }
 
@@ -1407,13 +1492,13 @@ jmp start`
         <div class="flex flex-wrap items-center justify-between border-b border-zinc-800 pb-2 gap-2 shrink-0">
             <div class="flex items-center gap-2">
                 <span class="text-sm font-mono text-[var(--color-schematic-primary)] font-bold">Select ROM -></span>
-                <select onchange={loadExample} class="bg-zinc-950 text-[11px] text-zinc-400 border border-zinc-800 p-2 rounded font-mono outline-none">
+                <select onchange={loadExample} class="bg-zinc-950 text-[11px] text-zinc-400 border border-zinc-800 py-0.5 px-0 rounded font-mono outline-none">
                     <option value="Intro">Graphics Test</option>
                     <option value="Fibonacci">Fibonacci</option>
                     <option value="Recursive Sum">Recursive Sum</option>
                     <option value="Factorial">Factorial</option>
                     <option value="16-bit Counter">16-bit Counter</option>
-                    <option value="Memory Test">Input & Memory</option>
+                    <option value="64-bit Counter!!!">64-bit Counter!!</option>
                     <option value="Hazards Test">Hazards Test</option>
                 </select>
                 <button onclick={() => showDocs = !showDocs} class="ml-2 px-3 py-2 bg-zinc-800 text-zinc-200 text-xs font-mono font-bold hover:bg-zinc-700 rounded border border-zinc-700">DOCS</button>
