@@ -326,8 +326,8 @@ ret`,
 ; Can calulate up to Sum(7) before a
 ; stack overflow occurs.
 
-; NOTE: This one takes a while, so
-; at 10hz, so i reccomend increasing
+; NOTE: This one takes a while
+; at 10hz, so I reccomend increasing
 ; the clock speed to 100hz.
 
 start:
@@ -363,8 +363,8 @@ ret`,
 ; Counts from 0 to 65535 using ADDC
 ; R1 = Low Byte, R2 = High Byte
 
-; NOTE: This one takes a while, so
-; at 10hz, so i reccomend increasing
+; NOTE: This one takes a while
+; at 10hz, so I reccomend increasing
 ; the clock speed to 100hz or higher.
 
 start:
@@ -1511,7 +1511,7 @@ update_ram_2:
                 <div class="relative">
                     <button 
                         onclick={() => clockMenuOpen = !clockMenuOpen} 
-                        class="px-2 py-1 border border-zinc-700 text-zinc-300 text-[10px] font-mono hover:border-zinc-500 transition-colors min-w-[100px] text-center"
+                        class="px-2 py-1 border border-zinc-700 text-zinc-300 text-[10px] font-mono hover:border-zinc-500 transition-colors min-w-[80px] text-center"
                     >
                         {#if isRunning && actualHz > 0}
                              {formatHz(actualHz)}
