@@ -1,4 +1,4 @@
-use wasm_bindgen::prelude::*;
+duse wasm_bindgen::prelude::*;
 use serde::{Serialize, Deserialize};
 use std::collections::HashMap;
 

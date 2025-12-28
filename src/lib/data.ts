@@ -27,12 +27,12 @@ export const projects: Project[] = [
         slug: "nuclear-telemetry-sprint",
         title: "Nuclear Safety Telemetry System",
         subtitle: "High-frequency Async Rust interface for Industrial PLCs",
-        description: "A mission-critical telemetry interface built during a 9-hour engineering sprint for Valar Atomics. The system interfaces with triple-redundant safety PLCs using the EtherNet/IP protocol to stream real-time voltage and status data.",
+        description: "A mission-critical telemetry interface built during a 9-hour engineering sprint for Valar Atomics. The system interfaces with triple-redundant safety PLCs to stream real-time data from neutron flux detectors and seismometers.",
         technologies: ["Rust", "Tokio (Async)", "EtherNet/IP (CIP)", "Allen Bradley PLCs", "Industrial Automation"],
         features: [
             "Engineered a custom EtherNet/IP client in Async Rust",
             "Achieved sub-10ms latency communication with Safety PLCs",
-            "Implemented robust error handling for industrial packet loss"
+            "Reverse-engineered proprietary tag structures by calculating byte offsets"
         ],
         links: {
             
@@ -40,13 +40,13 @@ export const projects: Project[] = [
         overview: "During an intensive on-site engineering sprint at Valar Atomics, I was tasked with building a fault-tolerant bridge between modern software infrastructure and industrial hardware. In under 9 hours, I reverse-engineered the tag structure of an Allen Bradley Safety PLC and wrote a performant Rust driver to extract critical telemetry data.",
         challenges: [
             "Interfacing modern Async Rust (Tokio) with the synchronous, legacy EtherNet/IP industrial protocol",
-            "Parsing complex Common Industrial Protocol (CIP) binary packets",
+            "Parsing complex Common Industrial Protocol (CIP) binary packets without standard drivers",
             "Delivering a working, crash-resistant prototype within a strict single-day deadline"
         ],
         outcomes: [
             "Successfully established two-way communication with the Safety PLC hardware",
             "Demonstrated the viability of using Rust for safety-critical nuclear instrumentation",
-            "Built a diagnostic TUI (Terminal User Interface) to visualize 'Alpha', 'Beta', and 'Gamma' redundant voltage readings in real-time"
+            "Built a diagnostic TUI to visualize 'Alpha', 'Beta', and 'Gamma' redundant voltage readings in real-time"
         ],
         gallery: {
             path: "valar-sprint",
@@ -62,7 +62,7 @@ export const projects: Project[] = [
         technologies: ["Rust", "Custom Assembly", "WebAssembly", "SvelteKit", "Redstone Logic"],
         features: [
             "Custom 8-bit ISA ('Electron 2') with raw pipeline architecture",
-            "Rust toolchain (Assembler/Emulator) performing static analysis",
+            "Rust toolchain (Assembler/Emulator) performing static analysis for data hazards",
             "In-browser visual debugger via WebAssembly and SvelteKit"
         ],
         links: {
@@ -93,8 +93,8 @@ export const projects: Project[] = [
         technologies: ["Rust", "Axum", "Python", "Shuttle", "Leaflet.js", "ETL Pipelines"],
         features: [
             "Serves 56,000+ documented facilities to 3,000+ monthly users",
-            "High-performance RESTful API engineered in Rust (Axum)",
-            "Robust Python ETL pipelines to aggregate and clean disparate data"
+            "High-performance Rust API utilizing Brotli compression and aggressive caching",
+            "Delivers massive geospatial datasets in a highly optimized 2.7MB payload"
         ],
         links: {
             live: "https://www.untileverycage.org/",
