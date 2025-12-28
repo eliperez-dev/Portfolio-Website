@@ -172,6 +172,9 @@ out %4 R4
 out %5 R5
 out %6 R6
 out %7 R6
+noop
+noop
+noop
 
 ; --- Cylon Scanline ---
 imm R1 255  ; Full Row ON
