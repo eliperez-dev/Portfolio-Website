@@ -248,7 +248,8 @@ jmp loop`,
 ; Limitations: Max input is 5 (6! = 720, which overflows 8-bit limit of 255)
 
 ; NOTE: This one takes a while, so
-; be patient.
+; at 10hz, so i reccomend increasing
+; the clock speed to 100hz.
 
 start:
 imm R1 5      ; Calculate Factorial(5)
@@ -324,7 +325,8 @@ ret`,
 ; stack overflow occurs.
 
 ; NOTE: This one takes a while, so
-; be patient.
+; at 10hz, so i reccomend increasing
+; the clock speed to 100hz.
 
 start:
 imm R1 5      ; Calculate Sum(5)
@@ -357,11 +359,14 @@ ret`,
 
     "16-bit Counter": `; 16-bit Counter
 ; Counts from 0 to 65535 using ADDC
-; in steps of 64 to save time.
 ; R1 = Low Byte, R2 = High Byte
 
+; NOTE: This one takes a while, so
+; at 10hz, so i reccomend increasing
+; the clock speed to 100hz or higher.
+
 start:
-imm R3 64    ; Add 64
+imm R3 1    ; Add 1
 
 loop:
 out %0 R1   ; Show Low Byte
@@ -531,6 +536,11 @@ jmp start`
     let clockMenuOpen = $state(false);
     let lastTime = 0;
     let accumulator = 0;
+    
+    // --- NEW: Speed Monitoring ---
+    let actualHz = $state(0);
+    let cycleCountSinceUpdate = 0;
+    let timeSinceUpdate = 0;
 
     // Default Code
     let code = $state(EXAMPLES["Intro"]);
@@ -750,6 +760,7 @@ jmp start`
         else if (hz === 100) tickDelay = 10;
         else if (hz === 1000) tickDelay = 1;
         else if (hz === 100000) tickDelay = 0.01; // 100kHz = 0.01ms per tick
+        else if (hz === -1) tickDelay = 0; // Max Speed
         clockMenuOpen = false;
     }
     
@@ -759,6 +770,7 @@ jmp start`
         if (tickDelay === 10) return "100Hz";
         if (tickDelay === 1) return "1kHz";
         if (tickDelay === 0.01) return "100kHz";
+        if (tickDelay === 0) return "MAX";
         return "10Hz";
     }
 
@@ -850,6 +862,12 @@ jmp start`
         autoScroll = true; // Reset autoScroll to true on reset
     }
 
+    function formatHz(hz: number) {
+        if (hz < 1000) return `${Math.round(hz)} Hz`;
+        if (hz < 1000000) return `${(hz / 1000).toFixed(1)} kHz`;
+        return `${(hz / 1000000).toFixed(2)} MHz`;
+    }
+
     function loop(timestamp: number = performance.now()) {
         if (!isRunning) return;
         
@@ -861,20 +879,84 @@ jmp start`
         accumulator += cappedDelta;
 
         let cyclesRun = 0;
-        const maxCyclesPerFrame = 200000; // Allow enough cycles for 100kHz (approx 1600 per frame, but gave headroom)
-
-        while (accumulator >= tickDelay && cyclesRun < maxCyclesPerFrame) {
-            accumulator -= tickDelay;
-            cyclesRun++;
-            
-            const interrupted = tick();
-            if (interrupted) return; // Stop loop if input needed
-            if (!isRunning) return; // Stop if paused inside tick
-        }
+        const currentTickDelay = tickDelay; 
         
-        // If we hit max cycles, discard remaining accumulator to catch up
-        if (cyclesRun >= maxCyclesPerFrame) {
-            accumulator = 0;
+        // Dynamic batching: 
+        // If we are running slow (100Hz), check often.
+        // If we are running fast (100kHz), check rarely.
+        const BATCH_SIZE = currentTickDelay < 1 ? 1000 : 1; 
+        
+        // MAX SPEED MODE (tickDelay = 0): Run for 12ms per frame (target 60fps = 16ms)
+        const isMaxSpeed = currentTickDelay === 0;
+        const maxTimeBudget = 12; // ms
+        const startTime = performance.now();
+
+        if (!emulator) {
+            initEmulator();
+            if (!emulator) return;
+        }
+        const emu = emulator!;
+
+        if (isMaxSpeed) {
+             // Adaptive Batching: Target ~1ms of execution per batch based on recent speed
+             // At 30MHz, this becomes ~30,000. At 1MHz, ~1,000. 
+             // Minimum 1000 to ensure we don't thrash on startup.
+             const adaptiveBatch = Math.max(1000, Math.floor(actualHz / 1000));
+             
+             while (performance.now() - startTime < maxTimeBudget) {
+                // Run a tight batch
+                for (let i = 0; i < adaptiveBatch; i++) {
+                    emu.clock();
+                }
+                cyclesRun += adaptiveBatch;
+                
+                // Check state occasionally
+                 const state = emu.get_state();
+                if (state.waiting_for_input) {
+                    handleInputInterrupt();
+                    return; 
+                }
+                if (!isRunning) return;
+             }
+             // Clear accumulator since we are just running as fast as possible
+             accumulator = 0;
+        } else {
+            const maxCyclesPerFrame = 200000; 
+
+            while (accumulator >= currentTickDelay && cyclesRun < maxCyclesPerFrame) {
+                const potentialCycles = Math.floor(accumulator / currentTickDelay);
+                const count = Math.min(potentialCycles, maxCyclesPerFrame - cyclesRun, BATCH_SIZE);
+                
+                if (count <= 0) break;
+
+                for (let i = 0; i < count; i++) {
+                    emu.clock();
+                }
+
+                accumulator -= count * currentTickDelay;
+                cyclesRun += count;
+                
+                // Check state
+                if (count > 0) {
+                     const state = emu.get_state();
+                     if (state.waiting_for_input) {
+                         handleInputInterrupt();
+                         return; 
+                     }
+                     if (!isRunning) return;
+                }
+            }
+            
+             if (cyclesRun >= maxCyclesPerFrame) accumulator = 0;
+        }
+
+        // --- Stats Update ---
+        cycleCountSinceUpdate += cyclesRun;
+        timeSinceUpdate += deltaTime;
+        if (timeSinceUpdate >= 500) { // Update every 500ms
+             actualHz = (cycleCountSinceUpdate / timeSinceUpdate) * 1000;
+             cycleCountSinceUpdate = 0;
+             timeSinceUpdate = 0;
         }
 
         if (cyclesRun > 0) {
@@ -1344,10 +1426,19 @@ jmp start`
                             <button onclick={() => setClock(10)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 hover:text-white">10 Hz</button>
                             <button onclick={() => setClock(100)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 hover:text-white">100 Hz</button>
                             <button onclick={() => setClock(1000)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 hover:text-white">1 kHz</button>
-                            <button onclick={() => setClock(100000)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 hover:text-white">100 kHz (Are you insane?)</button>
+                            <button onclick={() => setClock(100000)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 hover:text-white">100 kHz</button>
+                            <button onclick={() => setClock(-1)} class="text-left px-3 py-2 text-[10px] font-mono text-[var(--color-schematic-primary)] font-bold hover:bg-zinc-800 hover:text-white border-t border-zinc-700">MAX SPEED (Bench)</button>
                         </div>
                     {/if}
                 </div>
+                
+                <!-- Speed Monitor -->
+                {#if isRunning}
+                    <div class="px-2 py-1 bg-zinc-900 border border-zinc-800 text-zinc-400 text-[10px] font-mono min-w-[60px] text-center">
+                        {formatHz(actualHz)}
+                    </div>
+                {/if}
+
                 <label 
                     class="px-2 py-1 border border-zinc-700 text-zinc-300 text-[10px] font-mono hover:border-zinc-500 transition-colors flex items-center gap-2 cursor-pointer select-none rounded-[2px]"
                     title="Toggle Auto-Follow Execution"
