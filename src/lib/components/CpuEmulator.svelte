@@ -413,7 +413,7 @@ jmp start`
     function getLineToAddressMap(code: string): (number | string)[] {
         const lines = code.split('\n');
         const map: (number | string)[] = [];
-        let instructionCount = 0;
+        let instructionCount = 0; 
 
         for (let line of lines) {
             // 1. Remove comments
@@ -525,6 +525,12 @@ jmp start`
     // --- NEW: Auto Scroll State ---
     let autoScroll = $state(false); 
     let ignoreScrollEvent = false;
+
+    // --- NEW: Clock Speed State ---
+    let tickDelay = $state(100); // Default 100ms (10Hz)
+    let clockMenuOpen = $state(false);
+    let lastTime = 0;
+    let accumulator = 0;
 
     // Default Code
     let code = $state(EXAMPLES["Intro"]);
@@ -738,6 +744,24 @@ jmp start`
         reset();
     }
 
+    function setClock(hz: number) {
+        if (hz === 1) tickDelay = 1000;
+        else if (hz === 10) tickDelay = 100;
+        else if (hz === 100) tickDelay = 10;
+        else if (hz === 1000) tickDelay = 1;
+        else if (hz === 100000) tickDelay = 0.01; // 100kHz = 0.01ms per tick
+        clockMenuOpen = false;
+    }
+    
+    function getClockLabel() {
+        if (tickDelay === 1000) return "1Hz";
+        if (tickDelay === 100) return "10Hz";
+        if (tickDelay === 10) return "100Hz";
+        if (tickDelay === 1) return "1kHz";
+        if (tickDelay === 0.01) return "100kHz";
+        return "10Hz";
+    }
+
     function toggleRun() {
         if (showInputModal) return; 
         
@@ -747,6 +771,8 @@ jmp start`
              // Then fall through to start running
              setTimeout(() => {
                 isRunning = true;
+                lastTime = performance.now();
+                accumulator = 0;
                 loop();
              }, 0);
              return;
@@ -757,25 +783,33 @@ jmp start`
             if (!emulator) {
                 initEmulator();
             }
+            lastTime = performance.now();
+            accumulator = 0;
             loop();
         } else {
             cancelAnimationFrame(animationId);
         }
     }
     
+    // Single cycle execution without UI updates
+    function tick(): boolean {
+        if (!emulator) return false;
+        emulator.clock();
+        
+        const state = emulator.get_state();
+        if (state.waiting_for_input) {
+            handleInputInterrupt();
+            return true; // Interrupted
+        }
+        return false;
+    }
+
     function step() {
         if (!emulator) initEmulator();
         if (!emulator) return;
         if (showInputModal) return;
 
-        emulator.clock();
-        
-        // Get state to check waiting_for_input
-        const state = emulator!.get_state();
-        if (state.waiting_for_input) {
-            handleInputInterrupt();
-        }
-
+        tick();
         updateStats();
         draw();
     }
@@ -797,6 +831,8 @@ jmp start`
         emulator!.resolve_input(num);
         showInputModal = false;
         isRunning = true;
+        lastTime = performance.now(); // Reset time to avoid jump
+        accumulator = 0;
         loop();
     }
 
@@ -814,13 +850,40 @@ jmp start`
         autoScroll = true; // Reset autoScroll to true on reset
     }
 
-    function loop() {
+    function loop(timestamp: number = performance.now()) {
         if (!isRunning) return;
-        step();
+        
+        const deltaTime = timestamp - lastTime;
+        lastTime = timestamp;
+        
+        // Cap deltaTime to prevent spiral of death if tab was backgrounded
+        const cappedDelta = Math.min(deltaTime, 1000);
+        accumulator += cappedDelta;
+
+        let cyclesRun = 0;
+        const maxCyclesPerFrame = 200000; // Allow enough cycles for 100kHz (approx 1600 per frame, but gave headroom)
+
+        while (accumulator >= tickDelay && cyclesRun < maxCyclesPerFrame) {
+            accumulator -= tickDelay;
+            cyclesRun++;
+            
+            const interrupted = tick();
+            if (interrupted) return; // Stop loop if input needed
+            if (!isRunning) return; // Stop if paused inside tick
+        }
+        
+        // If we hit max cycles, discard remaining accumulator to catch up
+        if (cyclesRun >= maxCyclesPerFrame) {
+            accumulator = 0;
+        }
+
+        if (cyclesRun > 0) {
+            updateStats();
+            draw();
+        }
+
         if (showInputModal) return;
-        animationId = requestAnimationFrame(() => {
-            setTimeout(loop, 100); 
-        });
+        animationId = requestAnimationFrame(loop);
     }
     
     function updateStats() {
@@ -1263,11 +1326,33 @@ jmp start`
                 <button onclick={toggleRun} class="px-2 py-1 bg-[var(--color-schematic-primary)] text-black text-[10px] font-mono font-bold hover:bg-white transition-colors">{isRunning ? 'PAUSE' : 'RUN'}</button>
                 <button onclick={step} class="px-2 py-1 border border-zinc-700 text-zinc-300 text-[10px] font-mono hover:border-zinc-500 transition-colors">STEP</button>
                 <button onclick={reset} class="px-2 py-1 border border-zinc-700 text-zinc-300 text-[10px] font-mono hover:border-zinc-500 transition-colors">RESET</button>
+                <div class="relative">
+                    <button 
+                        onclick={() => clockMenuOpen = !clockMenuOpen} 
+                        class="px-2 py-1 border border-zinc-700 text-zinc-300 text-[10px] font-mono hover:border-zinc-500 transition-colors min-w-[80px]"
+                    >
+                        Clock: {getClockLabel()}
+                    </button>
+                    {#if clockMenuOpen}
+                        <!-- Backdrop to close menu -->
+                        <!-- svelte-ignore a11y_click_events_have_key_events -->
+                        <!-- svelte-ignore a11y_no_static_element_interactions -->
+                        <div class="fixed inset-0 z-40" onclick={() => clockMenuOpen = false}></div>
+                        
+                        <div class="absolute top-full left-0 mt-1 bg-zinc-900 border border-zinc-700 shadow-xl z-50 flex flex-col min-w-[120px]">
+                            <button onclick={() => setClock(1)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 hover:text-white">1 Hz (Real Time)</button>
+                            <button onclick={() => setClock(10)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 hover:text-white">10 Hz</button>
+                            <button onclick={() => setClock(100)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 hover:text-white">100 Hz</button>
+                            <button onclick={() => setClock(1000)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 hover:text-white">1 kHz</button>
+                            <button onclick={() => setClock(100000)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 hover:text-white">100 kHz (Are you insane?)</button>
+                        </div>
+                    {/if}
+                </div>
                 <label 
                     class="px-2 py-1 border border-zinc-700 text-zinc-300 text-[10px] font-mono hover:border-zinc-500 transition-colors flex items-center gap-2 cursor-pointer select-none rounded-[2px]"
                     title="Toggle Auto-Follow Execution"
                 >
-                    FOLLOW CODE EXECUTION
+                    FOLLOW
                     <input 
                         type="checkbox" 
                         bind:checked={autoScroll} 
