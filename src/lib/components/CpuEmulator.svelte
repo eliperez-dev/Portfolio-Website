@@ -298,7 +298,7 @@ RET           ; Return to caller`
         const keywords = [
             "IMM", "MOV", "ADD", "ADDC", "SUB", "OR", "XOR", "AND", "SHR", "NOT",
             "OUT", "INP", "JMP", "BIE", "BIG", "BIL", "BIO", "STORE", "LOAD",
-            "PUSH", "POP", "CALL", "RET", "NOOP", "NOP"
+            "PUSH", "POP", "CALL", "RET", "NOOP", "NOP", "ROUT"
         ];
         
         // Add S, U, X prefixed variants for ALU ops
@@ -328,6 +328,8 @@ RET           ; Return to caller`
 
             // 3. Registers (R0-R7)
             codePart = codePart.replace(/\b(R[0-7])\b/g, '<span class="text-purple-400 font-bold">$1</span>');
+
+            codePart = codePart.replace(/\b(r[0-7])\b/g, '<span class="text-purple-400 font-bold">$1</span>');
 
             // 4. Ports (%0-%7)
             codePart = codePart.replace(/(%[0-7])/g, '<span class="text-orange-400 font-bold">$1</span>');
@@ -1005,6 +1007,10 @@ RET           ; Return to caller`
                             <span class="text-[var(--color-schematic-primary)]">OUT</span>
                             <span class="text-white">OUT A B</span> 
                             <span>Send Register <b>B</b> to Port <b>A</b> (%0-%7).</span>
+
+                            <span class="text-[var(--color-schematic-primary)]">ROUT</span>
+                            <span class="text-white">ROUT A B</span> 
+                            <span>Send Register <b>B</b> to Port in Register <b>A</b> (%0-%7).</span>
 
                             <span class="text-[var(--color-schematic-primary)]">INP</span>
                             <span class="text-white">INP A</span> 
