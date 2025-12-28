@@ -1,4 +1,4 @@
-duse wasm_bindgen::prelude::*;
+use wasm_bindgen::prelude::*;
 use serde::{Serialize, Deserialize};
 use std::collections::HashMap;
 
@@ -158,7 +158,10 @@ impl ALU {
 
         match op {
             Operation::ADD => result = (a_data as i32) + (b_data as i32),
-            Operation::ADDC => result = (a_data as i32) + (b_data as i32) + 1,
+            Operation::ADDC => {
+                let carry = if self.flags.overflow { 1 } else { 0 };
+                result = (a_data as i32) + (b_data as i32) + carry;
+            },
             Operation::SUB => result = (a_data as i32) - (b_data as i32),
             Operation::OR => result = (a_data as i32) | (b_data as i32),
             Operation::XOR => result = (a_data as i32) ^ (b_data as i32),
@@ -173,16 +176,6 @@ impl ALU {
             _ => {}
         }
 
-        // Flags
-        self.flags.equals = a_data == b_data;
-        self.flags.greater = a_data > b_data;
-        self.flags.less = a_data < b_data;
-        self.flags.overflow = !(0..=255).contains(&result);
-
-        // Wrap
-        if result > 255 { result %= 256; }
-        if result < 0 { result = (result + 256) % 256; }
-
         // Store Accumulator
         let is_alu_op = matches!(op, 
             Operation::ADD | Operation::ADDC | Operation::SUB | 
@@ -191,6 +184,12 @@ impl ALU {
         );
 
         if is_alu_op {
+            // Flags
+            self.flags.equals = a_data == b_data;
+            self.flags.greater = a_data > b_data;
+            self.flags.less = a_data < b_data;
+            self.flags.overflow = !(0..=255).contains(&result);
+            
             self.accumulator = (result & 0xFF) as u8;
         }
     }
@@ -290,16 +289,6 @@ impl Emulator {
 
     pub fn resolve_input(&mut self, val: i32) {
         if self.waiting_for_input {
-            // Write to the pending register (handled in WriteBack stage usually, but INP stores to Accumulator in ALU stage?)
-            // TS ALU: "result = 0;" (Temp)
-            // TS WriteBack: "else if (op === Operation.INP) { this.registers.write(a, this.alu.accumulator); }"
-            // Wait, if ALU sets waitingForInput, the pipeline effectively stalls or continues?
-            // In TS `step()`: if (emulator!.waitingForInput) handleInputInterrupt().
-            // Then `submitInput()` calls `emulator!.resolveInput(num)`.
-            // In TS `resolveInput` isn't shown in the snippets I read! 
-            // I need to implement what I think it does.
-            // Likely it sets the accumulator (since WriteBack uses accumulator for INP) and clears waiting flag.
-            
             self.alu.accumulator = (val & 0xFF) as u8;
             self.waiting_for_input = false;
         }
@@ -363,6 +352,13 @@ impl Emulator {
         else if op == Operation::BIG && self.alu.flags.greater { take_branch = true; }
         else if op == Operation::BIO && self.alu.flags.overflow { take_branch = true; }
         else if op == Operation::BIL && self.alu.flags.less { take_branch = true; }
+        else if op == Operation::RET {
+            take_branch = true;
+            self.sp += 1;
+            if self.sp > 15 { self.sp = 0; }
+            let ret_addr = self.ram[self.sp as usize];
+            self.execute_reg.a.data = ret_addr as i32; // Hack to use common branch logic
+        }
 
         if take_branch {
             self.pc = self.execute_reg.a.data;
@@ -437,12 +433,6 @@ impl Emulator {
                     if self.sp < 0 { self.sp = 15; }
                 }
             },
-            Operation::RET => {
-                self.sp += 1;
-                if self.sp > 15 { self.sp = 0; }
-                let ret_addr = self.ram[self.sp as usize];
-                self.pc = ret_addr as i32;
-            },
             _ => {}
         }
     }
@@ -487,7 +477,6 @@ impl Parser {
                         labels.insert(label.to_string(), addr_counter);
                     }
                 }
-                // Check if code exists after label
                 let after = clean.get(idx+1..).unwrap_or("").trim();
                 if !after.is_empty() {
                     addr_counter += 1;
@@ -503,7 +492,24 @@ impl Parser {
             let source_line = (i + 1) as i32;
             match Self::parse_line(line, addr_counter, source_line, &labels) {
                 Ok(Some(instr)) => {
-                    let warns = Self::check_warnings(&instr, source_line);
+                    // 1. Static Warnings
+                    let mut warns = Self::check_warnings(&instr, source_line);
+                    
+                    // 2. DYNAMIC HAZARD CHECK (Read-After-Write)
+                    if let Some(prev) = instructions.last() {
+                         // Check if previous instruction writes to a register
+                        if let Some(written_reg) = Self::get_write_register(prev) {
+                            // Check if current instruction reads that same register
+                            let read_regs = Self::get_read_registers(&instr);
+                            if read_regs.contains(&written_reg) {
+                                warns.push(format!(
+                                    "Line {}: RAW Hazard. Reading R{} immediately after writing may yield old value due to pipeline latency. Insert a NOOP.", 
+                                    source_line, written_reg
+                                ));
+                            }
+                        }
+                    }
+
                     if !warns.is_empty() {
                         warnings.extend(warns);
                     }
@@ -552,7 +558,7 @@ impl Parser {
         if a.type_ == OperandType::Immediate
             && (a.data < 0 || a.data > 255)
                  && !matches!(op, Operation::JMP | Operation::CALL | Operation::BIE | Operation::BIG | Operation::BIL | Operation::BIO) {
-                      warnings.push(format!("Line {}: Immediate value {} is out of 8-bit range (0-255). It will be wrapped.", line, a.data));
+                     warnings.push(format!("Line {}: Immediate value {} is out of 8-bit range (0-255). It will be wrapped.", line, a.data));
                  }
         if b.type_ == OperandType::Immediate
             && (b.data < 0 || b.data > 255) {
@@ -579,6 +585,66 @@ impl Parser {
                  }
 
         warnings
+    }
+
+    // --- Helper Logic for Hazard Detection ---
+
+    /// Returns the register index if the instruction writes to a register.
+    fn get_write_register(instr: &Instruction) -> Option<i32> {
+        // Must target a register
+        if instr.a.type_ != OperandType::Register {
+            return None;
+        }
+
+        match instr.operation {
+            Operation::IMM | Operation::MOV | Operation::LOAD | Operation::POP | Operation::INP => Some(instr.a.data),
+            Operation::ADD | Operation::ADDC | Operation::SUB | Operation::AND | Operation::OR | Operation::XOR => {
+                // 'X' prefix writes to ACC only, not the Register
+                if instr.args == OperationArgs::X {
+                    None
+                } else {
+                    Some(instr.a.data)
+                }
+            },
+            Operation::SHR | Operation::NOT => Some(instr.a.data),
+            _ => None
+        }
+    }
+
+    /// Returns a list of registers that are read by the instruction.
+    fn get_read_registers(instr: &Instruction) -> Vec<i32> {
+        let mut reads = Vec::new();
+
+        // Check Operand A (Source)
+        if instr.a.type_ == OperandType::Register {
+            match instr.operation {
+                // Math ops read A unless using U/X (which use ACC as source A)
+                Operation::ADD | Operation::ADDC | Operation::SUB | Operation::AND | Operation::OR | Operation::XOR => {
+                    if instr.args != OperationArgs::U && instr.args != OperationArgs::X {
+                        reads.push(instr.a.data);
+                    }
+                },
+                Operation::PUSH | Operation::ROUT => {
+                    reads.push(instr.a.data);
+                },
+                _ => {}
+            }
+        }
+
+        // Check Operand B (Source)
+        if instr.b.type_ == OperandType::Register {
+            match instr.operation {
+                Operation::MOV | Operation::ADD | Operation::ADDC | Operation::SUB | 
+                Operation::AND | Operation::OR | Operation::XOR | 
+                Operation::SHR | Operation::NOT | Operation::OUT | 
+                Operation::ROUT | Operation::STORE => {
+                    reads.push(instr.b.data);
+                },
+                _ => {}
+            }
+        }
+
+        reads
     }
 
     fn parse_line(line: &str, address: i32, source_line: i32, labels: &HashMap<String, i32>) -> Result<Option<Instruction>, String> {
@@ -694,13 +760,13 @@ impl Parser {
         let first = s.chars().next().ok_or("Empty operand")?;
         let rest = &s[1..];
 
-        if first == 'R' {
+        if first == 'R' || first == '$' {
             if let Ok(val) = Self::parse_binary(rest) {
                 return Ok(Operand::new(OperandType::Register, val));
             }
         } 
         
-        if first == '#' {
+        if first == '#' || first == '@' {
             let val = Self::parse_binary(rest)?;
             return Ok(Operand::new(OperandType::MemoryAddress, val));
         }
@@ -719,7 +785,7 @@ impl Parser {
                     Ok(Operand::new(OperandType::Immediate, addr))
                 } 
                 else {
-                     Err(format!("Invalid value or unknown label: {}", s))
+                      Err(format!("Invalid value or unknown label: {}", s))
             }
         }
     }
@@ -732,4 +798,4 @@ impl Parser {
             clean.parse::<i32>().map_err(|_| format!("Invalid number: {}", s))
         }
     }
-} 
+}

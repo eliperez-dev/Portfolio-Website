@@ -57,204 +57,353 @@
 ; WASM to run in the browser.
 ; Feel free to write your own programs!
 
-START:
+start:
 ; --- Crab ---
-IMM R1 B10000001
-IMM R2 B11011011
-IMM R3 B01111110
-IMM R4 B11111111
-IMM R5 B01111110
-IMM R6 B10100101
-IMM R7 B10000001
-OUT %0 R0
-OUT %1 R1
-OUT %2 R2
-OUT %3 R3
-OUT %4 R4
-OUT %5 R5
-OUT %6 R6
-OUT %7 R7
-IMM R1 B01000010
-NOOP
-OUT %0 R1
-NOOP
-NOOP
+imm R1 b10000001
+imm R2 b11011011
+imm R3 b01111110
+imm R4 b11111111
+imm R5 b01111110
+imm R6 b10100101
+imm R7 b10000001
+out %0 R0
+out %1 R1
+out %2 R2
+out %3 R3
+out %4 R4
+out %5 R5
+out %6 R6
+out %7 R7
+imm R1 b01000010
+noop
+out %0 R1
+noop
+noop
 
 
 ; --- Draw Face ---
-IMM R1 60      ; 00111100 (Hair)
-IMM R2 66      ; 01000010 (Forehead)
-IMM R3 165     ; 10100101 (Eyes Open)
-IMM R4 129     ; 10000001 (Nose Bridge)
-IMM R5 165     ; 10100101 Smile
-IMM R6 153     ; 10011001
-IMM R7 B01000010 ; (Chin)
-OUT %0 R1
-OUT %1 R2
-OUT %2 R3
-OUT %3 R4
-OUT %4 R5
-OUT %5 R6
-OUT %6 R7
-OUT %7 R1
-NOOP
+imm R1 60      ; 00111100 (Hair)
+imm R2 66      ; 01000010 (Forehead)
+imm R3 165     ; 10100101 (Eyes Open)
+imm R4 129     ; 10000001 (Nose Bridge)
+imm R5 165     ; 10100101 Smile
+imm R6 153     ; 10011001
+imm R7 b01000010 ; (Chin)
+out %0 R1
+out %1 R2
+out %2 R3
+out %3 R4
+out %4 R5
+out %5 R6
+out %6 R7
+out %7 R1
+noop
 
 ; --- Heart --- 
-IMM R1 108
-IMM R2 254
-IMM R3 254
-IMM R4 254
-IMM R5 124
-IMM R6 56
-IMM R7 16
-OUT %0 R1
-OUT %1 R2
-OUT %2 R3
-OUT %3 R4
-OUT %4 R5
-OUT %5 R6
-OUT %6 R7
-OUT %7 R0
+imm R1 108
+imm R2 254
+imm R3 254
+imm R4 254
+imm R5 124
+imm R6 56
+imm R7 16
+out %0 R1
+out %1 R2
+out %2 R3
+out %3 R4
+out %4 R5
+out %5 R6
+out %6 R7
+out %7 R0
 
 ; --- Store Heart To RAM ---
-PUSH R1
-PUSH R2
-PUSH R3
-PUSH R4
-PUSH R5
-PUSH R6
-PUSH R7
+push R1
+push R2
+push R3
+push R4
+push R5
+push R6
+push R7
 
 ; --- Checkerboard --- 
-IMM R1 B10101010  
-IMM R2 B01010101  
+imm R1 b10101010  
+imm R2 b01010101  
 
-OUT %0 R1        
-OUT %1 R2         
-OUT %2 R1          
-OUT %3 R2         
-OUT %4 R1        
-OUT %5 R2        
-OUT %6 R1          
-OUT %7 R2     
+out %0 R1        
+out %1 R2         
+out %2 R1          
+out %3 R2         
+out %4 R1        
+out %5 R2        
+out %6 R1          
+out %7 R2     
 
 ; --- Snake (Python) ---
-IMM R1 B00011000
-IMM R2 B00011100
-IMM R3 B00110000
-IMM R4 B00111100
-IMM R5 B00000110
-IMM R6 B01111100
-IMM R7 B01100000
-OUT %0 R0
-OUT %1 R1
-OUT %2 R2
-OUT %3 R3
-OUT %4 R4
-OUT %5 R5
-OUT %6 R6
-OUT %7 R7
+imm R1 b00011000
+imm R2 b00011100
+imm R3 b00110000
+imm R4 b00111100
+imm R5 b00000110
+imm R6 b01111100
+imm R7 b01100000
+out %0 R0
+out %1 R1
+out %2 R2
+out %3 R3
+out %4 R4
+out %5 R5
+out %6 R6
+out %7 R7
 
 
 ; --- Music Note ---
-IMM R1 B00011100 ; Top / Flag
-IMM R2 B00010010
-IMM R3 B00010001
-IMM R4 B00010000 ; Stem
-IMM R5 B00010000 ; Stem
-IMM R6 B01110000 ; Note Head
-IMM R7 B00110000 ; Note Head
-OUT %0 R0
-OUT %1 R1
-OUT %2 R2
-OUT %3 R3
-OUT %4 R4
-OUT %5 R5
-OUT %6 R6
-OUT %7 R6
+imm R1 b00011100 ; Top / Flag
+imm R2 b00010010
+imm R3 b00010001
+imm R4 b00010000 ; Stem
+imm R5 b00010000 ; Stem
+imm R6 b01110000 ; Note Head
+imm R7 b00110000 ; Note Head
+out %0 R0
+out %1 R1
+out %2 R2
+out %3 R3
+out %4 R4
+out %5 R5
+out %6 R6
+out %7 R6
 
 ; --- Cylon Scanline ---
-IMM R1 255  ; Full Row ON
-IMM R2 0    ; Full Row OFF
+imm R1 255  ; Full Row ON
+imm R2 0    ; Full Row OFF
 
-OUT %0 R1
-OUT %0 R2
-OUT %1 R1
-OUT %1 R2
-OUT %2 R1
-OUT %2 R2
-OUT %3 R1
-OUT %3 R2
-OUT %4 R1
-OUT %4 R2
-OUT %5 R1
-OUT %5 R2
-OUT %6 R1
-OUT %6 R2
-OUT %7 R1
-OUT %7 R2
+out %0 R1
+out %0 R2
+out %1 R1
+out %1 R2
+out %2 R1
+out %2 R2
+out %3 R1
+out %3 R2
+out %4 R1
+out %4 R2
+out %5 R1
+out %5 R2
+out %6 R1
+out %6 R2
+out %7 R1
+out %7 R2
 
 ; --- Pop Heart From RAM ---
 ; This wont do anything,
 ; but it showcases RAM usage.
 
-POP R1 ; Pop value on stack to
-POP R1 ; Register 1
-POP R1
-POP R1
-POP R1
-POP R1
-POP R1
+pop R1 ; Pop value on stack to
+pop R1 ; Register 1
+pop R1
+pop R1
+pop R1
+pop R1
+pop R1
 
-JMP START`,
+jmp start`,
 
-        "Input Test": `; Input Instruction Test
-; Run this! It will popup a custom UI.
+        "Memory Test": `; Memory Test
+; 1. Store a input value in RAM at #10
+; 2. Load it back into R2
+; 3. Output R2 to Port %0
 
-START:
-INP R1          ; Ask user for value
-OUT %0 R1       ; Show input on Port 0
-IMM R2 1
-NOOP            ; Wait for writeback
-ADD R1 R2       ; Add 1 to Input
-OUT %1 R1       ; Show result on Port 1`,
+start:
+inp R1          ; Store user input to R1
+noop
+store #10 R1    ; Store into RAM address #10
+
+imm R2 0        ; Clear R2 to prove we load
+noop
+load R2 #10     ; Load RAM address #10 into R2
+noop
+out %0 R2       ; Output Result`,
 
         "Fibonacci": `; Fibonacci Sequence
 ; Output will be on Port %0
-IMM R1 0
-IMM R2 1
+imm R1 0
+imm R2 1
 
-LOOP:
-MOV R3 R1
-MOV R4 R2
-ADD R1 R2
-UADD R5 R0
-OUT %0 R5
-MOV R1 R2
-MOV R2 R5
-JMP LOOP`,
+loop:
+mov R3 R1
+mov R4 R2
+add R1 R2
+uadd R5 R0
+noop
+out %0 R5
+mov R1 R2
+mov R2 R5
+jmp loop`,
 
-    "Functions": `; Function Call Test
-; Main Program
+    "Factorial": `; Recursive Factorial
+; Calculates 5! = 120
+; Limitations: Max input is 5 (6! = 720, which overflows 8-bit limit of 255)
 
-IMM R1 3
-OUT %0 R1
+; NOTE: This one takes a while, so
+; be patient.
 
-MAIN_LOOP:
-CALL DOUBLE_R1 ; Call function by Label
-OUT %0 R1     ; Output result 
-JMP MAIN_LOOP ; Loop forever
-NOOP
+start:
+imm R1 5      ; Calculate Factorial(5)
+call fact
+out %0 R1     ; Output Result (120)
+noop
+jmp start
 
-; --- Function: double_r1 ---
-DOUBLE_R1:    ; Label defines entry point
-; Expects argument in R1
-; Returns result in R1
-IMM R2 2
-MOV R3 R1
-NOP           ; Wait for writeback
-ADD R1 R3     ; Double it
-RET           ; Return to caller`
+fact:
+; --- Recursive Step Prep ---
+push R1       ; Save current N to stack
+imm R2 1
+noop          ; Hazard Wait
+sub R1 R2     ; R1 = N - 1
+
+; --- Base Case Check ---
+; If R1 was 1, (1-1) is 0. Branch to base.
+bie base      
+
+; --- Recursion ---
+call fact     ; Returns Fact(N-1) in R1
+
+; --- Restore N ---
+pop R2        ; Restore N into R2
+noop          ; Hazard Wait (Wait for R2 to write back)
+
+; --- Multiplication (R1 = R1 * R2) ---
+call multiply ; Since there is no MUL opcode, we do it manually
+ret
+
+base:
+; --- Base Case Handling ---
+; We are here because N-1 was 0.
+; The Stack currently has the value '1' on it (from the push R1 at start).
+; We MUST pop this to balance the stack before returning.
+pop R2        ; Clear the stack (value 1)
+imm R1 1      ; Return 1
+ret
+
+; --- Helper: Multiplication ---
+; Calculates R1 = R1 * R2
+; Inputs: R1 (Multiplicand), R2 (Counter/Multiplier)
+; Output: R1 (Result)
+; Destroys: R3, R4
+multiply:
+mov R3 R1     ; Copy Multiplicand to R3
+imm R1 0      ; Clear R1 (Accumulator)
+
+mult_loop:
+; Check if Counter (R2) is 0
+imm R4 0
+noop          ; Hazard Wait
+sub R4 R2     ; Check 0 - R2
+bie mult_done ; If R2 is 0, we are done
+
+; Add R3 to Accumulator
+add R1 R3     
+
+; Decrement Counter
+imm R4 1
+noop          ; Hazard Wait
+sub R2 R4     ; R2--
+jmp mult_loop
+
+mult_done:
+ret`,
+
+    "Recursive Sum": `; Recursive Summation
+; Calculates Sum(5) = 5+4+3+2+1 = 15
+; Demonstrates Stack Push/Pop
+
+; Can calulate up to Sum(7) before a
+; stack overflow occurs.
+
+; NOTE: This one takes a while, so
+; be patient.
+
+start:
+imm R1 5      ; Calculate Sum(5)
+call sum
+out %0 R1     ; Output Result (15)
+noop
+jmp start
+
+sum:
+; Base Case Check
+imm R2 0
+noop          ; Wait for writeback
+sub R1 R2     ; Check if R1 == 0
+bie base      ; If 0, return 0
+
+; Recursive Step
+push R1       ; Save current N
+imm R2 1
+noop          ; Wait for writeback
+sub R1 R2     ; N = N - 1
+call sum      ; Recursive Call
+pop R2        ; Restore N
+noop          ; wait for writeback
+add R1 R2     ; Sum = Sum(N-1) + N
+ret
+
+base:
+imm R1 0      ; Return 0
+ret`,
+
+    "16-bit Counter": `; 16-bit Counter
+; Counts from 0 to 65535 using ADDC
+; in steps of 64 to save time.
+; R1 = Low Byte, R2 = High Byte
+
+start:
+imm R3 64    ; Add 64
+
+loop:
+out %0 R1   ; Show Low Byte
+out %1 R2   ; Show High Byte
+
+add R1 R3   ; R1 = R1 + 1 (Sets Overflow)
+addc R2 R0  ; R2 = R2 + 0 + Overflow
+; If R1 overflowed (255->0), 
+; R2 increments by 1.
+
+jmp loop`,
+
+    "Hazards Test": `; WARNINGS SHOWCASE
+
+; This program is ment to showcase
+; hazard detections caught
+; by the assembler.
+
+; Might also be useful for learning
+; the limitations of this CPU.
+
+start:
+; WARN 1: RAW Hazard
+; Reading R1 right after write
+pop R1
+add R2 R1
+
+; WARN 2: Write to R0
+; R0 is always 0
+imm R0 50
+
+; WARN 3: Overflow
+; 300 wraps to 44
+imm R3 300
+
+; WARN 4: Bad Port
+; Max port is %7
+out %8 R1
+
+; WARN 5: Bad RAM
+; Max addr is #15
+store #20 R1
+
+; Loop
+jmp start`
 };
     
     // --- 3. PARSER LOGIC (UI HELPERS) ---
@@ -319,20 +468,23 @@ RET           ; Return to caller`
                 commentPart = `<span class="text-zinc-500">${line.substring(commentIndex)}</span>`;
             }
 
-            // 1. Numbers (123, B101) - Match word boundary to avoid coloring inside words
-            codePart = codePart.replace(/(^|[^%])\b(\d+|B[01_]+)\b/g, '$1<span class="text-blue-400">$2</span>');
+            // 1. Numbers (123, B101, b101) - Match word boundary to avoid coloring inside words
+            // Exclude if preceded by %, $, #, @ (Special prefixes)
+            codePart = codePart.replace(/(^|[^%\$#@])\b(\d+|[Bb][01_]+)\b/g, '$1<span class="text-blue-400">$2</span>');
 
-            // 2. Keywords
-            const kwRegex = new RegExp(`\\b(${keywords.join('|')})\\b`, 'g');
+            // 2. Keywords (Case insensitive)
+            const kwRegex = new RegExp(`\\b(${keywords.join('|')})\\b`, 'gi');
             codePart = codePart.replace(kwRegex, '<span class="text-[var(--color-schematic-primary)] font-bold">$1</span>');
 
-            // 3. Registers (R0-R7)
-            codePart = codePart.replace(/\b(R[0-7])\b/g, '<span class="text-purple-400 font-bold">$1</span>');
-
-            codePart = codePart.replace(/\b(r[0-7])\b/g, '<span class="text-purple-400 font-bold">$1</span>');
+            // 3. Registers (R0-R7, r0-r7, $0-$7)
+            // Use word boundary \b only for R-registers, not for $ since $ is not a word character
+            codePart = codePart.replace(/(\b[Rr][0-7]\b|\$[0-7])/g, '<span class="text-purple-400 font-bold">$1</span>');
 
             // 4. Ports (%0-%7)
             codePart = codePart.replace(/(%[0-7])/g, '<span class="text-orange-400 font-bold">$1</span>');
+
+            // 5. Memory Addresses (#12, @12, #B101, @b101)
+            codePart = codePart.replace(/([#@](?:\d+|[Bb][01_]+))/g, '<span class="text-yellow-400 font-bold">$1</span>');
 
             // 5. Labels (Matches "WORD:" at start of line)
             // We use text-pink-400 to make them pop as "destinations"
@@ -844,6 +996,17 @@ RET           ; Return to caller`
                             <li><strong class="text-zinc-300">ROM:</strong> 256 Lines of Program Memory.</li>
                         </ul>
                     </section>
+                    
+                    <section class="mb-6">
+                        <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">Syntax & Formatting</h3>
+                        <ul class="list-disc list-inside text-zinc-400 text-[11px] space-y-1">
+                            <li><strong class="text-zinc-300">Case Insensitive:</strong> Operations and operands can be uppercase or lowercase (e.g., <span class="text-white">MOV</span>, <span class="text-white">mov</span>, <span class="text-white">R1</span>, <span class="text-white">r1</span>).</li>
+                            <li><strong class="text-zinc-300">Registers:</strong> Can be prefixed with 'R' or '$' (e.g., <span class="text-purple-400">R1</span>, <span class="text-purple-400">$1</span>).</li>
+                            <li><strong class="text-zinc-300">Memory Addresses:</strong> Can be prefixed with '#' or '@' (e.g., <span class="text-yellow-400">#10</span>, <span class="text-yellow-400">@5</span>).</li>
+                            <li><strong class="text-zinc-300">I/O Ports:</strong> Must be prefixed with '%' (e.g., <span class="text-orange-400">%0</span>).</li>
+                            <li><strong class="text-zinc-300">Binary Numbers:</strong> Can be prefixed with 'B' or 'b' (e.g., <span class="text-blue-400">B101</span>, <span class="text-blue-400">b101</span>).</li>
+                        </ul>
+                    </section>
 
                     <section class="bg-red-900/10 border border-red-900/30 p-4 rounded-md">
                         <h3 class="text-red-400 font-bold mb-3 uppercase tracking-widest text-[10px]">⚠ Hardware Constraints</h3>
@@ -859,18 +1022,8 @@ RET           ; Return to caller`
                                 </p>
                             </div>
 
-                            <div class="border-t border-red-900/20 pt-3">
-                                <strong class="text-[var(--color-schematic-primary)] block mb-1">The "OUT" Exception</strong>
-                                <p class="text-zinc-400 mb-2">
-                                    The <span class="text-white">OUT</span> instruction is unique. It captures the value of Register B during its <b>Execute</b> stage.
-                                </p>
-                                <p class="text-zinc-500">
-                                    Because its Execute stage coincides with the previous instruction's WriteBack stage, <span class="text-white">OUT</span> can safely read a register written by the instruction immediately before it without needing a <span class="text-white">NOOP</span>.
-                                </p>
-                            </div>
-
                             <p class="text-zinc-300">
-                                <span class="text-green-500">Note:</span> Pure overwrites (like <span class="text-white">POP</span> or <span class="text-white">IMM</span>) following each other do not trigger hazards, as they do not depend on the previous register state.
+                                <span class="text-green-500">Note:</span> Pure overwrites (like <span class="text-white">pop</span> or <span class="text-white">imm</span>) following each other do not trigger hazards, as they do not depend on the previous register state.
                             </p>
                         </div>
                     </section>
@@ -882,12 +1035,12 @@ RET           ; Return to caller`
                             <div class="text-[9px] uppercase text-zinc-600">Syntax</div>
                             <div class="text-[9px] uppercase text-zinc-600">Effect</div>
 
-                            <span class="text-[var(--color-schematic-primary)]">IMM</span>
-                            <span class="text-white">IMM A B</span> 
+                            <span class="text-[var(--color-schematic-primary)]">imm</span>
+                            <span class="text-white">imm A B</span> 
                             <span>Set Register <b>A</b> to value <b>B</b>.</span>
 
-                            <span class="text-[var(--color-schematic-primary)]">MOV</span>
-                            <span class="text-white">MOV A B</span> 
+                            <span class="text-[var(--color-schematic-primary)]">mov</span>
+                            <span class="text-white">mov A B</span> 
                             <span>Copy value from Register <b>B</b> to <b>A</b>.</span>
                         </div>
                     </section>
@@ -896,36 +1049,36 @@ RET           ; Return to caller`
                         <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">Math & Logic</h3>
                         <div class="grid grid-cols-[60px_100px_1fr] gap-y-2 text-zinc-400 border-b border-zinc-800/50 pb-4">
                             
-                            <span class="text-[var(--color-schematic-primary)]">ADD</span>
-                            <span class="text-white">ADD A B</span> 
+                            <span class="text-[var(--color-schematic-primary)]">add</span>
+                            <span class="text-white">add A B</span> 
                             <span><b>A</b> = <b>A</b> + <b>B</b></span>
 
-                            <span class="text-[var(--color-schematic-primary)]">ADDC</span>
-                            <span class="text-white">ADDC A B</span> 
-                            <span><b>A</b> = <b>A</b> + <b>B</b> + 1</span>
+                            <span class="text-[var(--color-schematic-primary)]">addc</span>
+                            <span class="text-white">addc A B</span> 
+                            <span><b>A</b> = <b>A</b> + <b>B</b> + <b>Overflow Flag</b> (from prev op)</span>
 
-                            <span class="text-[var(--color-schematic-primary)]">SUB</span>
-                            <span class="text-white">SUB A B</span> 
+                            <span class="text-[var(--color-schematic-primary)]">sub</span>
+                            <span class="text-white">sub A B</span> 
                             <span><b>A</b> = <b>A</b> - <b>B</b></span>
 
-                            <span class="text-[var(--color-schematic-primary)]">AND</span>
-                            <span class="text-white">AND A B</span> 
+                            <span class="text-[var(--color-schematic-primary)]">and</span>
+                            <span class="text-white">and A B</span> 
                             <span><b>A</b> = <b>A</b> &amp; <b>B</b> (Bitwise AND)</span>
 
-                            <span class="text-[var(--color-schematic-primary)]">OR</span>
-                            <span class="text-white">OR A B</span> 
+                            <span class="text-[var(--color-schematic-primary)]">or</span>
+                            <span class="text-white">or A B</span> 
                             <span><b>A</b> = <b>A</b> | <b>B</b> (Bitwise OR)</span>
 
-                            <span class="text-[var(--color-schematic-primary)]">XOR</span>
-                            <span class="text-white">XOR A B</span> 
+                            <span class="text-[var(--color-schematic-primary)]">xor</span>
+                            <span class="text-white">xor A B</span> 
                             <span><b>A</b> = <b>A</b> ^ <b>B</b> (Bitwise XOR)</span>
 
-                            <span class="text-[var(--color-schematic-primary)]">SHR</span>
-                            <span class="text-white">SHR A B</span> 
+                            <span class="text-[var(--color-schematic-primary)]">shr</span>
+                            <span class="text-white">shr A B</span> 
                             <span><b>A</b> = <b>B</b> shifted right by 1.</span>
 
-                            <span class="text-[var(--color-schematic-primary)]">NOT</span>
-                            <span class="text-white">NOT A B</span> 
+                            <span class="text-[var(--color-schematic-primary)]">not</span>
+                            <span class="text-white">not A B</span> 
                             <span><b>A</b> = Inverted bits of <b>B</b></span>
                         </div>
                     </section>
@@ -939,15 +1092,15 @@ RET           ; Return to caller`
                         <div class="grid gap-3 text-[11px]">
                             <div class="grid grid-cols-[80px_1fr] gap-2">
                                 <code class="text-white bg-zinc-800 px-1 rounded text-center">No Prefix</code>
-                                <span class="text-zinc-400"><b>ADD R1 R2</b>: Reads R1 and R2, stores result in <b>ACC</b> AND <b>R1</b>.</span>
+                                <span class="text-zinc-400"><b>add R1 R2</b>: Reads R1 and R2, stores result in <b>ACC</b> AND <b>R1</b>.</span>
                             </div>
                             <div class="grid grid-cols-[80px_1fr] gap-2">
                                 <code class="text-white bg-zinc-800 bg-zinc-800 px-1 rounded text-center">U </code>
-                                <span class="text-zinc-400"><b>UADD R1 R2</b>: Uses <b>ACC</b> as Operand A instead of R1. Stores result in <b>ACC</b> and <b>R1</b>.</span>
+                                <span class="text-zinc-400"><b>uadd R1 R2</b>: Uses <b>ACC</b> as Operand A instead of R1. Stores result in <b>ACC</b> and <b>R1</b>.</span>
                             </div>
                             <div class="grid grid-cols-[80px_1fr] gap-2">
                                 <code class="text-white bg-zinc-800 bg-zinc-800 px-1 rounded text-center">X</code>
-                                <span class="text-zinc-400"><b>XADD R0 R2</b>: Uses <b>ACC</b> as Operand A. Result goes to <b>ACC ONLY</b>. Register A is ignored (useful for comparisons).</span>
+                                <span class="text-zinc-400"><b>xadd R0 R2</b>: Uses <b>ACC</b> as Operand A. Result goes to <b>ACC ONLY</b>. Register A is ignored (useful for comparisons).</span>
                             </div>
                         </div>
                     </section>
@@ -956,12 +1109,12 @@ RET           ; Return to caller`
                         <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">Memory (RAM)</h3>
                         <div class="grid grid-cols-[60px_100px_1fr] gap-y-2 text-zinc-400 border-b border-zinc-800/50 pb-4">
                             
-                            <span class="text-[var(--color-schematic-primary)]">STORE</span>
-                            <span class="text-white">STORE A B</span> 
+                            <span class="text-[var(--color-schematic-primary)]">store</span>
+                            <span class="text-white">store A B</span> 
                             <span>Save Register <b>B</b> into Memory Address <b>A</b>.</span>
 
-                            <span class="text-[var(--color-schematic-primary)]">LOAD</span>
-                            <span class="text-white">LOAD A B</span> 
+                            <span class="text-[var(--color-schematic-primary)]">load</span>
+                            <span class="text-white">load A B</span> 
                             <span>Load Memory Address <b>B</b> into Register <b>A</b>.</span>
                         </div>
                     </section>
@@ -970,32 +1123,32 @@ RET           ; Return to caller`
                         <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">Flow Control</h3>
                         <div class="grid grid-cols-[60px_100px_1fr] gap-y-2 text-zinc-400 border-b border-zinc-800/50 pb-4">
                             
-                            <span class="text-[var(--color-schematic-primary)]">JMP</span>
-                            <span class="text-white">JMP A</span> 
+                            <span class="text-[var(--color-schematic-primary)]">jmp</span>
+                            <span class="text-white">jmp A</span> 
                             <span>Jump to Line Number <b>A</b>.</span>
 
-                            <span class="text-[var(--color-schematic-primary)]">BIE</span>
-                            <span class="text-white">BIE A</span> 
+                            <span class="text-[var(--color-schematic-primary)]">bie</span>
+                            <span class="text-white">bie A</span> 
                             <span>Jump to <b>A</b> if Equal (==).</span>
 
-                            <span class="text-[var(--color-schematic-primary)]">BIG</span>
-                            <span class="text-white">BIG A</span> 
+                            <span class="text-[var(--color-schematic-primary)]">big</span>
+                            <span class="text-white">big A</span> 
                             <span>Jump to <b>A</b> if Greater (&gt;).</span>
 
-                            <span class="text-[var(--color-schematic-primary)]">BIL</span>
-                            <span class="text-white">BIL A</span> 
+                            <span class="text-[var(--color-schematic-primary)]">bil</span>
+                            <span class="text-white">bil A</span> 
                             <span>Jump to <b>A</b> if Less (&lt;).</span>
 
-                            <span class="text-[var(--color-schematic-primary)]">BIO</span>
-                            <span class="text-white">BIO A</span> 
+                            <span class="text-[var(--color-schematic-primary)]">bio</span>
+                            <span class="text-white">bio A</span> 
                             <span>Jump to <b>A</b> if Overflow.</span>
 
-                            <span class="text-[var(--color-schematic-primary)]">CALL</span>
-                            <span class="text-white">CALL A</span> 
+                            <span class="text-[var(--color-schematic-primary)]">call</span>
+                            <span class="text-white">call A</span> 
                             <span>Run Function at Line <b>A</b>.</span>
 
-                            <span class="text-[var(--color-schematic-primary)]">RET</span>
-                            <span class="text-white">RET</span> 
+                            <span class="text-[var(--color-schematic-primary)]">ret</span>
+                            <span class="text-white">ret</span> 
                             <span>Return from function.</span>
                         </div>
                     </section>
@@ -1004,28 +1157,28 @@ RET           ; Return to caller`
                         <h3 class="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-[10px]">System & I/O</h3>
                         <div class="grid grid-cols-[60px_100px_1fr] gap-y-2 text-zinc-400">
                             
-                            <span class="text-[var(--color-schematic-primary)]">OUT</span>
-                            <span class="text-white">OUT A B</span> 
+                            <span class="text-[var(--color-schematic-primary)]">out</span>
+                            <span class="text-white">out A B</span> 
                             <span>Send Register <b>B</b> to Port <b>A</b> (%0-%7).</span>
 
-                            <span class="text-[var(--color-schematic-primary)]">ROUT</span>
-                            <span class="text-white">ROUT A B</span> 
+                            <span class="text-[var(--color-schematic-primary)]">rout</span>
+                            <span class="text-white">rout A B</span> 
                             <span>Send Register <b>B</b> to Port in Register <b>A</b> (%0-%7).</span>
 
-                            <span class="text-[var(--color-schematic-primary)]">INP</span>
-                            <span class="text-white">INP A</span> 
+                            <span class="text-[var(--color-schematic-primary)]">inp</span>
+                            <span class="text-white">inp A</span> 
                             <span>Wait for user input, store in Register <b>A</b>.</span>
 
-                            <span class="text-[var(--color-schematic-primary)]">PUSH</span>
-                            <span class="text-white">PUSH A</span> 
+                            <span class="text-[var(--color-schematic-primary)]">push</span>
+                            <span class="text-white">push A</span> 
                             <span>Push Register <b>A</b> onto Stack.</span>
 
-                            <span class="text-[var(--color-schematic-primary)]">POP</span>
-                            <span class="text-white">POP A</span> 
+                            <span class="text-[var(--color-schematic-primary)]">pop</span>
+                            <span class="text-white">pop A</span> 
                             <span>Pop Stack into Register <b>A</b>.</span>
 
-                            <span class="text-[var(--color-schematic-primary)]">NOOP</span>
-                            <span class="text-white">NOOP</span> 
+                            <span class="text-[var(--color-schematic-primary)]">noop</span>
+                            <span class="text-white">noop</span> 
                             <span>No Operation (Do nothing).</span>
                         </div>
                     </section>
@@ -1056,9 +1209,12 @@ RET           ; Return to caller`
                 <span class="text-sm font-mono text-[var(--color-schematic-primary)] font-bold">Select ROM -></span>
                 <select onchange={loadExample} class="bg-zinc-950 text-[11px] text-zinc-400 border border-zinc-800 p-2 rounded font-mono outline-none">
                     <option value="Intro">Intro</option>
-                    <option value="Input Test">Input Test</option>
                     <option value="Fibonacci">Fibonacci</option>
-                      <option value="Functions">Functions</option>
+                    <option value="Recursive Sum">Recursive Sum</option>
+                    <option value="Factorial">Factorial</option>
+                    <option value="16-bit Counter">16-bit Counter</option>
+                    <option value="Memory Test">Input & Memory</option>
+                    <option value="Hazards Test">Hazards Test</option>
                 </select>
                 <button onclick={() => showDocs = !showDocs} class="ml-2 px-3 py-2 bg-zinc-800 text-zinc-200 text-xs font-mono font-bold hover:bg-zinc-700 rounded border border-zinc-700">DOCS</button>
             </div>
@@ -1222,7 +1378,7 @@ RET           ; Return to caller`
             
             <div class="flex flex-row max-h-full h-auto w-auto max-w-full border border-zinc-800 bg-black rounded-sm shadow-xl shrink items-stretch overflow-hidden">
                 
-                <div class="flex flex-col w-10 shrink-0 font-mono border-r border-zinc-800 bg-zinc-950 hidden sm:flex">
+                <div class="flex flex-col w-10 shrink-0 font-mono border-r border-zinc-800 bg-zinc-950">
                     {#each ports as val, i}
                         <div class="flex-1 flex flex-col justify-center items-center text-[12px] border-b border-zinc-800/50 last:border-0 leading-none py-1">
                             <span class="text-zinc-500">%{i}</span>
