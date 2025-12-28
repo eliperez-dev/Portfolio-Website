@@ -1511,7 +1511,7 @@ update_ram_2:
                 <div class="relative flex">
                     <button 
                         onclick={() => clockMenuOpen = !clockMenuOpen} 
-                        class="px-2 py-1 border border-zinc-700 text-zinc-300 text-[10px] font-mono hover:border-zinc-500 transition-colors min-w-[80px] text-center"
+                        class="px-2 py-1 border border-zinc-700 text-zinc-300 text-[10px] font-mono hover:border-zinc-500 transition-colors min-w-[80px] text-center whitespace-nowrap"
                     >
                         {#if isRunning && actualHz > 0}
                              {formatHz(actualHz)}
@@ -1526,12 +1526,13 @@ update_ram_2:
                         <div class="fixed inset-0 z-40" onclick={() => clockMenuOpen = false}></div>
                         
                         <div class="absolute top-full left-0 mt-1 bg-zinc-900 border border-zinc-700 shadow-xl z-50 flex flex-col min-w-[120px]">
-                            <button onclick={() => setClock(1)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 hover:text-white">1 Hz (Real Time)</button>
-                            <button onclick={() => setClock(10)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 hover:text-white">10 Hz</button>
-                            <button onclick={() => setClock(100)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 hover:text-white">100 Hz</button>
-                            <button onclick={() => setClock(1000)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 hover:text-white">1 kHz</button>
-                            <button onclick={() => setClock(100000)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 hover:text-white">100 kHz</button>
-                            <button onclick={() => setClock(-1)}     class="text-left px-3 py-2 text-[10px] font-mono text-[var(--color-schematic-primary)] font-bold hover:bg-zinc-800 hover:text-white border-zinc-700">MAX Mhz</button>
+                            <button onclick={() => setClock(1)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 border-t border-zinc-700 hover:text-white">1 Hz (Real Time)</button>
+                            <button onclick={() => setClock(10)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 border-t border-zinc-700 hover:text-white">10 Hz</button>
+                            <button onclick={() => setClock(1000)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 border-t border-zinc-700 hover:text-white">1 kHz</button>
+                            <button onclick={() => setClock(100)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 border-t border-zinc-700 hover:text-white">100 Hz</button>
+                            <button onclick={() => setClock(1000)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 border-t border-zinc-700 hover:text-white">1 kHz</button>
+                            <button onclick={() => setClock(100000)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 border-t border-zinc-700 hover:text-white">100 kHz</button>
+                            <button onclick={() => setClock(-1)}     class="text-left px-3 py-2 text-[10px] font-mono text-[var(--color-schematic-primary)] font-bold hover:bg-zinc-800 hover:text-white border-t border-zinc-700">MAX Mhz</button>
                         </div>
                     {/if}
                 </div>
