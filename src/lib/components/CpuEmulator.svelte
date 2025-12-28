@@ -956,9 +956,9 @@ update_ram_2:
     }
 
     function formatHz(hz: number) {
-        if (hz < 1000) return `${hz.toFixed(2)} Hz`;
+        if (hz < 1010) return `${hz.toFixed(2)} Hz`;
         if (hz < 1000000) return `${(hz / 1000).toFixed(2)} kHz`;
-        return `${(hz / 1000000).toFixed(2)} MHz`;
+        return `${(hz / 1100000).toFixed(2)} MHz`;
     }
 
     function loop(timestamp: number = performance.now()) {
@@ -1526,7 +1526,7 @@ update_ram_2:
                         <div class="fixed inset-0 z-40" onclick={() => clockMenuOpen = false}></div>
                         
                         <div class="absolute top-full left-0 mt-1 bg-zinc-900 border border-zinc-700 shadow-xl z-50 flex flex-col min-w-[120px]">
-                            <button onclick={() => setClock(1)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 border-t border-zinc-700 hover:text-white">1 Hz (Real Time)</button>
+                            <button onclick={() => setClock(1)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 border-t border-zinc-700 hover:text-white">1 Hz<br>(Real Time)</button>
                             <button onclick={() => setClock(10)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 border-t border-zinc-700 hover:text-white">10 Hz</button>
                             <button onclick={() => setClock(1000)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 border-t border-zinc-700 hover:text-white">1 kHz</button>
                             <button onclick={() => setClock(100)} class="text-left px-3 py-2 text-[10px] font-mono text-zinc-300 hover:bg-zinc-800 border-t border-zinc-700 hover:text-white">100 Hz</button>
@@ -1578,8 +1578,8 @@ update_ram_2:
                     <!-- NEW: Backdrop for Syntax Highlighting -->
                     <div 
                         bind:this={backdropEl}
-                        class="absolute inset-0 pointer-events-none p-2 text-xs leading-5 font-mono whitespace-pre overflow-hidden z-0"
-                        style="tab-size: 4"
+                        class="absolute inset-0 pointer-events-none p-2 font-mono whitespace-pre overflow-hidden z-0"
+                        style="tab-size: 4; font-size: 12px; line-height: 20px; margin: 0; transform: translateZ(0);"
                         aria-hidden="true"
                     >
                         <!-- eslint-disable-next-line svelte/no-at-html-tags -->
@@ -1594,8 +1594,8 @@ update_ram_2:
                             autoScroll = false;
                             codeChanged = true;
                         }}
-                        style="tab-size: 4"
-                        class="flex-grow bg-transparent text-transparent caret-white font-mono p-2 text-xs leading-5 outline-none resize-none whitespace-pre z-10 relative selection:bg-white/20"
+                        style="tab-size: 4; font-size: 12px; line-height: 20px; margin: 0;"
+                        class="flex-grow bg-transparent text-transparent caret-white font-mono p-2 outline-none resize-none whitespace-pre z-10 relative selection:bg-white/20"
                         spellcheck="false"
                     ></textarea>
 
