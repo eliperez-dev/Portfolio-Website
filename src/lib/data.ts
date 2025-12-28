@@ -57,7 +57,7 @@ export const projects: Project[] = [
         id: 2,
         slug: "electron-redstone-cpu",
         title: "Electron Redstone CPU",
-        subtitle: "4-Stage Pipelined 8-bit RISC-V Inspired CPU",
+        subtitle: "4-Stage Pipelined 8-bit RISC CPU",
         description: "A custom 8-bit ISA with a raw pipeline architecture, hand-wired using Redstone digital logic gates. Includes a custom Rust toolchain for static analysis and emulation.",
         technologies: ["Rust", "Custom Assembly", "WebAssembly", "SvelteKit", "Redstone Logic"],
         features: [

@@ -56,7 +56,7 @@
                 </p>
 
                 <p>
-                    That curiosity evolved into <strong class="text-[var(--color-schematic-primary)]">Electron</strong>, a <span class="text-white">4-stage pipelined RISC-V inspired CPU</span> I designed from first principles. Refusing to stop at simulation, I built a complete ecosystem in <span class="text-white">Rust</span>—including an assembler that performs <span class="text-white">static analysis</span> to resolve data hazards—to validate my architecture against real-world constraints.
+                    That curiosity evolved into <strong class="text-[var(--color-schematic-primary)]">Electron</strong>, a <span class="text-white">4-stage pipelined RISC CPU</span> I designed from first principles. Refusing to stop at simulation, I built a complete ecosystem in <span class="text-white">Rust</span>—including an assembler that performs <span class="text-white">static analysis</span> to resolve data hazards—to validate my architecture against real-world constraints.
                 </p>
 
                 <p>
