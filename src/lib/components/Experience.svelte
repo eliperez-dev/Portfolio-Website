@@ -2,7 +2,7 @@
 	const experiences = [
 		{
 			id: 1,
-			title: "Lead Software Engineer & Maintainer",
+			title: "Lead Software Engineer & Founder",
 			company: "Until Every Cage is Empty (Open Source)",
 			period: "June 2025 - Present",
 			location: "Remote",
