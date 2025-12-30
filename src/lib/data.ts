@@ -28,25 +28,25 @@ export const projects: Project[] = [
         title: "Nuclear Safety Telemetry System",
         subtitle: "High-frequency Async Rust interface for Industrial PLCs",
         description: "A mission-critical telemetry interface built during a 9-hour engineering sprint for Valar Atomics. The system interfaces with triple-redundant safety PLCs to stream real-time data from neutron flux detectors and seismometers.",
-        technologies: ["Rust", "Tokio (Async)", "EtherNet/IP (CIP)", "Allen Bradley PLCs", "Industrial Automation"],
+        technologies: ["Rust", "Tokio (Async)", "Axum", "EtherNet/IP (CIP)", "Allen Bradley PLCs"],
         features: [
             "Engineered a custom EtherNet/IP client in Async Rust",
             "Achieved sub-10ms latency communication with Safety PLCs",
-            "Reverse-engineered proprietary tag structures by calculating byte offsets"
+            "Reverse-engineered proprietary tag structures by implementing a custom Rust decoder"
         ],
         links: {
             
         },
-        overview: "During an intensive on-site engineering sprint at Valar Atomics, I was tasked with building a fault-tolerant bridge between modern software infrastructure and industrial hardware. In under 9 hours, I reverse-engineered the tag structure of an Allen Bradley Safety PLC and wrote a performant Rust driver to extract critical telemetry data.",
+        overview: "During an intensive on-site engineering sprint at Valar Atomics, I was tasked with building a fault-tolerant bridge between modern software infrastructure and industrial hardware. In under 9 hours, I reverse-engineered the undocumented tag structure of an Allen Bradley Safety PLC and wrote a resilient Async Rust driver to extract critical telemetry data.",
         challenges: [
             "Interfacing modern Async Rust (Tokio) with the synchronous, legacy EtherNet/IP industrial protocol",
-            "Parsing complex Common Industrial Protocol (CIP) binary packets without standard drivers",
+            "Parsing proprietary EtherNet/IP data streams without standard vendor drivers",
             "Delivering a working, crash-resistant prototype within a strict single-day deadline"
         ],
         outcomes: [
             "Successfully established two-way communication with the Safety PLC hardware",
             "Demonstrated the viability of using Rust for safety-critical nuclear instrumentation",
-            "Built a diagnostic TUI to visualize 'Alpha', 'Beta', and 'Gamma' redundant voltage readings in real-time"
+            "Built a diagnostic JSON API to visualize 'Alpha', 'Beta', and 'Gamma' redundant voltage readings in real-time"
         ],
         gallery: {
             path: "valar-sprint",
@@ -70,7 +70,7 @@ export const projects: Project[] = [
         },
         overview: "Designed 'Electron 2', a custom 8-bit ISA with a raw pipeline architecture, and hand-wired the implementation using Redstone digital logic gates in a simulation environment. The project includes a comprehensive toolchain engineered in Rust.",
         challenges: [
-            "Engineering a Rust toolchain that performs static analysis to resolve data hazards inherent to the hardware design",
+            "Engineering a Rust toolchain that performs static analysis to detect data hazards inherent to the hardware design",
             "Resolving interlocking constraints within a raw pipeline architecture",
             "Porting the emulator to WebAssembly (WASM) to provide a performant in-browser visual debugger"
         ],
